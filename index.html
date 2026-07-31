@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>I3O - Gestão Premium de Stock</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #0F172A;
+            --brand: #2563EB;
+            --brand-light: #EFF6FF;
+            --bg: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --text-main: #0F172A;
+            --text-muted: #64748B;
+            --border: #E2E8F0;
+            --success: #16A34A;
+            --success-bg: #DCFCE7;
+            --warning: #EA580C;
+            --warning-bg: #FFEDD5;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 20px -2px rgba(15, 23, 42, 0.08);
+            --radius: 16px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            padding-bottom: 40px;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        header {
+            background: var(--primary);
+            color: #FFFFFF;
+            padding: 18px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 800;
+            font-size: 1.15rem;
+            letter-spacing: -0.5px;
+        }
+
+        .brand-logo i {
+            background: var(--brand);
+            padding: 8px;
+            border-radius: 10px;
+            font-size: 1rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-header {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.82rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .btn-header.btn-add {
+            background: var(--brand);
+            border-color: var(--brand);
+        }
+
+        .btn-header:active { transform: scale(0.95); }
+
+        .container {
+            max-width: 640px;
+            margin: 0 auto;
+            padding: 20px 16px;
+        }
+
+        /* Pesquisa */
+        .search-container {
+            position: relative;
+            margin-bottom: 16px;
+        }
+
+        .search-container input {
+            width: 100%;
+            padding: 16px 16px 16px 48px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            background: var(--card-bg);
+            font-size: 0.95rem;
+            font-weight: 500;
+            outline: none;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.2s;
+        }
+
+        .search-container input:focus {
+            border-color: var(--brand);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+        }
+
+        .search-container i {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        /* Categorias / Filtros rápidos */
+        .categories-scroll {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 12px;
+            margin-bottom: 12px;
+            scrollbar-width: none;
+        }
+
+        .categories-scroll::-webkit-scrollbar { display: none; }
+
+        .cat-chip {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .cat-chip.active {
+            background: var(--brand);
+            color: white;
+            border-color: var(--brand);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+        }
+
+        /* Grupos de Categorias */
+        .group-title {
+            font-size: 0.85rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--text-muted);
+            margin: 24px 0 12px 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .group-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        /* Card do Equipamento */
+        .item-card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 16px 18px;
+            margin-bottom: 12px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .item-card.low-stock {
+            border-left: 5px solid var(--warning);
+            background: linear-gradient(90deg, #FFFDFB 0%, #FFFFFF 100%);
+        }
+
+        .item-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .item-name {
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--text-main);
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .item-sub {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.72rem;
+            font-weight: 700;
+        }
+
+        .badge-ok { background: var(--success-bg); color: var(--success); }
+        .badge-low { background: var(--warning-bg); color: var(--warning); }
+
+        /* Controlos de Quantidade */
+        .action-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .control-row {
+            display: flex;
+            align-items: center;
+            background: var(--bg);
+            padding: 4px 6px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .control-tag {
+            font-size: 0.68rem;
+            font-weight: 800;
+            width: 44px;
+            text-align: center;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .btn-qty {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: none;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
+        }
+
+        .btn-stock-minus { background: #E2E8F0; color: var(--text-main); }
+        .btn-stock-plus { background: var(--brand); color: white; }
+        
+        .btn-demo-minus { background: #E2E8F0; color: var(--text-main); }
+        .btn-demo-plus { background: var(--warning); color: white; }
+
+        .btn-qty:active { transform: scale(0.9); }
+
+        .qty-number {
+            font-size: 0.95rem;
+            font-weight: 800;
+            width: 28px;
+            text-align: center;
+        }
+
+        /* Modal para Adicionar Novo Equipamento */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            padding: 16px;
+        }
+
+        .modal-box {
+            background: var(--card-bg);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 450px;
+            padding: 24px;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2);
+            animation: modalFade 0.2s ease-out;
+        }
+
+        @keyframes modalFade {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-title {
+            font-size: 1.15rem;
+            font-weight: 800;
+            margin-bottom: 16px;
+            color: var(--primary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+
+        .form-group {
+            margin-bottom: 14px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            font-size: 0.95rem;
+            font-family: inherit;
+            outline: none;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            border-color: var(--brand);
+        }
+
+        .btn-submit {
+            width: 100%;
+            background: var(--brand);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.2s;
+        }
+
+        .btn-submit:active { transform: scale(0.98); }
+
+        /* Loader Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(255,255,255,0.9);
+            backdrop-filter: blur(4px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 100;
+        }
+
+        .spinner {
+            width: 42px;
+            height: 42px;
+            border: 4px solid var(--border);
+            border-top: 4px solid var(--brand);
+            border-radius: 50%;
+            animation: spin 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="brand-logo">
+            <i class="fa-solid fa-layer-group"></i>
+            <span>STOCK I3O</span>
+        </div>
+        <div class="header-actions">
+            <button class="btn-header btn-add" onclick="openModal()">
+                <i class="fa-solid fa-plus"></i> Novo
+            </button>
+            <button class="btn-header" onclick="loadStock()">
+                <i class="fa-solid fa-arrows-rotate"></i>
+            </button>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Campo de Pesquisa -->
+        <div class="search-container">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="searchInput" placeholder="Pesquisar máquina, marca ou modelo..." oninput="renderItems()">
+        </div>
+
+        <!-- Filtro por Marca / Categoria -->
+        <div class="categories-scroll" id="categoryChips">
+            <button class="cat-chip active" onclick="filterCategory('TODOS', this)">Todos</button>
+            <button class="cat-chip" onclick="filterCategory('Corte', this)">✂️ Corte & Bisel</button>
+            <button class="cat-chip" onclick="filterCategory('Huvitz', this)">Huvitz</button>
+            <button class="cat-chip" onclick="filterCategory('Charops', this)">Charops</button>
+            <button class="cat-chip" onclick="filterCategory('ICare', this)">ICare</button>
+            <button class="cat-chip" onclick="filterCategory('MDT', this)">MDT</button>
+        </div>
+
+        <!-- Lista de Produtos -->
+        <div id="itemsContainer"></div>
+    </div>
+
+    <!-- Modal para Adicionar Novo Equipamento -->
+    <div class="modal-overlay" id="addModal">
+        <div class="modal-box">
+            <div class="modal-title">
+                <span>Adicionar Equipamento</span>
+                <button class="modal-close" onclick="closeModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="addForm" onsubmit="submitNewItem(event)">
+                <div class="form-group">
+                    <label>Nome do Equipamento / Modelo</label>
+                    <input type="text" id="newNome" placeholder="Ex: Huvitz HRK-9000" required>
+                </div>
+                <div class="form-group">
+                    <label>Marca / Categoria</label>
+                    <select id="newCategoria" required>
+                        <option value="Huvitz">Huvitz</option>
+                        <option value="Charops">Charops</option>
+                        <option value="ICare">ICare</option>
+                        <option value="MDT">MDT</option>
+                        <option value="Optomed">Optomed</option>
+                        <option value="Optilasa">Optilasa</option>
+                        <option value="Kanghua">Kanghua</option>
+                        <option value="Outros">Outros</option>
+                    </select>
+                </div>
+                <div style="display: flex; gap: 12px;">
+                    <div class="form-group" style="flex: 1;">
+                        <label>Stock Inicial</label>
+                        <input type="number" id="newStock" value="0" min="0" required>
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label>Demo Inicial</label>
+                        <input type="number" id="newDemo" value="0" min="0" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn-submit">Guardar no Stock</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Ecrã de Carregamento -->
+    <div class="loading-overlay" id="loading">
+        <div class="spinner"></div>
+        <p style="margin-top: 14px; font-weight: 700; color: var(--primary); font-size: 0.9rem;">Sincronizando inventário...</p>
+    </div>
+
+    <script>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxwa-zR8baUlI_MP1XKbqOR-KY1KIdPqu26JSa5Fxlong5Wh3ITIVbn2KxfF6k2AAgo/exec";
+        let stockData = [];
+        let currentFilter = 'TODOS';
+
+        window.onload = function() {
+            loadStock();
+        };
+
+        function loadStock() {
+            showLoading(true);
+            fetch(SCRIPT_URL)
+                .then(res => res.json())
+                .then(data => {
+                    if (Array.isArray(data)) {
+                        stockData = data.map(item => ({
+                            id: item.id,
+                            nome: item.nome,
+                            categoria: item.categoria || 'Outros',
+                            stock: isNaN(item.stock) ? Number(item.quantidade || 0) : Number(item.stock || 0),
+                            demo: isNaN(item.demo) ? 0 : Number(item.demo || 0)
+                        }));
+                        renderItems();
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert("Não foi possível carregar o stock.");
+                })
+                .finally(() => showLoading(false));
+        }
+
+        function filterCategory(cat, btn) {
+            currentFilter = cat;
+            document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
+            btn.classList.add('active');
+            renderItems();
+        }
+
+        function isCorteMachine(nome) {
+            const corteKeywords = ['hpe-', 'hab-', 'hbk-', 'biseladora', 'corte'];
+            return corteKeywords.some(key => nome.toLowerCase().includes(key));
+        }
+
+        function updateQty(id, change, field) {
+            let item = stockData.find(x => String(x.id) === String(id));
+            if (!item) return;
+
+            if (field === 'stock') {
+                if (item.stock + change < 0) return;
+                item.stock += change;
+            } else {
+                if (item.demo + change < 0) return;
+                item.demo += change;
+            }
+
+            renderItems();
+
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    id: id,
+                    quantidade: field === 'stock' ? item.stock : item.demo,
+                    field: field
+                })
+            }).catch(e => console.error("Erro na gravação:", e));
+        }
+
+        function submitNewItem(e) {
+            e.preventDefault();
+            showLoading(true);
+
+            const nome = document.getElementById('newNome').value;
+            const categoria = document.getElementById('newCategoria').value;
+            const stock = Number(document.getElementById('newStock').value) || 0;
+            const demo = Number(document.getElementById('newDemo').value) || 0;
+
+            const payload = {
+                action: 'add',
+                nome: nome,
+                categoria: categoria,
+                stock: stock,
+                demo: demo
+            };
+
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+            .then(() => {
+                closeModal();
+                document.getElementById('addForm').reset();
+                
+                // Adiciona temporariamente ao ecrã para resposta instantânea
+                stockData.push({
+                    id: Date.now(),
+                    nome: nome,
+                    categoria: categoria,
+                    stock: stock,
+                    demo: demo
+                });
+                
+                renderItems();
+                
+                // Recarrega do Sheets após 2.5s para sincronizar o ID correto
+                setTimeout(loadStock, 2500);
+            })
+            .catch(err => {
+                console.error(err);
+                alert("Erro ao enviar dados. Tenta novamente.");
+            })
+            .finally(() => {
+                showLoading(false);
+            });
+        }
+
+        function openModal() { document.getElementById('addModal').style.display = 'flex'; }
+        function closeModal() { document.getElementById('addModal').style.display = 'none'; }
+
+        function renderItems() {
+            let container = document.getElementById('itemsContainer');
+            let query = document.getElementById('searchInput').value.toLowerCase();
+            
+            let filtered = stockData.filter(i => {
+                let matchQuery = String(i.nome).toLowerCase().includes(query) || 
+                                 String(i.categoria).toLowerCase().includes(query);
+                
+                if (currentFilter === 'TODOS') return matchQuery;
+                if (currentFilter === 'Corte') return matchQuery && isCorteMachine(i.nome);
+                return matchQuery && String(i.categoria).toLowerCase() === currentFilter.toLowerCase();
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align:center; padding: 40px 20px; color: var(--text-muted);">
+                        <i class="fa-solid fa-box-open" style="font-size: 2.5rem; margin-bottom: 12px; opacity: 0.5;"></i>
+                        <p style="font-weight:600;">Nenhum equipamento encontrado.</p>
+                    </div>`;
+                return;
+            }
+
+            let groups = {};
+            filtered.forEach(item => {
+                let groupName = item.categoria;
+                if (isCorteMachine(item.nome)) {
+                    groupName = 'Máquinas de Corte & Biseladeiras';
+                }
+                if (!groups[groupName]) groups[groupName] = [];
+                groups[groupName].push(item);
+            });
+
+            let html = '';
+
+            for (let group in groups) {
+                html += `<div class="group-title"><i class="fa-solid fa-tag"></i> ${group}</div>`;
+                
+                html += groups[group].map(item => {
+                    let stockVal = Number(item.stock) || 0;
+                    let demoVal = Number(item.demo) || 0;
+                    let isLow = stockVal < 3;
+
+                    return `
+                        <div class="item-card ${isLow ? 'low-stock' : ''}">
+                            <div class="item-info">
+                                <div class="item-name">${item.nome}</div>
+                                <div class="item-sub">${item.categoria}</div>
+                                <span class="badge ${isLow ? 'badge-low' : 'badge-ok'}">
+                                    <i class="fa-solid ${isLow ? 'fa-triangle-exclamation' : 'fa-circle-check'}"></i>
+                                    ${isLow ? 'Stock Baixo (< 3)' : 'Stock OK'}
+                                </span>
+                            </div>
+                            
+                            <div class="action-group">
+                                <!-- Controlo Stock -->
+                                <div class="control-row">
+                                    <span class="control-tag">Stock</span>
+                                    <button class="btn-qty btn-stock-minus" onclick="updateQty('${item.id}', -1, 'stock')">-</button>
+                                    <span class="qty-number">${stockVal}</span>
+                                    <button class="btn-qty btn-stock-plus" onclick="updateQty('${item.id}', 1, 'stock')">+</button>
+                                </div>
+                                
+                                <!-- Controlo Demo -->
+                                <div class="control-row">
+                                    <span class="control-tag">Demo</span>
+                                    <button class="btn-qty btn-demo-minus" onclick="updateQty('${item.id}', -1, 'demo')">-</button>
+                                    <span class="qty-number">${demoVal}</span>
+                                    <button class="btn-qty btn-demo-plus" onclick="updateQty('${item.id}', 1, 'demo')">+</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            container.innerHTML = html;
+        }
+
+        function showLoading(show) {
+            document.getElementById('loading').style.display = show ? 'flex' : 'none';
+        }
+    </script>
+</body>
+</html>
