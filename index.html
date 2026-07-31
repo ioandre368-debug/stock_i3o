@@ -142,6 +142,7 @@
             padding-bottom: 12px;
             margin-bottom: 12px;
             scrollbar-width: none;
+            align-items: center;
         }
 
         .categories-scroll::-webkit-scrollbar { display: none; }
@@ -164,6 +165,12 @@
             color: white;
             border-color: var(--brand);
             box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+        }
+
+        .btn-add-cat {
+            background: #F1F5F9;
+            border: 1px dashed var(--brand);
+            color: var(--brand);
         }
 
         /* Grupos de Categorias */
@@ -295,7 +302,7 @@
             text-align: center;
         }
 
-        /* Modal para Adicionar Novo Equipamento */
+        /* Modal Generico */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -437,10 +444,8 @@
         <div class="categories-scroll" id="categoryChips">
             <button class="cat-chip active" onclick="filterCategory('TODOS', this)">Todos</button>
             <button class="cat-chip" onclick="filterCategory('Corte', this)">✂️ Corte & Bisel</button>
-            <button class="cat-chip" onclick="filterCategory('Huvitz', this)">Huvitz</button>
-            <button class="cat-chip" onclick="filterCategory('Charops', this)">Charops</button>
-            <button class="cat-chip" onclick="filterCategory('ICare', this)">ICare</button>
-            <button class="cat-chip" onclick="filterCategory('MDT', this)">MDT</button>
+            <!-- Categorias dinâmicas serão inseridas aqui -->
+            <button class="cat-chip btn-add-cat" onclick="openCatModal()">+ Categoria</button>
         </div>
 
         <!-- Lista de Produtos -->
@@ -461,15 +466,8 @@
                 </div>
                 <div class="form-group">
                     <label>Marca / Categoria</label>
-                    <select id="newCategoria" required>
-                        <option value="Huvitz">Huvitz</option>
-                        <option value="Charops">Charops</option>
-                        <option value="ICare">ICare</option>
-                        <option value="MDT">MDT</option>
-                        <option value="Optomed">Optomed</option>
-                        <option value="Optilasa">Optilasa</option>
-                        <option value="Kanghua">Kanghua</option>
-                        <option value="Outros">Outros</option>
+                    <select id="newCategoria" onchange="checkNewCategorySelect(this)" required>
+                        <!-- Opções geradas via JS -->
                     </select>
                 </div>
                 <div style="display: flex; gap: 12px;">
@@ -487,6 +485,23 @@
         </div>
     </div>
 
+    <!-- Modal para Criar Nova Categoria -->
+    <div class="modal-overlay" id="addCatModal">
+        <div class="modal-box">
+            <div class="modal-title">
+                <span>Criar Nova Categoria</span>
+                <button class="modal-close" onclick="closeCatModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="addCatForm" onsubmit="submitNewCategory(event)">
+                <div class="form-group">
+                    <label>Nome da Categoria / Marca</label>
+                    <input type="text" id="catNameInput" placeholder="Ex: Nidek, Canon, Topcon..." required>
+                </div>
+                <button type="submit" class="btn-submit">Adicionar Categoria</button>
+            </form>
+        </div>
+    </div>
+
     <!-- Ecrã de Carregamento -->
     <div class="loading-overlay" id="loading">
         <div class="spinner"></div>
@@ -497,8 +512,15 @@
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxwa-zR8baUlI_MP1XKbqOR-KY1KIdPqu26JSa5Fxlong5Wh3ITIVbn2KxfF6k2AAgo/exec";
         let stockData = [];
         let currentFilter = 'TODOS';
+        
+        // Categorias iniciais por defeito
+        let customCategories = JSON.parse(localStorage.getItem('i3o_custom_cats')) || [
+            "Huvitz", "Charops", "ICare", "MDT", "Optomed", "Optilasa", "Kanghua", "Outros"
+        ];
 
         window.onload = function() {
+            renderCategoryChips();
+            updateCategorySelectOptions();
             loadStock();
         };
 
@@ -515,6 +537,17 @@
                             stock: isNaN(item.stock) ? Number(item.quantidade || 0) : Number(item.stock || 0),
                             demo: isNaN(item.demo) ? 0 : Number(item.demo || 0)
                         }));
+
+                        // Regista categorias novas que venham diretamente da folha
+                        stockData.forEach(i => {
+                            if (i.categoria && !customCategories.includes(i.categoria) && i.categoria !== 'Máquinas de Corte & Biseladeiras') {
+                                customCategories.push(i.categoria);
+                            }
+                        });
+                        saveCategories();
+                        renderCategoryChips();
+                        updateCategorySelectOptions();
+
                         renderItems();
                     }
                 })
@@ -523,6 +556,56 @@
                     alert("Não foi possível carregar o stock.");
                 })
                 .finally(() => showLoading(false));
+        }
+
+        function renderCategoryChips() {
+            const container = document.getElementById('categoryChips');
+            let html = `
+                <button class="cat-chip ${currentFilter === 'TODOS' ? 'active' : ''}" onclick="filterCategory('TODOS', this)">Todos</button>
+                <button class="cat-chip ${currentFilter === 'Corte' ? 'active' : ''}" onclick="filterCategory('Corte', this)">✂️ Corte & Bisel</button>
+            `;
+
+            customCategories.forEach(cat => {
+                html += `<button class="cat-chip ${currentFilter.toLowerCase() === cat.toLowerCase() ? 'active' : ''}" onclick="filterCategory('${cat}', this)">${cat}</button>`;
+            });
+
+            html += `<button class="cat-chip btn-add-cat" onclick="openCatModal()">+ Categoria</button>`;
+            container.innerHTML = html;
+        }
+
+        function updateCategorySelectOptions() {
+            const select = document.getElementById('newCategoria');
+            let html = customCategories.map(cat => `<option value="${cat}">${cat}</option>`).join('');
+            html += `<option value="NEW_CAT">+ Criar Nova Categoria...</option>`;
+            select.innerHTML = html;
+        }
+
+        function checkNewCategorySelect(select) {
+            if (select.value === 'NEW_CAT') {
+                openCatModal();
+                select.value = customCategories[0] || 'Outros';
+            }
+        }
+
+        function openCatModal() { document.getElementById('addCatModal').style.display = 'flex'; }
+        function closeCatModal() { document.getElementById('addCatModal').style.display = 'none'; }
+
+        function submitNewCategory(e) {
+            e.preventDefault();
+            const newCat = document.getElementById('catNameInput').value.trim();
+            if (newCat && !customCategories.includes(newCat)) {
+                customCategories.push(newCat);
+                saveCategories();
+                renderCategoryChips();
+                updateCategorySelectOptions();
+                document.getElementById('newCategoria').value = newCat;
+                document.getElementById('addCatForm').reset();
+                closeCatModal();
+            }
+        }
+
+        function saveCategories() {
+            localStorage.setItem('i3o_custom_cats', JSON.stringify(customCategories));
         }
 
         function filterCategory(cat, btn) {
@@ -551,15 +634,17 @@
 
             renderItems();
 
+            const payload = JSON.stringify({
+                id: id,
+                quantidade: field === 'stock' ? item.stock : item.demo,
+                field: field
+            });
+
             fetch(SCRIPT_URL, {
                 method: 'POST',
                 mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    id: id,
-                    quantidade: field === 'stock' ? item.stock : item.demo,
-                    field: field
-                })
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({ payload: payload })
             }).catch(e => console.error("Erro na gravação:", e));
         }
 
@@ -572,25 +657,24 @@
             const stock = Number(document.getElementById('newStock').value) || 0;
             const demo = Number(document.getElementById('newDemo').value) || 0;
 
-            const payload = {
+            const payload = JSON.stringify({
                 action: 'add',
                 nome: nome,
                 categoria: categoria,
                 stock: stock,
                 demo: demo
-            };
+            });
 
             fetch(SCRIPT_URL, {
                 method: 'POST',
                 mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({ payload: payload })
             })
             .then(() => {
                 closeModal();
                 document.getElementById('addForm').reset();
                 
-                // Adiciona temporariamente ao ecrã para resposta instantânea
                 stockData.push({
                     id: Date.now(),
                     nome: nome,
@@ -600,13 +684,11 @@
                 });
                 
                 renderItems();
-                
-                // Recarrega do Sheets após 2.5s para sincronizar o ID correto
-                setTimeout(loadStock, 2500);
+                setTimeout(loadStock, 3000);
             })
             .catch(err => {
                 console.error(err);
-                alert("Erro ao enviar dados. Tenta novamente.");
+                alert("Erro ao enviar dados.");
             })
             .finally(() => {
                 showLoading(false);
@@ -656,7 +738,7 @@
                 html += groups[group].map(item => {
                     let stockVal = Number(item.stock) || 0;
                     let demoVal = Number(item.demo) || 0;
-                    let isLow = stockVal < 3;
+                    let isLow = stockVal < 2;
 
                     return `
                         <div class="item-card ${isLow ? 'low-stock' : ''}">
@@ -665,12 +747,11 @@
                                 <div class="item-sub">${item.categoria}</div>
                                 <span class="badge ${isLow ? 'badge-low' : 'badge-ok'}">
                                     <i class="fa-solid ${isLow ? 'fa-triangle-exclamation' : 'fa-circle-check'}"></i>
-                                    ${isLow ? 'Stock Baixo (< 2)' : 'Stock OK'}
+                                    ${isLow ? 'Stock Baixo (≤ 1)' : 'Stock OK'}
                                 </span>
                             </div>
                             
                             <div class="action-group">
-                                <!-- Controlo Stock -->
                                 <div class="control-row">
                                     <span class="control-tag">Stock</span>
                                     <button class="btn-qty btn-stock-minus" onclick="updateQty('${item.id}', -1, 'stock')">-</button>
@@ -678,7 +759,6 @@
                                     <button class="btn-qty btn-stock-plus" onclick="updateQty('${item.id}', 1, 'stock')">+</button>
                                 </div>
                                 
-                                <!-- Controlo Demo -->
                                 <div class="control-row">
                                     <span class="control-tag">Demo</span>
                                     <button class="btn-qty btn-demo-minus" onclick="updateQty('${item.id}', -1, 'demo')">-</button>
