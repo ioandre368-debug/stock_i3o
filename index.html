@@ -173,6 +173,40 @@
             color: var(--brand);
         }
 
+        /* Botão de Eliminar Categoria na Chip */
+        .cat-chip-wrapper {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .delete-cat-btn {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            padding: 2px 4px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .delete-cat-btn:hover {
+            color: #EF4444;
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .cat-chip.active + .delete-cat-btn {
+            color: white;
+        }
+
+        .cat-chip.active + .delete-cat-btn:hover {
+            color: #FEE2E2;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
         /* Grupos de Categorias */
         .group-title {
             font-size: 0.85rem;
@@ -442,10 +476,7 @@
 
         <!-- Filtro por Marca / Categoria -->
         <div class="categories-scroll" id="categoryChips">
-            <button class="cat-chip active" onclick="filterCategory('TODOS', this)">Todos</button>
-            <button class="cat-chip" onclick="filterCategory('Corte', this)">✂️ Corte & Bisel</button>
-            <!-- Categorias dinâmicas serão inseridas aqui -->
-            <button class="cat-chip btn-add-cat" onclick="openCatModal()">+ Categoria</button>
+            <!-- Gerado via JavaScript -->
         </div>
 
         <!-- Lista de Produtos -->
@@ -566,11 +597,42 @@
             `;
 
             customCategories.forEach(cat => {
-                html += `<button class="cat-chip ${currentFilter.toLowerCase() === cat.toLowerCase() ? 'active' : ''}" onclick="filterCategory('${cat}', this)">${cat}</button>`;
+                const isActive = currentFilter.toLowerCase() === cat.toLowerCase();
+                html += `
+                    <div class="cat-chip-wrapper">
+                        <button class="cat-chip ${isActive ? 'active' : ''}" onclick="filterCategory('${cat}', this)" style="padding-right: ${cat === 'Outros' ? '16px' : '28px'};">
+                            ${cat}
+                        </button>
+                        ${cat !== 'Outros' ? `<i class="fa-solid fa-xmark delete-cat-btn" onclick="deleteCategory('${cat}', event)" title="Eliminar Categoria"></i>` : ''}
+                    </div>
+                `;
             });
 
             html += `<button class="cat-chip btn-add-cat" onclick="openCatModal()">+ Categoria</button>`;
             container.innerHTML = html;
+        }
+
+        function deleteCategory(catName, event) {
+            event.stopPropagation();
+
+            if (confirm(`Tem a certeza que deseja eliminar a categoria "${catName}"?`)) {
+                customCategories = customCategories.filter(cat => cat !== catName);
+                
+                if (currentFilter.toLowerCase() === catName.toLowerCase()) {
+                    currentFilter = 'TODOS';
+                }
+
+                stockData.forEach(item => {
+                    if (item.categoria.toLowerCase() === catName.toLowerCase()) {
+                        item.categoria = 'Outros';
+                    }
+                });
+
+                saveCategories();
+                renderCategoryChips();
+                updateCategorySelectOptions();
+                renderItems();
+            }
         }
 
         function updateCategorySelectOptions() {
