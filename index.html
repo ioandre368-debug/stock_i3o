@@ -90,7 +90,7 @@ table{width:100%;border-collapse:collapse;background:white;border-radius:12px;ov
 </div>
 
 <script>
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxsE7w1-H0C1htbSufmcvAfmM2nc700Ehlyon4CUT-DBjPeKgojvjWv9BdIu6PnK-x3/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxws8SlTAbVOUecY8F9sRPaKt-Mpx1kfwUJV1pjnmxvDwxa_xqdKGj3RitPV46j0Tk/exec';
 
 let db = {stock:[], clientes:[], reservados:[], historico:[]};
 let modalMode = '';
@@ -121,7 +121,7 @@ function showTab(tab){
 }
 
 function esc(v){
-  return String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  return String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&','<':'<','>':'>','"':'"',"'":'''}[c]));
 }
 
 async function readJsonResponse(response){
@@ -143,8 +143,7 @@ async function loadData(){
     validateScriptUrl();
     const response = await fetch(SCRIPT_URL + '?t=' + Date.now(), {
       method:'GET',
-      redirect:'follow',
-      cache:'no-store'
+      redirect:'follow'
     });
     const data = await readJsonResponse(response);
     if (!data || data.ok !== true) throw new Error(data && data.error ? data.error : 'A API respondeu sem confirmação.');
