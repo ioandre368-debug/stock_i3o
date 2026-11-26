@@ -8,58 +8,150 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
-:root{--navy:#0f172a;--blue:#2563eb;--bg:#f8fafc;--muted:#64748b;--line:#e2e8f0;--green:#15803d;--orange:#c2410c}
+:root{
+  --navy:#0f172a;
+  --blue:#2563eb;
+  --green:#16a34a;
+  --bg:#f8fafc;
+  --muted:#64748b;
+  --line:#e2e8f0;
+  --red-bg:#fef2f2;
+  --red-bd:#ef4444;
+  --red-tx:#991b1b;
+  --amber-bg:#fffbeb;
+  --amber-bd:#f59e0b;
+  --amber-tx:#92400e;
+}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--navy);font-family:'Plus Jakarta Sans',sans-serif}
-header{background:var(--navy);color:white;padding:16px max(16px,calc((100% - 1100px)/2));display:flex;justify-content:space-between;align-items:center;gap:12px;position:sticky;top:0;z-index:5}
-.brand{font-weight:800;font-size:1.15rem;display:flex;gap:10px;align-items:center}.brand i{background:var(--blue);padding:9px;border-radius:10px}
-main{max-width:1100px;margin:auto;padding:22px 16px}
-.tabs{display:flex;gap:8px;overflow:auto;margin-bottom:18px}
-.tab,.btn{border:0;border-radius:10px;padding:11px 15px;font:600 .88rem 'Plus Jakarta Sans',sans-serif;cursor:pointer;white-space:nowrap}
-.tab{background:white;border:1px solid var(--line);color:var(--muted)}.tab.active,.btn.primary{background:var(--blue);color:white;border-color:var(--blue)}
-.btn{background:white;border:1px solid var(--line);color:var(--navy)}.btn.danger{color:#b91c1c}
-.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}.toolbar input,.toolbar select{flex:1;min-width:180px}
-input,select,textarea{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:9px;font:inherit;background:white}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
-.card{background:white;border:1px solid var(--line);border-radius:15px;padding:16px;box-shadow:0 3px 14px #0f172a0a}
-.card h3{margin:0 0 5px;font-size:1rem}.muted{color:var(--muted);font-size:.82rem}
-.qty{display:flex;align-items:center;gap:9px;margin-top:12px}.qty strong{min-width:28px;text-align:center}.qty button{width:32px;height:32px;border:0;border-radius:8px;background:#e2e8f0;cursor:pointer;font-weight:800}.qty button.plus{background:var(--blue);color:white}
-.pill{display:inline-block;border-radius:20px;padding:4px 9px;font-size:.72rem;font-weight:700;background:#dbeafe;color:#1d4ed8}.pill.warn{background:#ffedd5;color:#9a3412}.pill.ok{background:#dcfce7;color:#166534}.pill.gray{background:#e2e8f0;color:#475569}
-table{width:100%;border-collapse:collapse;background:white;border-radius:12px;overflow:hidden}th,td{text-align:left;padding:11px;border-bottom:1px solid var(--line);font-size:.82rem}th{background:#f1f5f9;color:#475569}
-.table-wrap{overflow:auto}.empty{padding:35px;text-align:center;color:var(--muted);background:white;border-radius:14px}
-.modal{display:none;position:fixed;inset:0;background:#0f172a99;z-index:10;align-items:center;justify-content:center;padding:16px}.modal.show{display:flex}.modal-box{background:white;width:min(520px,100%);max-height:92vh;overflow:auto;border-radius:17px;padding:22px}
-.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}.modal-head h2{font-size:1.1rem;margin:0}.field{margin-bottom:12px}.field label{display:block;font-size:.76rem;font-weight:700;color:var(--muted);margin-bottom:5px}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
-#status{font-size:.82rem;color:var(--muted);margin:8px 0;padding:10px 12px;background:white;border:1px solid var(--line);border-radius:9px;overflow-wrap:anywhere}
-.hidden{display:none!important}.btn:disabled{opacity:.55;cursor:wait}
+header{background:var(--navy);color:white;padding:16px max(16px,calc((100% - 1140px)/2));display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;position:sticky;top:0;z-index:5}
+.brand{font-weight:800;font-size:1.12rem;display:flex;gap:10px;align-items:center}
+.brand i{background:var(--blue);padding:9px;border-radius:10px}
+.head-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+main{max-width:1140px;margin:auto;padding:22px 16px}
+.tabs{display:flex;gap:8px;overflow:auto;margin-bottom:16px}
+.tab,.btn{border:0;border-radius:10px;padding:10px 14px;font:600 .86rem 'Plus Jakarta Sans',sans-serif;cursor:pointer;white-space:nowrap}
+.tab{background:white;border:1px solid var(--line);color:var(--muted)}
+.tab.active,.btn.primary{background:var(--blue);color:white;border-color:var(--blue)}
+.btn.sync-btn{background:var(--green);color:white;border-color:#15803d;box-shadow:0 3px 12px #16a34a44}
+.btn{background:white;border:1px solid var(--line);color:var(--navy)}
+.btn.sm{padding:6px 10px;font-size:.78rem;border-radius:8px}
+.btn.danger{color:#b91c1c}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.toolbar input,.toolbar select{flex:1;min-width:180px}
+input,select,textarea{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:9px;font:inherit;background:white}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(285px,1fr));gap:14px}
+
+.card{background:white;border:1.5px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 3px 14px #0f172a0a;display:flex;flex-direction:column;gap:10px;transition:background-color .22s ease,border-color .22s ease}
+.card.alerta-zero{background:var(--red-bg);border-color:var(--red-bd)}
+.card.alerta-um{background:var(--amber-bg);border-color:var(--amber-bd)}
+.card h3{margin:0;font-size:1.02rem}
+.muted{color:var(--muted);font-size:.82rem}
+
+.block-box{background:#ffffffcc;border:1px solid var(--line);border-radius:11px;padding:10px 12px}
+.block-title{font-size:.75rem;font-weight:800;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);margin-bottom:6px;display:flex;justify-content:space-between;align-items:center}
+
+.qty{display:flex;align-items:center;gap:9px;margin-top:6px}
+.qty strong{
+  min-width:34px;
+  text-align:center;
+  font-size:1rem;
+  padding:4px 8px;
+  border-radius:8px;
+  display:inline-block;
+  transition:background-color .2s ease,color .2s ease;
+}
+.qty strong.zero{background:#fee2e2;color:var(--red-tx)}
+.qty strong.um{background:#fef3c7;color:var(--amber-tx)}
+.qty button{width:34px;height:34px;border:0;border-radius:8px;background:#e2e8f0;cursor:pointer;font-weight:800;font-size:1.05rem;transition:transform .1s ease}
+.qty button:active{transform:scale(.9)}
+.qty button.plus{background:var(--blue);color:white}
+
+@keyframes bumpUp{
+  0%{transform:translateY(0) scale(1)}
+  45%{transform:translateY(-6px) scale(1.25);color:#16a34a}
+  100%{transform:translateY(0) scale(1)}
+}
+@keyframes bumpDown{
+  0%{transform:translateY(0) scale(1)}
+  45%{transform:translateY(6px) scale(.84);color:#dc2626}
+  100%{transform:translateY(0) scale(1)}
+}
+.anim-up{animation:bumpUp .26s cubic-bezier(.22,1,.36,1)}
+.anim-down{animation:bumpDown .26s cubic-bezier(.22,1,.36,1)}
+
+.loc-row{margin-top:8px;font-size:.81rem}
+.loc-text{color:var(--navy);font-weight:600}
+.loc-empty{color:var(--muted);font-style:italic}
+.res-chip{margin-top:4px;font-size:.79rem;background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe;border-radius:8px;padding:6px 9px}
+
+.pill{display:inline-block;border-radius:20px;padding:4px 9px;font-size:.72rem;font-weight:700;background:#dbeafe;color:#1d4ed8}
+.pill.warn{background:#fef3c7;color:#92400e}
+.pill.ok{background:#dcfce7;color:#166534}
+.pill.gray{background:#e2e8f0;color:#475569}
+
+table{width:100%;border-collapse:collapse;background:white;border-radius:12px;overflow:hidden}
+th,td{text-align:left;padding:11px;border-bottom:1px solid var(--line);font-size:.82rem;vertical-align:top}
+th{background:#f1f5f9;color:#475569}
+.table-wrap{overflow:auto}
+.empty{padding:35px;text-align:center;color:var(--muted);background:white;border-radius:14px}
+
+.modal{display:none;position:fixed;inset:0;background:#0f172a99;z-index:10;align-items:center;justify-content:center;padding:16px}
+.modal.show{display:flex}
+.modal-box{background:white;width:min(540px,100%);max-height:92vh;overflow:auto;border-radius:17px;padding:22px}
+.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.modal-head h2{font-size:1.1rem;margin:0}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:.76rem;font-weight:700;color:var(--muted);margin-bottom:5px}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+
+#status{font-size:.82rem;color:var(--muted);margin:8px 0 14px;padding:10px 12px;background:white;border:1px solid var(--line);border-radius:9px;overflow-wrap:anywhere;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+#status.dirty{background:#fffbeb;border-color:#f59e0b;color:#92400e;font-weight:600}
+.hidden{display:none!important}
+.btn:disabled{opacity:.55;cursor:wait}
 @media(max-width:600px){header{padding:14px 16px}main{padding:16px 12px}.tab{padding:10px 12px}th,td{padding:9px}}
 </style>
 </head>
 <body>
 <header>
   <div class="brand"><i class="fa-solid fa-layer-group"></i> STOCK I3O</div>
-  <button class="btn primary" onclick="openModal('item')"><i class="fa fa-plus"></i> Novo artigo</button>
+  <div class="head-actions">
+    <button class="btn sync-btn" id="topSyncBtn" onclick="syncNow()"><i class="fa-solid fa-rotate"></i> Sincronizar (<span id="pendingCount">0</span>)</button>
+    <button class="btn primary" onclick="openModal('item')"><i class="fa-plus"></i> Novo equipamento</button>
+  </div>
 </header>
 <main>
   <nav class="tabs">
     <button class="tab active" data-tab="stock" onclick="showTab('stock')"><i class="fa fa-boxes-stacked"></i> Stock</button>
-    <button class="tab" data-tab="reservados" onclick="showTab('reservados')"><i class="fa fa-bookmark"></i> Reservados</button>
+    <button class="tab" data-tab="reservados" onclick="showTab('reservados')"><i class="fa fa-route"></i> Reservados</button>
     <button class="tab" data-tab="clientes" onclick="showTab('clientes')"><i class="fa fa-users"></i> Clientes</button>
     <button class="tab" data-tab="historico" onclick="showTab('historico')"><i class="fa fa-clock-rotate-left"></i> Histórico</button>
   </nav>
-  <div id="status">A ligar à base de dados...</div>
+  <div id="status">
+    <span id="statusText">A carregar dados...</span>
+    <span id="statusActions" class="hidden">
+      <button class="btn sm" onclick="discardChanges()">Anular</button>
+      <button class="btn sm sync-btn" onclick="syncNow()"><i class="fa-solid fa-rotate"></i> Sincronizar</button>
+    </span>
+  </div>
 
   <section id="view-stock">
     <div class="toolbar">
-      <input id="stockSearch" placeholder="Pesquisar artigo, marca ou modelo..." oninput="renderStock()">
+      <input id="stockSearch" placeholder="Pesquisar equipamento, marca, onde está a demo ou destino..." oninput="renderStock()">
       <select id="stockCategory" onchange="renderStock()"><option value="">Todas as categorias</option></select>
-      <button class="btn" onclick="loadData()">↻ Atualizar</button>
+      <select id="stockAlertFilter" onchange="renderStock()">
+        <option value="">Todos os níveis</option>
+        <option value="zero">Sem stock (0 — Vermelho)</option>
+        <option value="um">Apenas 1 unidade (1 — Amarelo)</option>
+        <option value="demo">Em demonstração</option>
+      </select>
     </div>
     <div id="stockList" class="grid"></div>
   </section>
 
   <section id="view-reservados" class="hidden">
     <div class="toolbar">
-      <input id="reservationSearch" placeholder="Pesquisar reserva, cliente ou artigo..." oninput="renderReservations()">
+      <input id="reservationSearch" placeholder="Pesquisar equipamento, cliente ou para onde vai..." oninput="renderReservations()">
       <select id="reservationState" onchange="renderReservations()">
         <option value="">Todos os estados</option><option>Pendente</option><option>Entregue</option><option>Cancelada</option>
       </select>
@@ -84,7 +176,7 @@ table{width:100%;border-collapse:collapse;background:white;border-radius:12px;ov
     <div class="modal-head"><h2 id="modalTitle">Novo registo</h2><button class="btn" type="button" onclick="closeModal()">✕</button></div>
     <form id="modalForm" onsubmit="submitModal(event)">
       <div id="modalFields"></div>
-      <button class="btn primary" style="width:100%;margin-top:8px" type="submit" id="saveButton">Guardar</button>
+      <button class="btn primary" style="width:100%;margin-top:8px" type="submit" id="saveButton">Aplicar</button>
     </form>
   </div>
 </div>
@@ -93,11 +185,47 @@ table{width:100%;border-collapse:collapse;background:white;border-radius:12px;ov
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwQdaZrq353LGi01xHfnrbwU2zcFHgRox4g92U47I9-hQzfh4lXu7hx-BuLiWl5a-Br/exec';
 
 let db = {stock:[], clientes:[], reservados:[], historico:[]};
+let queue = [];
 let modalMode = '';
-let isSaving = false;
+let modalContextId = '';
+let isSyncing = false;
 
 const $ = id => document.getElementById(id);
-function msg(t){ $('status').textContent = t; }
+function msg(t){ $('statusText').textContent = t; }
+
+function updatePendingBanner(){
+  const n = queue.length;
+  const dirty = n > 0;
+  $('pendingCount').textContent = n;
+  $('statusActions').classList.toggle('hidden', !dirty);
+  $('status').classList.toggle('dirty', dirty);
+  if (dirty) {
+    msg(`${n} alteração(ões) por sincronizar. Clica em "Sincronizar" quando quiseres gravar no Sheets.`);
+  }
+}
+
+function enqueue(op){
+  if (op.action === 'updateQty') {
+    const prev = queue[queue.length - 1];
+    if (prev && prev.action === 'updateQty' && String(prev.id) === String(op.id) && prev.field === op.field) {
+      prev.change += op.change;
+      if (op.localDemo !== undefined) prev.localDemo = op.localDemo;
+      if (prev.change === 0) queue.pop();
+      updatePendingBanner();
+      return;
+    }
+  }
+  if (op.action === 'setDemoLocation') {
+    const idx = queue.findIndex(x => x.action === 'setDemoLocation' && String(x.id) === String(op.id));
+    if (idx >= 0) {
+      queue[idx].localDemo = op.localDemo;
+      updatePendingBanner();
+      return;
+    }
+  }
+  queue.push(op);
+  updatePendingBanner();
+}
 
 function isActive(v){
   const s = String(v ?? '').trim().toLowerCase();
@@ -109,10 +237,11 @@ function formatTipo(v){
   return String(v);
 }
 
-function validateScriptUrl(){
-  if (!SCRIPT_URL || !/^https:\/\/script\.google\.com\/macros\/s\/[^/]+\/exec$/.test(SCRIPT_URL)) {
-    throw new Error('Configura o SCRIPT_URL com o endereço da Aplicação Web terminado em /exec.');
-  }
+function stockLevel(n){
+  const val = Number(n || 0);
+  if (val <= 0) return 'zero';
+  if (val === 1) return 'um';
+  return 'ok';
 }
 
 function showTab(tab){
@@ -121,7 +250,7 @@ function showTab(tab){
 }
 
 function esc(v){
-  return String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  return String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&','<':'<','>':'>','"':'"',"'":'''}[c]));
 }
 
 async function readJsonResponse(response){
@@ -130,65 +259,68 @@ async function readJsonResponse(response){
     return JSON.parse(text);
   } catch (e) {
     const preview = text.replace(/\s+/g,' ').slice(0,220);
-    if (/^\s*<!doctype html|^\s*<html/i.test(text) || /accounts\.google\.com|ServiceLogin|sign in/i.test(text)) {
-      throw new Error('O Google devolveu uma página HTML em vez de JSON. Confirma a implementação como Aplicação Web (Acesso: Qualquer pessoa) e o URL /exec.');
-    }
     throw new Error('Resposta inválida do Apps Script: ' + (preview || '(vazia)'));
   }
 }
 
-async function loadData(){
-  msg('A carregar dados da Google Sheets...');
+async function fetchInitialData(){
+  msg('A carregar dados do Google Sheets...');
   try {
-    validateScriptUrl();
-    const response = await fetch(SCRIPT_URL + '?t=' + Date.now(), {
-      method:'GET',
-      redirect:'follow'
-    });
+    const response = await fetch(SCRIPT_URL + '?t=' + Date.now(), { method:'GET', redirect:'follow' });
     const data = await readJsonResponse(response);
-    if (!data || data.ok !== true) throw new Error(data && data.error ? data.error : 'A API respondeu sem confirmação.');
-    if (!data.data || !Array.isArray(data.data.stock)) {
-      throw new Error('Estrutura de dados inválida recebida do Code.gs.');
-    }
+    if (!data || data.ok !== true) throw new Error(data && data.error ? data.error : 'Sem confirmação da API.');
     db = data.data;
+    queue = [];
     renderAll();
-    msg(`Sincronizado com Google Sheets (${db.stock.length} artigos).`);
+    updatePendingBanner();
+    if (!queue.length) {
+      msg(`Sincronizado (${db.stock.length} equipamentos).`);
+    }
   } catch(e) {
-    console.error('Erro ao carregar I3O:', e);
+    console.error('Erro ao carregar:', e);
     msg('Falha ao carregar: ' + e.message);
   }
 }
 
-async function post(payload){
-  if (isSaving) return;
-  validateScriptUrl();
-  isSaving = true;
-  $('saveButton').disabled = true;
-  msg('A guardar na Google Sheets...');
+async function discardChanges(){
+  if (!queue.length) return;
+  if (confirm('Anular as alterações locais por sincronizar?')) {
+    await fetchInitialData();
+  }
+}
+
+async function syncNow(){
+  if (isSyncing) return;
+  isSyncing = true;
+  document.querySelectorAll('.sync-btn').forEach(b => b.disabled = true);
+
   try {
-    const response = await fetch(SCRIPT_URL, {
-      method:'POST',
-      redirect:'follow',
-      body: JSON.stringify(payload)
-    });
-    const res = await readJsonResponse(response);
-    if (!res || res.ok !== true) {
-      throw new Error(res && res.error ? res.error : 'Erro ao gravar na folha.');
-    }
-    if (res.data) {
-      db = res.data;
+    if (queue.length > 0) {
+      msg(`A sincronizar ${queue.length} alteração(ões) com o Google Sheets...`);
+      const response = await fetch(SCRIPT_URL, {
+        method:'POST',
+        redirect:'follow',
+        body: JSON.stringify({ action: 'batch', changes: queue })
+      });
+      const res = await readJsonResponse(response);
+      if (!res || res.ok !== true) {
+        throw new Error(res && res.error ? res.error : 'Erro ao sincronizar.');
+      }
+      if (res.data) db = res.data;
+      queue = [];
       renderAll();
-      msg('Alteração gravada e sincronizada com Google Sheets.');
+      updatePendingBanner();
+      msg(`Sincronizado com o Google Sheets (${db.stock.length} equipamentos).`);
     } else {
-      await loadData();
+      await fetchInitialData();
     }
   } catch(e) {
-    console.error('Erro ao guardar:', e);
-    msg('Erro ao guardar: ' + e.message);
-    throw e;
+    console.error('Erro ao sincronizar:', e);
+    msg('Erro ao sincronizar: ' + e.message);
+    alert('Erro ao sincronizar: ' + e.message);
   } finally {
-    isSaving = false;
-    $('saveButton').disabled = false;
+    isSyncing = false;
+    document.querySelectorAll('.sync-btn').forEach(b => b.disabled = false);
   }
 }
 
@@ -208,40 +340,143 @@ function fillSelects(){
   $('stockCategory').value = cats.includes(current) ? current : '';
 }
 
+function getActiveReservationsForItem(itemId){
+  return (db.reservados || []).filter(r => String(r.ItemID) === String(itemId) && r.Estado === 'Pendente');
+}
+
 function renderStock(){
   const q = $('stockSearch').value.toLowerCase();
   const cat = $('stockCategory').value;
-  const items = db.stock.filter(x =>
-    isActive(x.Ativo) &&
-    (!cat || x.Categoria === cat) &&
-    [x.Nome, x.Categoria, formatTipo(x.Tipo)].join(' ').toLowerCase().includes(q)
-  );
-  $('stockList').innerHTML = items.length ? items.map(x => `
-    <article class="card">
-      <h3>${esc(x.Nome)}</h3>
-      <div class="muted">${esc(x.Categoria || 'Outros')} · ${esc(formatTipo(x.Tipo))}</div>
-      <div class="qty"><span class="muted">Stock</span>
-        <button onclick="changeQty('${esc(x.ID)}',-1,'stock')">−</button>
-        <strong>${Number(x.Stock)||0}</strong>
-        <button class="plus" onclick="changeQty('${esc(x.ID)}',1,'stock')">+</button>
-      </div>
-      <div class="qty"><span class="muted">Demo</span>
-        <button onclick="changeQty('${esc(x.ID)}',-1,'demo')">−</button>
-        <strong>${Number(x.Demo)||0}</strong>
-        <button class="plus" onclick="changeQty('${esc(x.ID)}',1,'demo')">+</button>
-      </div>
-      <div class="actions">
-        <button class="btn" onclick="reserveThis('${esc(x.ID)}')">Reservar</button>
-        <button class="btn danger" onclick="archiveItem('${esc(x.ID)}')">Arquivar</button>
-      </div>
-    </article>`).join('') : '<div class="empty">Não foram encontrados artigos.</div>';
+  const alertFilter = $('stockAlertFilter').value;
+
+  const items = db.stock.filter(x => {
+    if (!isActive(x.Ativo)) return false;
+    const st = Number(x.Stock || 0);
+    const dm = Number(x.Demo || 0);
+    const lvl = stockLevel(st);
+    const resList = getActiveReservationsForItem(x.ID);
+    const destTexto = resList.map(r => r.Destino || r.ClienteNome || '').join(' ');
+
+    if (cat && x.Categoria !== cat) return false;
+    if (alertFilter === 'zero' && lvl !== 'zero') return false;
+    if (alertFilter === 'um' && lvl !== 'um') return false;
+    if (alertFilter === 'demo' && dm <= 0) return false;
+
+    const hay = [x.Nome, x.Categoria, formatTipo(x.Tipo), x.LocalDemo, destTexto].join(' ').toLowerCase();
+    return hay.includes(q);
+  });
+
+  $('stockList').innerHTML = items.length ? items.map(x => {
+    const st = Number(x.Stock || 0);
+    const dm = Number(x.Demo || 0);
+    const lvl = stockLevel(st);
+    const cardCls = lvl === 'zero' ? 'card alerta-zero' : (lvl === 'um' ? 'card alerta-um' : 'card');
+
+    const resList = getActiveReservationsForItem(x.ID);
+    const resHtml = resList.length
+      ? resList.map(r => `<div class="res-chip"><i class="fa fa-truck"></i> <b>Reservado (${esc(r.Quantidade)}x ${esc(r.Origem)}):</b> Para <b>${esc(r.Destino || r.ClienteNome)}</b></div>`).join('')
+      : '';
+
+    return `
+      <article class="${cardCls}" data-card-id="${esc(x.ID)}">
+        <h3>${esc(x.Nome)}</h3>
+        <div class="muted">${esc(x.Categoria || 'Equipamento')} · ${esc(formatTipo(x.Tipo))}</div>
+
+        <div class="block-box">
+          <div class="block-title"><span>Stock</span></div>
+          <div class="qty">
+            <button onclick="changeQty('${esc(x.ID)}',-1,'stock')">−</button>
+            <strong class="${lvl}" data-val="stock-${esc(x.ID)}">${st}</strong>
+            <button class="plus" onclick="changeQty('${esc(x.ID)}',1,'stock')">+</button>
+          </div>
+        </div>
+
+        <div class="block-box">
+          <div class="block-title">
+            <span>Demonstração</span>
+            <button class="btn sm" onclick="openModal('demoLocation','${esc(x.ID)}')"><i class="fa fa-location-dot"></i> Onde está</button>
+          </div>
+          <div class="qty">
+            <button onclick="changeQty('${esc(x.ID)}',-1,'demo')">−</button>
+            <strong data-val="demo-${esc(x.ID)}">${dm}</strong>
+            <button class="plus" onclick="changeQty('${esc(x.ID)}',1,'demo')">+</button>
+          </div>
+          <div class="loc-row">
+            <span class="${x.LocalDemo ? 'loc-text' : 'loc-empty'}">
+              <i class="fa fa-map-pin"></i> ${x.LocalDemo ? 'Onde está: ' + esc(x.LocalDemo) : 'Local demo não definido'}
+            </span>
+          </div>
+        </div>
+
+        ${resHtml}
+
+        <div class="actions">
+          <button class="btn" onclick="reserveThis('${esc(x.ID)}')">Reservar</button>
+          <button class="btn danger" onclick="archiveItem('${esc(x.ID)}')">Arquivar</button>
+        </div>
+      </article>`;
+  }).join('') : '<div class="empty">Não foram encontrados equipamentos.</div>';
 }
 
-function changeQty(id,change,field){
-  post({action:'updateQty',id,change,field}).catch(e => alert(e.message));
+function animateNumEl(el, nextValue, isUp){
+  if (!el) return;
+  el.textContent = nextValue;
+  el.classList.remove('anim-up', 'anim-down');
+  void el.offsetWidth;
+  el.classList.add(isUp ? 'anim-up' : 'anim-down');
 }
+
+function changeQty(id, change, field){
+  const item = db.stock.find(x => String(x.ID) === String(id));
+  if (!item) return;
+  const prop = field === 'demo' ? 'Demo' : 'Stock';
+  const next = Number(item[prop] || 0) + change;
+  if (next < 0) {
+    alert('Quantidade insuficiente.');
+    return;
+  }
+
+  let localDemo = String(item.LocalDemo || '').trim();
+  if (field === 'demo' && change > 0 && !localDemo) {
+    const loc = prompt('Onde está este equipamento em demonstração? (Ex: Clínica / Ótica / Técnico)', '');
+    if (loc === null) return;
+    localDemo = loc.trim();
+  }
+  if (field === 'demo' && next === 0) {
+    localDemo = '';
+  }
+
+  item[prop] = next;
+  if (field === 'demo') item.LocalDemo = localDemo;
+
+  enqueue({ action:'updateQty', id, change, field, localDemo });
+
+  const numEl = document.querySelector(`[data-val="${field}-${id}"]`);
+  const cardEl = document.querySelector(`[data-card-id="${id}"]`);
+
+  if (numEl && cardEl) {
+    animateNumEl(numEl, next, change > 0);
+    if (field === 'stock') {
+      const lvl = stockLevel(next);
+      numEl.classList.remove('zero', 'um');
+      if (lvl === 'zero' || lvl === 'um') numEl.classList.add(lvl);
+      cardEl.classList.remove('alerta-zero', 'alerta-um');
+      if (lvl === 'zero') cardEl.classList.add('alerta-zero');
+      else if (lvl === 'um') cardEl.classList.add('alerta-um');
+    } else if (field === 'demo') {
+      renderStock();
+    }
+  } else {
+    renderStock();
+  }
+}
+
 function archiveItem(id){
-  if(confirm('Arquivar este artigo?')) post({action:'deleteItem',id}).catch(e => alert(e.message));
+  if (!confirm('Arquivar este equipamento? (Só será sincronizado ao clicar em "Sincronizar")')) return;
+  const item = db.stock.find(x => String(x.ID) === String(id));
+  if (item) item.Ativo = false;
+  enqueue({ action:'deleteItem', id });
+  renderStock();
 }
 
 function renderReservations(){
@@ -249,19 +484,19 @@ function renderReservations(){
   const state = $('reservationState').value;
   const rows = db.reservados.filter(x =>
     (!state || x.Estado === state) &&
-    [x.ClienteNome,x.ItemNome,x.ID].join(' ').toLowerCase().includes(q)
+    [x.ClienteNome,x.Destino,x.ItemNome,x.ID].join(' ').toLowerCase().includes(q)
   ).slice().reverse();
 
   $('reservationList').innerHTML = rows.length ? `
     <div class="table-wrap"><table><thead><tr>
-      <th>Reserva</th><th>Cliente / Artigo</th><th>Qtd.</th><th>Estado</th><th>Datas</th><th>Ações</th>
+      <th>Equipamento</th><th>Para onde vai</th><th>Cliente</th><th>Qtd. / Origem</th><th>Estado</th><th>Ações</th>
     </tr></thead><tbody>${rows.map(x => `<tr>
-      <td>${esc(String(x.ID).slice(0,8))}<br><span class="muted">${dateFmt(x.DataReserva)}</span></td>
-      <td><b>${esc(x.ClienteNome)}</b><br>${esc(x.ItemNome)}<br><span class="muted">${esc(x.Origem)} · ${esc(x.TipoArtigo)}</span></td>
-      <td>${esc(x.Quantidade)}</td>
+      <td><b>${esc(x.ItemNome)}</b><br><span class="muted">${dateFmt(x.DataReserva)}</span></td>
+      <td><b>${esc(x.Destino || x.ClienteNome || '—')}</b>${x.DataPrevista ? `<br><span class="muted">Previsto: ${dateFmt(x.DataPrevista)}</span>` : ''}</td>
+      <td>${esc(x.ClienteNome)}</td>
+      <td>${esc(x.Quantidade)} · <span class="muted">${esc(x.Origem)}</span></td>
       <td><span class="pill ${x.Estado==='Pendente'?'warn':x.Estado==='Entregue'?'ok':'gray'}">${esc(x.Estado)}</span></td>
-      <td>${dateFmt(x.DataPrevista)}</td>
-      <td>${x.Estado==='Pendente' ? `<button class="btn" onclick="reservationAction('${esc(x.ID)}','deliverReservation')">Entregue</button> <button class="btn danger" onclick="reservationAction('${esc(x.ID)}','cancelReservation')">Cancelar</button>` : '—'}</td>
+      <td>${x.Estado==='Pendente' ? `<button class="btn sm" onclick="reservationAction('${esc(x.ID)}','deliverReservation')">Entregue</button> <button class="btn sm danger" onclick="reservationAction('${esc(x.ID)}','cancelReservation')">Cancelar</button>` : '—'}</td>
     </tr>`).join('')}</tbody></table></div>` : '<div class="empty">Ainda não existem reservas.</div>';
 }
 
@@ -270,11 +505,28 @@ function dateFmt(v){
   const d = new Date(v);
   return isNaN(d) ? esc(v) : d.toLocaleDateString('pt-PT');
 }
-function reservationAction(id,action){
+
+function reservationAction(id, action){
   const question = action === 'cancelReservation'
-    ? 'Cancelar a reserva e repor a quantidade no stock?'
-    : 'Confirmar que o artigo foi entregue?';
-  if(confirm(question)) post({action,id}).catch(e => alert(e.message));
+    ? 'Cancelar a reserva e repor a quantidade?'
+    : 'Marcar como entregue?';
+  if (!confirm(question)) return;
+
+  const res = db.reservados.find(r => String(r.ID) === String(id));
+  if (res && res.Estado === 'Pendente') {
+    if (action === 'cancelReservation') {
+      const item = db.stock.find(x => String(x.ID) === String(res.ItemID));
+      if (item) {
+        const prop = res.Origem === 'Demo' ? 'Demo' : 'Stock';
+        item[prop] = Number(item[prop] || 0) + Number(res.Quantidade || 0);
+      }
+      res.Estado = 'Cancelada';
+    } else if (action === 'deliverReservation') {
+      res.Estado = 'Entregue';
+    }
+  }
+  enqueue({ action, id });
+  renderAll();
 }
 
 function renderClients(){
@@ -291,8 +543,13 @@ function renderClients(){
       <div class="actions"><button class="btn danger" onclick="archiveClient('${esc(x.ID)}')">Arquivar</button></div>
     </article>`).join('') : '<div class="empty">Ainda não existem clientes.</div>';
 }
+
 function archiveClient(id){
-  if(confirm('Arquivar este cliente?')) post({action:'deleteClient',id}).catch(e => alert(e.message));
+  if (!confirm('Arquivar este cliente?')) return;
+  const cl = db.clientes.find(x => String(x.ID) === String(id));
+  if (cl) cl.Ativo = false;
+  enqueue({ action:'deleteClient', id });
+  renderClients();
 }
 
 function renderHistory(){
@@ -305,22 +562,28 @@ function renderHistory(){
 
 function reserveThis(id){
   showTab('reservados');
-  openModal('reservation',id);
+  openModal('reservation', id);
 }
 
-function openModal(mode,preselect=''){
+function openModal(mode, contextId=''){
   modalMode = mode;
+  modalContextId = contextId;
   $('modalForm').reset();
   const activeClients = db.clientes.filter(x => isActive(x.Ativo));
   const activeItems = db.stock.filter(x => isActive(x.Ativo));
+  const targetItem = db.stock.find(x => String(x.ID) === String(contextId));
 
   const fields = {
     item: `
-      <div class="field"><label>Nome do artigo</label><input name="nome" required></div>
-      <div class="field"><label>Categoria / Marca</label><input name="categoria" placeholder="Huvitz, Nidek, Acessórios..."></div>
-      <div class="field"><label>Tipo de artigo</label><select name="tipo"><option>Equipamento</option><option>Acessório</option><option>Consumível</option><option>Outro</option></select></div>
+      <div class="field"><label>Nome do equipamento</label><input name="nome" required></div>
+      <div class="field"><label>Categoria / Marca</label><input name="categoria" placeholder="Huvitz, iCare, Charops..."></div>
+      <div class="field"><label>Tipo</label><select name="tipo"><option>Equipamento</option><option>Acessório</option><option>Consumível</option></select></div>
       <div class="field"><label>Stock inicial</label><input name="stock" type="number" min="0" step="1" value="0" required></div>
-      <div class="field"><label>Demo inicial</label><input name="demo" type="number" min="0" step="1" value="0" required></div>`,
+      <div class="field"><label>Demonstração inicial</label><input name="demo" type="number" min="0" step="1" value="0" required></div>
+      <div class="field"><label>Demonstração — Onde está</label><input name="localDemo" placeholder="Ex: Clínica / Ótica / Técnico"></div>`,
+    demoLocation: `
+      <div class="field"><label>Equipamento</label><input value="${esc(targetItem?.Nome || '')}" disabled></div>
+      <div class="field"><label>Demonstração — Onde está</label><input name="localDemo" value="${esc(targetItem?.LocalDemo || '')}" placeholder="Ex: Ótica Central / Porto" required></div>`,
     client: `
       <div class="field"><label>Nome do cliente</label><input name="nome" required></div>
       <div class="field"><label>NIF</label><input name="nif"></div>
@@ -329,58 +592,126 @@ function openModal(mode,preselect=''){
       <div class="field"><label>Morada</label><input name="morada"></div>
       <div class="field"><label>Observações</label><textarea name="observacoes"></textarea></div>`,
     reservation: `
-      <div class="field"><label>Cliente</label><select name="clienteId" required>
-        ${activeClients.map(x => `<option value="${esc(x.ID)}">${esc(x.Nome)}</option>`).join('')}
+      <div class="field"><label>Cliente</label><select name="clienteId" id="reserveClient" onchange="prefillDestino()" required>
+        ${activeClients.map(x => `<option value="${esc(x.ID)}" data-dest="${esc(x.Morada || x.Nome || '')}">${esc(x.Nome)}</option>`).join('')}
       </select></div>
-      <div class="field"><label>Artigo</label><select name="itemId" id="reserveItem" required>
+      <div class="field"><label>Para onde vai (Destino)</label><input name="destino" id="reserveDestino" placeholder="Ex: Clínica / Ótica / Morada de entrega" required></div>
+      <div class="field"><label>Equipamento</label><select name="itemId" id="reserveItem" required>
         ${activeItems.map(x => `<option value="${esc(x.ID)}">${esc(x.Nome)} (stock ${Number(x.Stock)||0} · demo ${Number(x.Demo)||0})</option>`).join('')}
       </select></div>
       <div class="field"><label>Retirar de</label><select name="origem"><option>Stock</option><option>Demo</option></select></div>
       <div class="field"><label>Quantidade</label><input name="quantidade" type="number" min="1" step="1" value="1" required></div>
-      <div class="field"><label>Data prevista de entrega</label><input name="dataPrevista" type="date"></div>
+      <div class="field"><label>Data prevista</label><input name="dataPrevista" type="date"></div>
       <div class="field"><label>Responsável</label><input name="responsavel"></div>
       <div class="field"><label>Observações</label><textarea name="observacoes"></textarea></div>`
   };
 
-  $('modalTitle').textContent = ({item:'Adicionar artigo',client:'Adicionar cliente',reservation:'Criar reserva'})[mode] || 'Novo registo';
+  $('modalTitle').textContent = ({
+    item:'Novo equipamento',
+    demoLocation:'Demonstração — Onde está',
+    client:'Novo cliente',
+    reservation:'Nova reserva'
+  })[mode] || 'Novo registo';
   $('modalFields').innerHTML = fields[mode] || '';
-  if(mode === 'reservation'){
-    if(!activeClients.length) msg('Para criar uma reserva, primeiro adiciona um cliente.');
-    if(!activeItems.length) msg('Não existem artigos ativos para reservar.');
-    if(preselect && $('reserveItem')) $('reserveItem').value = preselect;
+  if (mode === 'reservation') {
+    if (!activeClients.length) msg('Cria primeiro um cliente.');
+    if (!activeItems.length) msg('Não existem equipamentos ativos para reservar.');
+    if (contextId && $('reserveItem')) $('reserveItem').value = contextId;
+    prefillDestino();
   }
   $('modal').classList.add('show');
 }
 
+function prefillDestino(){
+  const sel = $('reserveClient');
+  const dest = $('reserveDestino');
+  if (!sel || !dest || dest.value.trim()) return;
+  const opt = sel.options[sel.selectedIndex];
+  if (opt && opt.dataset.dest) dest.value = opt.dataset.dest;
+}
+
 function closeModal(){ $('modal').classList.remove('show'); }
 
-async function submitModal(e){
+function submitModal(e){
   e.preventDefault();
-  const form = e.target;
-  const f = Object.fromEntries(new FormData(form).entries());
+  const f = Object.fromEntries(new FormData(e.target).entries());
 
   try {
-    if(modalMode === 'item'){
-      f.action = 'addItem';
-      f.stock = Number(f.stock);
-      f.demo = Number(f.demo);
+    if (modalMode === 'item') {
+      const st = Number(f.stock || 0);
+      const dm = Number(f.demo || 0);
+      const loc = (f.localDemo || '').trim();
+      db.stock.push({
+        ID: 'tmp_' + Date.now(),
+        Nome: f.nome.trim(),
+        Categoria: f.categoria || 'Equipamento',
+        Tipo: f.tipo || 'Equipamento',
+        Stock: st,
+        Demo: dm,
+        LocalDemo: loc,
+        Ativo: true
+      });
+      enqueue({ action:'addItem', ...f, stock: st, demo: dm, localDemo: loc });
+    } else if (modalMode === 'demoLocation') {
+      const item = db.stock.find(x => String(x.ID) === String(modalContextId));
+      const loc = (f.localDemo || '').trim();
+      if (item) item.LocalDemo = loc;
+      enqueue({ action:'setDemoLocation', id: modalContextId, localDemo: loc });
+    } else if (modalMode === 'client') {
+      db.clientes.push({
+        ID: 'tmp_c_' + Date.now(),
+        Nome: f.nome.trim(),
+        NIF: f.nif || '',
+        Contacto: f.contacto || '',
+        Email: f.email || '',
+        Morada: f.morada || '',
+        Ativo: true
+      });
+      enqueue({ action:'addClient', ...f });
+    } else if (modalMode === 'reservation') {
+      if (!f.clienteId) throw new Error('Não existem clientes. Cria primeiro um cliente.');
+      if (!f.itemId) throw new Error('Não existem equipamentos ativos para reservar.');
+      const qty = Number(f.quantidade || 1);
+      const item = db.stock.find(x => String(x.ID) === String(f.itemId));
+      const client = db.clientes.find(c => String(c.ID) === String(f.clienteId));
+      const prop = f.origem === 'Demo' ? 'Demo' : 'Stock';
+      if (item && Number(item[prop] || 0) < qty) {
+        throw new Error('Quantidade insuficiente. Disponível: ' + Number(item[prop] || 0));
+      }
+      if (item) item[prop] = Number(item[prop] || 0) - qty;
+      const destino = (f.destino || (client && (client.Morada || client.Nome)) || '').trim();
+      db.reservados.push({
+        ID: 'tmp_r_' + Date.now(),
+        DataReserva: new Date().toISOString(),
+        DataPrevista: f.dataPrevista || '',
+        ClienteID: f.clienteId,
+        ClienteNome: client ? client.Nome : '',
+        Destino: destino,
+        ItemID: f.itemId,
+        ItemNome: item ? item.Nome : '',
+        Origem: f.origem,
+        TipoArtigo: item ? formatTipo(item.Tipo) : 'Equipamento',
+        Quantidade: qty,
+        Estado: 'Pendente'
+      });
+      enqueue({
+        action:'createReservation',
+        ...f,
+        destino,
+        quantidade: qty,
+        dataReserva: new Date().toISOString()
+      });
     }
-    if(modalMode === 'client') f.action = 'addClient';
-    if(modalMode === 'reservation'){
-      if(!f.clienteId) throw new Error('Não existem clientes. Cria primeiro um cliente.');
-      if(!f.itemId) throw new Error('Não existem artigos ativos para reservar.');
-      f.action = 'createReservation';
-      f.quantidade = Number(f.quantidade);
-      f.dataReserva = new Date().toISOString();
-    }
-    await post(f);
+
+    renderAll();
+    updatePendingBanner();
     closeModal();
   } catch(err) {
     alert(err.message);
   }
 }
 
-loadData();
+fetchInitialData();
 </script>
 </body>
 </html>
