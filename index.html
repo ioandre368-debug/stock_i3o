@@ -23,7 +23,7 @@ input,select,textarea{width:100%;padding:11px 12px;border:1px solid var(--line);
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
 .card{background:white;border:1px solid var(--line);border-radius:15px;padding:16px;box-shadow:0 3px 14px #0f172a0a}
 .card h3{margin:0 0 5px;font-size:1rem}.muted{color:var(--muted);font-size:.82rem}
-.qty{display:flex;align-items:center;gap:9px;margin-top:12px}.qty strong{min-width:28px;text-align:center}.qty button{width:32px;height:32px;border:0;border-radius:8px;background:#e2e8f0;cursor:pointer;font-weight:800}.qty button.plus{background:var(--blue);color:white}
+.qty{display:flex;align-items:center;gap:9px;margin-top:12px;flex-wrap:wrap}.qty input{width:88px;padding:7px 8px;text-align:center}.qty button{border:0;border-radius:8px;padding:8px 11px;background:var(--blue);color:white;cursor:pointer;font-weight:700}
 .pill{display:inline-block;border-radius:20px;padding:4px 9px;font-size:.72rem;font-weight:700;background:#dbeafe;color:#1d4ed8}.pill.warn{background:#ffedd5;color:#9a3412}.pill.ok{background:#dcfce7;color:#166534}.pill.gray{background:#e2e8f0;color:#475569}
 table{width:100%;border-collapse:collapse;background:white;border-radius:12px;overflow:hidden}th,td{text-align:left;padding:11px;border-bottom:1px solid var(--line);font-size:.82rem}th{background:#f1f5f9;color:#475569}
 .table-wrap{overflow:auto}.empty{padding:35px;text-align:center;color:var(--muted);background:white;border-radius:14px}
@@ -221,14 +221,12 @@ function renderStock(){
       <h3>${esc(x.Nome)}</h3>
       <div class="muted">${esc(x.Categoria || 'Outros')} · ${esc(formatTipo(x.Tipo))}</div>
       <div class="qty"><span class="muted">Stock</span>
-        <button onclick="changeQty('${esc(x.ID)}',-1,'stock')">−</button>
-        <strong>${Number(x.Stock)||0}</strong>
-        <button class="plus" onclick="changeQty('${esc(x.ID)}',1,'stock')">+</button>
+        <input id="qty-stock-${esc(x.ID)}" type="number" min="0" step="1" value="${Number(x.Stock)||0}" aria-label="Quantidade em stock">
+        <button onclick="saveQty('${esc(x.ID)}','stock',${Number(x.Stock)||0})">Guardar</button>
       </div>
       <div class="qty"><span class="muted">Demo</span>
-        <button onclick="changeQty('${esc(x.ID)}',-1,'demo')">−</button>
-        <strong>${Number(x.Demo)||0}</strong>
-        <button class="plus" onclick="changeQty('${esc(x.ID)}',1,'demo')">+</button>
+        <input id="qty-demo-${esc(x.ID)}" type="number" min="0" step="1" value="${Number(x.Demo)||0}" aria-label="Quantidade demo">
+        <button onclick="saveQty('${esc(x.ID)}','demo',${Number(x.Demo)||0})">Guardar</button>
       </div>
       <div class="actions">
         <button class="btn" onclick="reserveThis('${esc(x.ID)}')">Reservar</button>
@@ -237,7 +235,20 @@ function renderStock(){
     </article>`).join('') : '<div class="empty">Não foram encontrados artigos.</div>';
 }
 
-function changeQty(id,change,field){
+function saveQty(id,field,current){
+  const input = $('qty-' + field + '-' + id);
+  if (!input) return;
+  const value = Number(input.value);
+  if (!Number.isInteger(value) || value < 0){
+    alert('Introduz uma quantidade inteira igual ou superior a zero.');
+    input.focus();
+    return;
+  }
+  const change = value - Number(current || 0);
+  if (change === 0){
+    msg('A quantidade não foi alterada.');
+    return;
+  }
   post({action:'updateQty',id,change,field}).catch(e => alert(e.message));
 }
 function archiveItem(id){
