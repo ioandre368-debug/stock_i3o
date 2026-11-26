@@ -24,52 +24,67 @@
 }
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--navy);font-family:'Plus Jakarta Sans',sans-serif}
-header{background:var(--navy);color:white;padding:16px max(16px,calc((100% - 1100px)/2));display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;position:sticky;top:0;z-index:5}
-.brand{font-weight:800;font-size:1.15rem;display:flex;gap:10px;align-items:center}
+header{background:var(--navy);color:white;padding:16px max(16px,calc((100% - 1140px)/2));display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;position:sticky;top:0;z-index:5}
+.brand{font-weight:800;font-size:1.12rem;display:flex;gap:10px;align-items:center}
 .brand i{background:var(--blue);padding:9px;border-radius:10px}
 .head-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-main{max-width:1100px;margin:auto;padding:22px 16px}
-.tabs{display:flex;gap:8px;overflow:auto;margin-bottom:18px}
-.tab,.btn{border:0;border-radius:10px;padding:11px 15px;font:600 .88rem 'Plus Jakarta Sans',sans-serif;cursor:pointer;white-space:nowrap}
+main{max-width:1140px;margin:auto;padding:22px 16px}
+.tabs{display:flex;gap:8px;overflow:auto;margin-bottom:16px}
+.tab,.btn{border:0;border-radius:10px;padding:10px 14px;font:600 .86rem 'Plus Jakarta Sans',sans-serif;cursor:pointer;white-space:nowrap}
 .tab{background:white;border:1px solid var(--line);color:var(--muted)}
 .tab.active,.btn.primary{background:var(--blue);color:white;border-color:var(--blue)}
-.btn.send-btn{background:var(--green);color:white;border-color:#15803d;box-shadow:0 3px 12px #16a34a40}
+.btn.save-sheets{background:var(--green);color:white;border-color:#15803d;box-shadow:0 3px 12px #16a34a44}
 .btn{background:white;border:1px solid var(--line);color:var(--navy)}
 .btn.sm{padding:6px 10px;font-size:.78rem;border-radius:8px}
 .btn.danger{color:#b91c1c}
 .toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
 .toolbar input,.toolbar select{flex:1;min-width:180px}
-input,select,textarea{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:9px;font:inherit;background:white}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
-.card{background:white;border:1.5px solid var(--line);border-radius:15px;padding:16px;box-shadow:0 3px 14px #0f172a0a}
+input,select,textarea{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:9px;font:inherit;background:white}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(285px,1fr));gap:14px}
+
+.card{background:white;border:1.5px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 3px 14px #0f172a0a;display:flex;flex-direction:column;gap:10px}
 .card.alerta-zero{background:var(--red-bg);border-color:var(--red-bd)}
 .card.alerta-um{background:var(--amber-bg);border-color:var(--amber-bd)}
-.card h3{margin:0 0 5px;font-size:1rem}
+.card h3{margin:0;font-size:1.02rem}
 .muted{color:var(--muted);font-size:.82rem}
-.qty{display:flex;align-items:center;gap:9px;margin-top:12px}
-.qty strong{min-width:28px;text-align:center;padding:2px 6px;border-radius:6px}
+
+.block-box{background:#ffffffcc;border:1px solid var(--line);border-radius:11px;padding:10px 12px}
+.block-title{font-size:.75rem;font-weight:800;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);margin-bottom:6px;display:flex;justify-content:space-between;align-items:center}
+
+.qty{display:flex;align-items:center;gap:9px;margin-top:6px}
+.qty strong{min-width:28px;text-align:center;font-size:.98rem;padding:3px 7px;border-radius:7px}
 .qty strong.zero{background:#fee2e2;color:var(--red-tx)}
 .qty strong.um{background:#fef3c7;color:var(--amber-tx)}
-.qty button{width:32px;height:32px;border:0;border-radius:8px;background:#e2e8f0;cursor:pointer;font-weight:800}
+.qty button{width:32px;height:32px;border:0;border-radius:8px;background:#e2e8f0;cursor:pointer;font-weight:800;font-size:1rem}
 .qty button.plus{background:var(--blue);color:white}
+
+.loc-row{margin-top:8px;font-size:.81rem}
+.loc-text{color:var(--navy);font-weight:600}
+.loc-empty{color:var(--muted);font-style:italic}
+
+.res-chip{margin-top:4px;font-size:.79rem;background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe;border-radius:8px;padding:6px 9px}
+
 .pill{display:inline-block;border-radius:20px;padding:4px 9px;font-size:.72rem;font-weight:700;background:#dbeafe;color:#1d4ed8}
-.pill.warn{background:#ffedd5;color:#9a3412}
+.pill.warn{background:#fef3c7;color:#92400e}
 .pill.ok{background:#dcfce7;color:#166534}
 .pill.gray{background:#e2e8f0;color:#475569}
+
 table{width:100%;border-collapse:collapse;background:white;border-radius:12px;overflow:hidden}
-th,td{text-align:left;padding:11px;border-bottom:1px solid var(--line);font-size:.82rem}
+th,td{text-align:left;padding:11px;border-bottom:1px solid var(--line);font-size:.82rem;vertical-align:top}
 th{background:#f1f5f9;color:#475569}
 .table-wrap{overflow:auto}
 .empty{padding:35px;text-align:center;color:var(--muted);background:white;border-radius:14px}
+
 .modal{display:none;position:fixed;inset:0;background:#0f172a99;z-index:10;align-items:center;justify-content:center;padding:16px}
 .modal.show{display:flex}
-.modal-box{background:white;width:min(520px,100%);max-height:92vh;overflow:auto;border-radius:17px;padding:22px}
+.modal-box{background:white;width:min(540px,100%);max-height:92vh;overflow:auto;border-radius:17px;padding:22px}
 .modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
 .modal-head h2{font-size:1.1rem;margin:0}
 .field{margin-bottom:12px}
 .field label{display:block;font-size:.76rem;font-weight:700;color:var(--muted);margin-bottom:5px}
-.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
-#status{font-size:.82rem;color:var(--muted);margin:8px 0;padding:10px 12px;background:white;border:1px solid var(--line);border-radius:9px;overflow-wrap:anywhere;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+
+#status{font-size:.82rem;color:var(--muted);margin:8px 0 14px;padding:10px 12px;background:white;border:1px solid var(--line);border-radius:9px;overflow-wrap:anywhere;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
 #status.dirty{background:#fffbeb;border-color:#f59e0b;color:#92400e;font-weight:600}
 .hidden{display:none!important}
 .btn:disabled{opacity:.55;cursor:wait}
@@ -80,14 +95,14 @@ th{background:#f1f5f9;color:#475569}
 <header>
   <div class="brand"><i class="fa-solid fa-layer-group"></i> STOCK I3O</div>
   <div class="head-actions">
-    <button class="btn send-btn hidden" id="topSendBtn" onclick="sendChanges()"><i class="fa-solid fa-paper-plane"></i> Enviar alterações (<span id="changeCount">0</span>)</button>
-    <button class="btn primary" onclick="openModal('item')"><i class="fa fa-plus"></i> Novo artigo</button>
+    <button class="btn save-sheets hidden" id="topSaveBtn" onclick="saveToSheets()"><i class="fa-solid fa-floppy-disk"></i> Guardar no Sheets (<span id="pendingCount">0</span>)</button>
+    <button class="btn primary" onclick="openModal('item')"><i class="fa fa-plus"></i> Novo equipamento</button>
   </div>
 </header>
 <main>
   <nav class="tabs">
     <button class="tab active" data-tab="stock" onclick="showTab('stock')"><i class="fa fa-boxes-stacked"></i> Stock</button>
-    <button class="tab" data-tab="reservados" onclick="showTab('reservados')"><i class="fa fa-bookmark"></i> Reservados</button>
+    <button class="tab" data-tab="reservados" onclick="showTab('reservados')"><i class="fa fa-route"></i> Reservados</button>
     <button class="tab" data-tab="clientes" onclick="showTab('clientes')"><i class="fa fa-users"></i> Clientes</button>
     <button class="tab" data-tab="historico" onclick="showTab('historico')"><i class="fa fa-clock-rotate-left"></i> Histórico</button>
   </nav>
@@ -95,14 +110,20 @@ th{background:#f1f5f9;color:#475569}
     <span id="statusText">A ligar à base de dados...</span>
     <span id="statusActions" class="hidden">
       <button class="btn sm" onclick="discardChanges()">Anular</button>
-      <button class="btn sm send-btn" onclick="sendChanges()">Enviar alterações</button>
+      <button class="btn sm save-sheets" onclick="saveToSheets()"><i class="fa-solid fa-floppy-disk"></i> Guardar no Sheets</button>
     </span>
   </div>
 
   <section id="view-stock">
     <div class="toolbar">
-      <input id="stockSearch" placeholder="Pesquisar artigo, marca ou modelo..." oninput="renderStock()">
+      <input id="stockSearch" placeholder="Pesquisar equipamento, marca, onde está a demo ou destino..." oninput="renderStock()">
       <select id="stockCategory" onchange="renderStock()"><option value="">Todas as categorias</option></select>
+      <select id="stockAlertFilter" onchange="renderStock()">
+        <option value="">Todos os níveis</option>
+        <option value="zero">Sem stock (0 — Vermelho)</option>
+        <option value="um">Apenas 1 unidade (1 — Amarelo)</option>
+        <option value="demo">Em demonstração</option>
+      </select>
       <button class="btn" onclick="loadData()">↻ Atualizar</button>
     </div>
     <div id="stockList" class="grid"></div>
@@ -110,7 +131,7 @@ th{background:#f1f5f9;color:#475569}
 
   <section id="view-reservados" class="hidden">
     <div class="toolbar">
-      <input id="reservationSearch" placeholder="Pesquisar reserva, cliente ou artigo..." oninput="renderReservations()">
+      <input id="reservationSearch" placeholder="Pesquisar equipamento, cliente ou para onde vai..." oninput="renderReservations()">
       <select id="reservationState" onchange="renderReservations()">
         <option value="">Todos os estados</option><option>Pendente</option><option>Entregue</option><option>Cancelada</option>
       </select>
@@ -135,7 +156,7 @@ th{background:#f1f5f9;color:#475569}
     <div class="modal-head"><h2 id="modalTitle">Novo registo</h2><button class="btn" type="button" onclick="closeModal()">✕</button></div>
     <form id="modalForm" onsubmit="submitModal(event)">
       <div id="modalFields"></div>
-      <button class="btn primary" style="width:100%;margin-top:8px" type="submit" id="saveButton">Guardar</button>
+      <button class="btn primary" style="width:100%;margin-top:8px" type="submit" id="saveButton">Aplicar na lista</button>
     </form>
   </div>
 </div>
@@ -146,39 +167,44 @@ const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwQdaZrq353LGi01xHfn
 let db = {stock:[], clientes:[], reservados:[], historico:[]};
 let queue = [];
 let modalMode = '';
-let isSending = false;
+let modalContextId = '';
+let isSaving = false;
 
 const $ = id => document.getElementById(id);
 function msg(t){ $('statusText').textContent = t; }
 
 function updatePendingBanner(){
-  const count = queue.length;
-  const hasPending = count > 0;
-  $('changeCount').textContent = count;
-  $('topSendBtn').classList.toggle('hidden', !hasPending);
-  $('statusActions').classList.toggle('hidden', !hasPending);
-  $('status').classList.toggle('dirty', hasPending);
-  if (hasPending) {
-    msg(`${count} alteração(ões) por enviar. Ajusta à vontade e clica em "Enviar alterações".`);
+  const n = queue.length;
+  const dirty = n > 0;
+  $('pendingCount').textContent = n;
+  $('topSaveBtn').classList.toggle('hidden', !dirty);
+  $('statusActions').classList.toggle('hidden', !dirty);
+  $('status').classList.toggle('dirty', dirty);
+  if (dirty) {
+    msg(`${n} alteração(ões) por guardar no Sheets. Podes continuar a mudar e só no fim clicar em "Guardar no Sheets".`);
   }
 }
 
-function enqueue(actionObj){
-  if (actionObj.action === 'updateQty') {
+function enqueue(op){
+  if (op.action === 'updateQty') {
     const prev = queue[queue.length - 1];
-    if (
-      prev &&
-      prev.action === 'updateQty' &&
-      String(prev.id) === String(actionObj.id) &&
-      prev.field === actionObj.field
-    ) {
-      prev.change += actionObj.change;
+    if (prev && prev.action === 'updateQty' && String(prev.id) === String(op.id) && prev.field === op.field) {
+      prev.change += op.change;
+      if (op.localDemo !== undefined) prev.localDemo = op.localDemo;
       if (prev.change === 0) queue.pop();
       updatePendingBanner();
       return;
     }
   }
-  queue.push(actionObj);
+  if (op.action === 'setDemoLocation') {
+    const idx = queue.findIndex(x => x.action === 'setDemoLocation' && String(x.id) === String(op.id));
+    if (idx >= 0) {
+      queue[idx].localDemo = op.localDemo;
+      updatePendingBanner();
+      return;
+    }
+  }
+  queue.push(op);
   updatePendingBanner();
 }
 
@@ -199,12 +225,6 @@ function stockLevel(n){
   return 'ok';
 }
 
-function validateScriptUrl(){
-  if (!SCRIPT_URL || !/^https:\/\/script\.google\.com\/macros\/s\/[^/]+\/exec$/.test(SCRIPT_URL)) {
-    throw new Error('Configura o SCRIPT_URL com o endereço da Aplicação Web terminado em /exec.');
-  }
-}
-
 function showTab(tab){
   document.querySelectorAll('.tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
   ['stock','reservados','clientes','historico'].forEach(x => $('view-'+x).classList.toggle('hidden', x !== tab));
@@ -220,79 +240,66 @@ async function readJsonResponse(response){
     return JSON.parse(text);
   } catch (e) {
     const preview = text.replace(/\s+/g,' ').slice(0,220);
-    if (/^\s*<!doctype html|^\s*<html/i.test(text) || /accounts\.google\.com|ServiceLogin|sign in/i.test(text)) {
-      throw new Error('O Google devolveu uma página HTML em vez de JSON. Confirma a implementação como Aplicação Web (Acesso: Qualquer pessoa) e o URL /exec.');
-    }
     throw new Error('Resposta inválida do Apps Script: ' + (preview || '(vazia)'));
   }
 }
 
 async function loadData(){
-  msg('A carregar dados da Google Sheets...');
+  msg('A carregar dados do Google Sheets...');
   try {
-    validateScriptUrl();
-    const response = await fetch(SCRIPT_URL + '?t=' + Date.now(), {
-      method:'GET',
-      redirect:'follow'
-    });
+    const response = await fetch(SCRIPT_URL + '?t=' + Date.now(), { method:'GET', redirect:'follow' });
     const data = await readJsonResponse(response);
-    if (!data || data.ok !== true) throw new Error(data && data.error ? data.error : 'A API respondeu sem confirmação.');
-    if (!data.data || !Array.isArray(data.data.stock)) {
-      throw new Error('Estrutura de dados inválida recebida do Code.gs.');
-    }
+    if (!data || data.ok !== true) throw new Error(data && data.error ? data.error : 'Sem confirmação da API.');
     db = data.data;
     queue = [];
     renderAll();
     updatePendingBanner();
     if (!queue.length) {
-      msg(`Sincronizado com Google Sheets (${db.stock.length} artigos).`);
+      msg(`Sincronizado (${db.stock.length} equipamentos).`);
     }
   } catch(e) {
-    console.error('Erro ao carregar I3O:', e);
+    console.error('Erro ao carregar:', e);
     msg('Falha ao carregar: ' + e.message);
   }
 }
 
 async function discardChanges(){
   if (!queue.length) return;
-  if (confirm('Anular as alterações ainda não enviadas e repor os valores da folha?')) {
+  if (confirm('Anular tudo o que alteraste ainda não guardado no Sheets?')) {
     await loadData();
   }
 }
 
-async function sendChanges(){
-  if (!queue.length || isSending) return;
-  validateScriptUrl();
-  isSending = true;
-  document.querySelectorAll('.send-btn').forEach(b => b.disabled = true);
-  msg(`A enviar ${queue.length} alteração(ões) para a Google Sheets...`);
+async function saveToSheets(){
+  if (!queue.length || isSaving) return;
+  isSaving = true;
+  document.querySelectorAll('.save-sheets').forEach(b => b.disabled = true);
+  msg(`A guardar ${queue.length} alteração(ões) no Google Sheets...`);
 
   try {
-    for (const item of queue) {
-      const response = await fetch(SCRIPT_URL, {
-        method:'POST',
-        redirect:'follow',
-        body: JSON.stringify(item)
-      });
-      const res = await readJsonResponse(response);
-      if (!res || res.ok !== true) {
-        throw new Error(res && res.error ? res.error : 'Erro ao gravar na folha.');
-      }
-      if (res.data) {
-        db = res.data;
-      }
+    const response = await fetch(SCRIPT_URL, {
+      method:'POST',
+      redirect:'follow',
+      body: JSON.stringify({ action: 'batch', changes: queue })
+    });
+    const res = await readJsonResponse(response);
+    if (!res || res.ok !== true) {
+      throw new Error(res && res.error ? res.error : 'Erro ao guardar no Sheets.');
+    }
+    if (res.data) {
+      db = res.data;
     }
     queue = [];
     renderAll();
     updatePendingBanner();
-    msg(`Alterações enviadas e sincronizadas (${db.stock.length} artigos).`);
+    msg(`Guardado no Google Sheets com sucesso (${db.stock.length} equipamentos).`);
   } catch(e) {
-    console.error('Erro ao enviar alterações:', e);
-    msg('Erro ao enviar: ' + e.message + ' (alterações mantidas para nova tentativa)');
-    alert('Erro ao enviar: ' + e.message);
+    console.error('Erro ao guardar no Sheets:', e);
+    msg('Erro ao guardar: ' + e.message);
+    alert('Erro ao guardar: ' + e.message);
   } finally {
-    isSending = false;
-    document.querySelectorAll('.send-btn').forEach(b => b.disabled = false);
+    isSaving = false;
+    document.querySelectorAll('.save-sheets').forEach(b => b.disabled = false);
   }
 }
 
@@ -312,39 +319,82 @@ function fillSelects(){
   $('stockCategory').value = cats.includes(current) ? current : '';
 }
 
+function getActiveReservationsForItem(itemId){
+  return (db.reservados || []).filter(r => String(r.ItemID) === String(itemId) && r.Estado === 'Pendente');
+}
+
 function renderStock(){
   const q = $('stockSearch').value.toLowerCase();
   const cat = $('stockCategory').value;
-  const items = db.stock.filter(x =>
-    isActive(x.Ativo) &&
-    (!cat || x.Categoria === cat) &&
-    [x.Nome, x.Categoria, formatTipo(x.Tipo)].join(' ').toLowerCase().includes(q)
-  );
+  const alertFilter = $('stockAlertFilter').value;
+
+  const items = db.stock.filter(x => {
+    if (!isActive(x.Ativo)) return false;
+    const st = Number(x.Stock || 0);
+    const dm = Number(x.Demo || 0);
+    const lvl = stockLevel(st);
+    const resList = getActiveReservationsForItem(x.ID);
+    const destTexto = resList.map(r => r.Destino || r.ClienteNome || '').join(' ');
+
+    if (cat && x.Categoria !== cat) return false;
+    if (alertFilter === 'zero' && lvl !== 'zero') return false;
+    if (alertFilter === 'um' && lvl !== 'um') return false;
+    if (alertFilter === 'demo' && dm <= 0) return false;
+
+    const hay = [x.Nome, x.Categoria, formatTipo(x.Tipo), x.LocalDemo, destTexto].join(' ').toLowerCase();
+    return hay.includes(q);
+  });
+
   $('stockList').innerHTML = items.length ? items.map(x => {
     const st = Number(x.Stock || 0);
     const dm = Number(x.Demo || 0);
     const lvl = stockLevel(st);
     const cardCls = lvl === 'zero' ? 'card alerta-zero' : (lvl === 'um' ? 'card alerta-um' : 'card');
+
+    const resList = getActiveReservationsForItem(x.ID);
+    const resHtml = resList.length
+      ? resList.map(r => `<div class="res-chip"><i class="fa fa-truck"></i> <b>Reservado (${esc(r.Quantidade)}x ${esc(r.Origem)}):</b> Para <b>${esc(r.Destino || r.ClienteNome)}</b></div>`).join('')
+      : '';
+
     return `
       <article class="${cardCls}">
         <h3>${esc(x.Nome)}</h3>
-        <div class="muted">${esc(x.Categoria || 'Outros')} · ${esc(formatTipo(x.Tipo))}</div>
-        <div class="qty"><span class="muted">Stock</span>
-          <button onclick="changeQty('${esc(x.ID)}',-1,'stock')">−</button>
-          <strong class="${lvl}">${st}</strong>
-          <button class="plus" onclick="changeQty('${esc(x.ID)}',1,'stock')">+</button>
+        <div class="muted">${esc(x.Categoria || 'Equipamento')} · ${esc(formatTipo(x.Tipo))}</div>
+
+        <div class="block-box">
+          <div class="block-title"><span>Stock</span></div>
+          <div class="qty">
+            <button onclick="changeQty('${esc(x.ID)}',-1,'stock')">−</button>
+            <strong class="${lvl}">${st}</strong>
+            <button class="plus" onclick="changeQty('${esc(x.ID)}',1,'stock')">+</button>
+          </div>
         </div>
-        <div class="qty"><span class="muted">Demo</span>
-          <button onclick="changeQty('${esc(x.ID)}',-1,'demo')">−</button>
-          <strong>${dm}</strong>
-          <button class="plus" onclick="changeQty('${esc(x.ID)}',1,'demo')">+</button>
+
+        <div class="block-box">
+          <div class="block-title">
+            <span>Demonstração</span>
+            <button class="btn sm" onclick="openModal('demoLocation','${esc(x.ID)}')"><i class="fa fa-location-dot"></i> Onde está</button>
+          </div>
+          <div class="qty">
+            <button onclick="changeQty('${esc(x.ID)}',-1,'demo')">−</button>
+            <strong>${dm}</strong>
+            <button class="plus" onclick="changeQty('${esc(x.ID)}',1,'demo')">+</button>
+          </div>
+          <div class="loc-row">
+            <span class="${x.LocalDemo ? 'loc-text' : 'loc-empty'}">
+              <i class="fa fa-map-pin"></i> ${x.LocalDemo ? 'Onde está: ' + esc(x.LocalDemo) : 'Local demo não definido'}
+            </span>
+          </div>
         </div>
+
+        ${resHtml}
+
         <div class="actions">
           <button class="btn" onclick="reserveThis('${esc(x.ID)}')">Reservar</button>
           <button class="btn danger" onclick="archiveItem('${esc(x.ID)}')">Arquivar</button>
         </div>
       </article>`;
-  }).join('') : '<div class="empty">Não foram encontrados artigos.</div>';
+  }).join('') : '<div class="empty">Não foram encontrados equipamentos.</div>';
 }
 
 function changeQty(id, change, field){
@@ -356,13 +406,26 @@ function changeQty(id, change, field){
     alert('Quantidade insuficiente.');
     return;
   }
+
+  let localDemo = String(item.LocalDemo || '').trim();
+  if (field === 'demo' && change > 0 && !localDemo) {
+    const loc = prompt('Onde está este equipamento em demonstração? (Ex: Clínica / Ótica / Técnico)', '');
+    if (loc === null) return;
+    localDemo = loc.trim();
+  }
+  if (field === 'demo' && next === 0) {
+    localDemo = '';
+  }
+
   item[prop] = next;
-  enqueue({ action:'updateQty', id, change, field });
+  if (field === 'demo') item.LocalDemo = localDemo;
+
+  enqueue({ action:'updateQty', id, change, field, localDemo });
   renderStock();
 }
 
 function archiveItem(id){
-  if (!confirm('Arquivar este artigo? (Será enviado ao clicar em "Enviar alterações")')) return;
+  if (!confirm('Arquivar este equipamento? (Só será gravado ao clicar em "Guardar no Sheets")')) return;
   const item = db.stock.find(x => String(x.ID) === String(id));
   if (item) item.Ativo = false;
   enqueue({ action:'deleteItem', id });
@@ -374,19 +437,19 @@ function renderReservations(){
   const state = $('reservationState').value;
   const rows = db.reservados.filter(x =>
     (!state || x.Estado === state) &&
-    [x.ClienteNome,x.ItemNome,x.ID].join(' ').toLowerCase().includes(q)
+    [x.ClienteNome,x.Destino,x.ItemNome,x.ID].join(' ').toLowerCase().includes(q)
   ).slice().reverse();
 
   $('reservationList').innerHTML = rows.length ? `
     <div class="table-wrap"><table><thead><tr>
-      <th>Reserva</th><th>Cliente / Artigo</th><th>Qtd.</th><th>Estado</th><th>Datas</th><th>Ações</th>
+      <th>Equipamento</th><th>Para onde vai</th><th>Cliente</th><th>Qtd. / Origem</th><th>Estado</th><th>Ações</th>
     </tr></thead><tbody>${rows.map(x => `<tr>
-      <td>${esc(String(x.ID).slice(0,8))}<br><span class="muted">${dateFmt(x.DataReserva)}</span></td>
-      <td><b>${esc(x.ClienteNome)}</b><br>${esc(x.ItemNome)}<br><span class="muted">${esc(x.Origem)} · ${esc(x.TipoArtigo)}</span></td>
-      <td>${esc(x.Quantidade)}</td>
+      <td><b>${esc(x.ItemNome)}</b><br><span class="muted">${dateFmt(x.DataReserva)}</span></td>
+      <td><b>${esc(x.Destino || x.ClienteNome || '—')}</b>${x.DataPrevista ? `<br><span class="muted">Previsto: ${dateFmt(x.DataPrevista)}</span>` : ''}</td>
+      <td>${esc(x.ClienteNome)}</td>
+      <td>${esc(x.Quantidade)} · <span class="muted">${esc(x.Origem)}</span></td>
       <td><span class="pill ${x.Estado==='Pendente'?'warn':x.Estado==='Entregue'?'ok':'gray'}">${esc(x.Estado)}</span></td>
-      <td>${dateFmt(x.DataPrevista)}</td>
-      <td>${x.Estado==='Pendente' ? `<button class="btn" onclick="reservationAction('${esc(x.ID)}','deliverReservation')">Entregue</button> <button class="btn danger" onclick="reservationAction('${esc(x.ID)}','cancelReservation')">Cancelar</button>` : '—'}</td>
+      <td>${x.Estado==='Pendente' ? `<button class="btn sm" onclick="reservationAction('${esc(x.ID)}','deliverReservation')">Entregue</button> <button class="btn sm danger" onclick="reservationAction('${esc(x.ID)}','cancelReservation')">Cancelar</button>` : '—'}</td>
     </tr>`).join('')}</tbody></table></div>` : '<div class="empty">Ainda não existem reservas.</div>';
 }
 
@@ -398,13 +461,13 @@ function dateFmt(v){
 
 function reservationAction(id, action){
   const question = action === 'cancelReservation'
-    ? 'Cancelar a reserva e repor a quantidade no stock?'
-    : 'Confirmar que o artigo foi entregue?';
+    ? 'Cancelar a reserva e repor a quantidade?'
+    : 'Marcar como entregue?';
   if (!confirm(question)) return;
 
   const res = db.reservados.find(r => String(r.ID) === String(id));
-  if (res) {
-    if (action === 'cancelReservation' && res.Estado === 'Pendente') {
+  if (res && res.Estado === 'Pendente') {
+    if (action === 'cancelReservation') {
       const item = db.stock.find(x => String(x.ID) === String(res.ItemID));
       if (item) {
         const prop = res.Origem === 'Demo' ? 'Demo' : 'Stock';
@@ -455,19 +518,25 @@ function reserveThis(id){
   openModal('reservation', id);
 }
 
-function openModal(mode, preselect=''){
+function openModal(mode, contextId=''){
   modalMode = mode;
+  modalContextId = contextId;
   $('modalForm').reset();
   const activeClients = db.clientes.filter(x => isActive(x.Ativo));
   const activeItems = db.stock.filter(x => isActive(x.Ativo));
+  const targetItem = db.stock.find(x => String(x.ID) === String(contextId));
 
   const fields = {
     item: `
-      <div class="field"><label>Nome do artigo</label><input name="nome" required></div>
-      <div class="field"><label>Categoria / Marca</label><input name="categoria" placeholder="Huvitz, Nidek, Acessórios..."></div>
-      <div class="field"><label>Tipo de artigo</label><select name="tipo"><option>Equipamento</option><option>Acessório</option><option>Consumível</option><option>Outro</option></select></div>
+      <div class="field"><label>Nome do equipamento</label><input name="nome" required></div>
+      <div class="field"><label>Categoria / Marca</label><input name="categoria" placeholder="Huvitz, iCare, Charops..."></div>
+      <div class="field"><label>Tipo</label><select name="tipo"><option>Equipamento</option><option>Acessório</option><option>Consumível</option></select></div>
       <div class="field"><label>Stock inicial</label><input name="stock" type="number" min="0" step="1" value="0" required></div>
-      <div class="field"><label>Demo inicial</label><input name="demo" type="number" min="0" step="1" value="0" required></div>`,
+      <div class="field"><label>Demonstração inicial</label><input name="demo" type="number" min="0" step="1" value="0" required></div>
+      <div class="field"><label>Demonstração — Onde está</label><input name="localDemo" placeholder="Ex: Clínica / Ótica / Técnico"></div>`,
+    demoLocation: `
+      <div class="field"><label>Equipamento</label><input value="${esc(targetItem?.Nome || '')}" disabled></div>
+      <div class="field"><label>Demonstração — Onde está</label><input name="localDemo" value="${esc(targetItem?.LocalDemo || '')}" placeholder="Ex: Ótica Central / Porto" required></div>`,
     client: `
       <div class="field"><label>Nome do cliente</label><input name="nome" required></div>
       <div class="field"><label>NIF</label><input name="nif"></div>
@@ -476,32 +545,47 @@ function openModal(mode, preselect=''){
       <div class="field"><label>Morada</label><input name="morada"></div>
       <div class="field"><label>Observações</label><textarea name="observacoes"></textarea></div>`,
     reservation: `
-      <div class="field"><label>Cliente</label><select name="clienteId" required>
-        ${activeClients.map(x => `<option value="${esc(x.ID)}">${esc(x.Nome)}</option>`).join('')}
+      <div class="field"><label>Cliente</label><select name="clienteId" id="reserveClient" onchange="prefillDestino()" required>
+        ${activeClients.map(x => `<option value="${esc(x.ID)}" data-dest="${esc(x.Morada || x.Nome || '')}">${esc(x.Nome)}</option>`).join('')}
       </select></div>
-      <div class="field"><label>Artigo</label><select name="itemId" id="reserveItem" required>
+      <div class="field"><label>Para onde vai (Destino)</label><input name="destino" id="reserveDestino" placeholder="Ex: Clínica / Ótica / Morada de entrega" required></div>
+      <div class="field"><label>Equipamento</label><select name="itemId" id="reserveItem" required>
         ${activeItems.map(x => `<option value="${esc(x.ID)}">${esc(x.Nome)} (stock ${Number(x.Stock)||0} · demo ${Number(x.Demo)||0})</option>`).join('')}
       </select></div>
       <div class="field"><label>Retirar de</label><select name="origem"><option>Stock</option><option>Demo</option></select></div>
       <div class="field"><label>Quantidade</label><input name="quantidade" type="number" min="1" step="1" value="1" required></div>
-      <div class="field"><label>Data prevista de entrega</label><input name="dataPrevista" type="date"></div>
+      <div class="field"><label>Data prevista</label><input name="dataPrevista" type="date"></div>
       <div class="field"><label>Responsável</label><input name="responsavel"></div>
       <div class="field"><label>Observações</label><textarea name="observacoes"></textarea></div>`
   };
 
-  $('modalTitle').textContent = ({item:'Adicionar artigo',client:'Adicionar cliente',reservation:'Criar reserva'})[mode] || 'Novo registo';
+  $('modalTitle').textContent = ({
+    item:'Novo equipamento',
+    demoLocation:'Demonstração — Onde está',
+    client:'Novo cliente',
+    reservation:'Nova reserva'
+  })[mode] || 'Novo registo';
   $('modalFields').innerHTML = fields[mode] || '';
   if (mode === 'reservation') {
-    if (!activeClients.length) msg('Para criar uma reserva, primeiro adiciona um cliente.');
-    if (!activeItems.length) msg('Não existem artigos ativos para reservar.');
-    if (preselect && $('reserveItem')) $('reserveItem').value = preselect;
+    if (!activeClients.length) msg('Cria primeiro um cliente.');
+    if (!activeItems.length) msg('Não existem equipamentos ativos para reservar.');
+    if (contextId && $('reserveItem')) $('reserveItem').value = contextId;
+    prefillDestino();
   }
   $('modal').classList.add('show');
 }
 
+function prefillDestino(){
+  const sel = $('reserveClient');
+  const dest = $('reserveDestino');
+  if (!sel || !dest || dest.value.trim()) return;
+  const opt = sel.options[sel.selectedIndex];
+  if (opt && opt.dataset.dest) dest.value = opt.dataset.dest;
+}
+
 function closeModal(){ $('modal').classList.remove('show'); }
 
-async function submitModal(e){
+function submitModal(e){
   e.preventDefault();
   const f = Object.fromEntries(new FormData(e.target).entries());
 
@@ -509,16 +593,23 @@ async function submitModal(e){
     if (modalMode === 'item') {
       const st = Number(f.stock || 0);
       const dm = Number(f.demo || 0);
+      const loc = (f.localDemo || '').trim();
       db.stock.push({
         ID: 'tmp_' + Date.now(),
         Nome: f.nome.trim(),
-        Categoria: f.categoria || 'Outros',
+        Categoria: f.categoria || 'Equipamento',
         Tipo: f.tipo || 'Equipamento',
         Stock: st,
         Demo: dm,
+        LocalDemo: loc,
         Ativo: true
       });
-      enqueue({ action:'addItem', ...f, stock: st, demo: dm });
+      enqueue({ action:'addItem', ...f, stock: st, demo: dm, localDemo: loc });
+    } else if (modalMode === 'demoLocation') {
+      const item = db.stock.find(x => String(x.ID) === String(modalContextId));
+      const loc = (f.localDemo || '').trim();
+      if (item) item.LocalDemo = loc;
+      enqueue({ action:'setDemoLocation', id: modalContextId, localDemo: loc });
     } else if (modalMode === 'client') {
       db.clientes.push({
         ID: 'tmp_c_' + Date.now(),
@@ -532,7 +623,7 @@ async function submitModal(e){
       enqueue({ action:'addClient', ...f });
     } else if (modalMode === 'reservation') {
       if (!f.clienteId) throw new Error('Não existem clientes. Cria primeiro um cliente.');
-      if (!f.itemId) throw new Error('Não existem artigos ativos para reservar.');
+      if (!f.itemId) throw new Error('Não existem equipamentos ativos para reservar.');
       const qty = Number(f.quantidade || 1);
       const item = db.stock.find(x => String(x.ID) === String(f.itemId));
       const client = db.clientes.find(c => String(c.ID) === String(f.clienteId));
@@ -541,12 +632,14 @@ async function submitModal(e){
         throw new Error('Quantidade insuficiente. Disponível: ' + Number(item[prop] || 0));
       }
       if (item) item[prop] = Number(item[prop] || 0) - qty;
+      const destino = (f.destino || (client && (client.Morada || client.Nome)) || '').trim();
       db.reservados.push({
         ID: 'tmp_r_' + Date.now(),
         DataReserva: new Date().toISOString(),
         DataPrevista: f.dataPrevista || '',
         ClienteID: f.clienteId,
         ClienteNome: client ? client.Nome : '',
+        Destino: destino,
         ItemID: f.itemId,
         ItemNome: item ? item.Nome : '',
         Origem: f.origem,
@@ -557,6 +650,7 @@ async function submitModal(e){
       enqueue({
         action:'createReservation',
         ...f,
+        destino,
         quantidade: qty,
         dataReserva: new Date().toISOString()
       });
