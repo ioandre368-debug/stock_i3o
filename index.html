@@ -90,11 +90,6 @@ table{width:100%;border-collapse:collapse;background:white;border-radius:12px;ov
 </div>
 
 <script>
-/*
-  IMPORTANTE:
-  Substitui o texto abaixo pelo URL da Aplicação Web do Apps Script,
-  terminado em /exec. Não uses o URL do editor nem o URL /dev.
-*/
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxsE7w1-H0C1htbSufmcvAfmM2nc700Ehlyon4CUT-DBjPeKgojvjWv9BdIu6PnK-x3/exec';
 
 let db = {stock:[], clientes:[], reservados:[], historico:[]};
@@ -104,10 +99,19 @@ let isSaving = false;
 const $ = id => document.getElementById(id);
 function msg(t){ $('status').textContent = t; }
 
+function isActive(v){
+  const s = String(v ?? '').trim().toLowerCase();
+  return v !== false && s !== 'false' && s !== 'nao' && s !== 'não' && s !== 'arquivado';
+}
+
+function formatTipo(v){
+  if (v === '' || v === null || v === undefined || !isNaN(Number(v))) return 'Equipamento';
+  return String(v);
+}
+
 function validateScriptUrl(){
-  if (!SCRIPT_URL || SCRIPT_URL.includes('COLOCAR_AQUI') ||
-      !/^https:\/\/script\.google\.com\/macros\/s\/[^/]+\/exec$/.test(SCRIPT_URL)) {
-    throw new Error('Ainda não configuraste o URL. Coloca no SCRIPT_URL o endereço da Aplicação Web do Apps Script, terminado em /exec.');
+  if (!SCRIPT_URL || !/^https:\/\/script\.google\.com\/macros\/s\/[^/]+\/exec$/.test(SCRIPT_URL)) {
+    throw new Error('Configura o SCRIPT_URL com o endereço da Aplicação Web terminado em /exec.');
   }
 }
 
@@ -127,9 +131,9 @@ async function readJsonResponse(response){
   } catch (e) {
     const preview = text.replace(/\s+/g,' ').slice(0,220);
     if (/^\s*<!doctype html|^\s*<html/i.test(text) || /accounts\.google\.com|ServiceLogin|sign in/i.test(text)) {
-      throw new Error('O Google devolveu uma página HTML em vez de JSON. Confirma a implementação como Aplicação Web, o acesso autorizado e se estás a usar o URL /exec. Resposta: ' + preview);
+      throw new Error('O Google devolveu uma página HTML em vez de JSON. Confirma a implementação como Aplicação Web (Acesso: Qualquer pessoa) e o URL /exec.');
     }
-    throw new Error('Resposta do Apps Script não é JSON válido. Início da resposta: ' + (preview || '(vazia)'));
+    throw new Error('Resposta inválida do Apps Script: ' + (preview || '(vazia)'));
   }
 }
 
@@ -143,25 +147,19 @@ async function loadData(){
       cache:'no-store'
     });
     const data = await readJsonResponse(response);
-    if (!data || data.ok !== true) throw new Error(data && data.error ? data.error : 'A API respondeu sem confirmação de sucesso.');
-    if (!data.data || !Array.isArray(data.data.stock) || !Array.isArray(data.data.clientes) ||
-        !Array.isArray(data.data.reservados) || !Array.isArray(data.data.historico)) {
-      throw new Error('O JSON foi recebido, mas a estrutura de dados não corresponde à versão I3O. Confirma o Code.gs.');
+    if (!data || data.ok !== true) throw new Error(data && data.error ? data.error : 'A API respondeu sem confirmação.');
+    if (!data.data || !Array.isArray(data.data.stock)) {
+      throw new Error('Estrutura de dados inválida recebida do Code.gs.');
     }
     db = data.data;
     renderAll();
-    msg('Ligação concluída. Dados sincronizados com Google Sheets.');
+    msg(`Sincronizado com Google Sheets (${db.stock.length} artigos).`);
   } catch(e) {
     console.error('Erro ao carregar I3O:', e);
     msg('Falha ao carregar: ' + e.message);
   }
 }
 
-/*
-  O POST usa formulário URL-encoded para que o Apps Script receba
-  e.parameter.payload. O modo no-cors impede ler a resposta do POST;
-  por isso, depois do envio voltamos a consultar os dados por GET.
-*/
 async function post(payload){
   if (isSaving) return;
   validateScriptUrl();
@@ -169,17 +167,25 @@ async function post(payload){
   $('saveButton').disabled = true;
   msg('A guardar na Google Sheets...');
   try {
-    await fetch(SCRIPT_URL, {
+    const response = await fetch(SCRIPT_URL, {
       method:'POST',
-      mode:'no-cors',
-      headers:{'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8'},
-      body:new URLSearchParams({payload:JSON.stringify(payload)})
+      redirect:'follow',
+      body: JSON.stringify(payload)
     });
-    await new Promise(resolve => setTimeout(resolve, 1100));
-    await loadData();
+    const res = await readJsonResponse(response);
+    if (!res || res.ok !== true) {
+      throw new Error(res && res.error ? res.error : 'Erro ao gravar na folha.');
+    }
+    if (res.data) {
+      db = res.data;
+      renderAll();
+      msg('Alteração gravada e sincronizada com Google Sheets.');
+    } else {
+      await loadData();
+    }
   } catch(e) {
     console.error('Erro ao guardar:', e);
-    msg('Não foi possível enviar os dados: ' + e.message);
+    msg('Erro ao guardar: ' + e.message);
     throw e;
   } finally {
     isSaving = false;
@@ -197,7 +203,7 @@ function renderAll(){
 
 function fillSelects(){
   const current = $('stockCategory').value;
-  const cats = [...new Set(db.stock.filter(x => String(x.Ativo) !== 'false').map(x => x.Categoria).filter(Boolean))].sort();
+  const cats = [...new Set(db.stock.filter(x => isActive(x.Ativo)).map(x => x.Categoria).filter(Boolean))].sort();
   $('stockCategory').innerHTML = '<option value="">Todas as categorias</option>' +
     cats.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
   $('stockCategory').value = cats.includes(current) ? current : '';
@@ -207,14 +213,14 @@ function renderStock(){
   const q = $('stockSearch').value.toLowerCase();
   const cat = $('stockCategory').value;
   const items = db.stock.filter(x =>
-    String(x.Ativo) !== 'false' &&
+    isActive(x.Ativo) &&
     (!cat || x.Categoria === cat) &&
-    [x.Nome,x.Categoria,x.Tipo].join(' ').toLowerCase().includes(q)
+    [x.Nome, x.Categoria, formatTipo(x.Tipo)].join(' ').toLowerCase().includes(q)
   );
   $('stockList').innerHTML = items.length ? items.map(x => `
     <article class="card">
       <h3>${esc(x.Nome)}</h3>
-      <div class="muted">${esc(x.Categoria || 'Outros')} · ${esc(x.Tipo || 'Equipamento')}</div>
+      <div class="muted">${esc(x.Categoria || 'Outros')} · ${esc(formatTipo(x.Tipo))}</div>
       <div class="qty"><span class="muted">Stock</span>
         <button onclick="changeQty('${esc(x.ID)}',-1,'stock')">−</button>
         <strong>${Number(x.Stock)||0}</strong>
@@ -275,7 +281,7 @@ function reservationAction(id,action){
 function renderClients(){
   const q = $('clientSearch').value.toLowerCase();
   const rows = db.clientes.filter(x =>
-    String(x.Ativo) !== 'false' &&
+    isActive(x.Ativo) &&
     [x.Nome,x.NIF,x.Contacto,x.Email].join(' ').toLowerCase().includes(q)
   );
   $('clientList').innerHTML = rows.length ? rows.map(x => `
@@ -306,8 +312,8 @@ function reserveThis(id){
 function openModal(mode,preselect=''){
   modalMode = mode;
   $('modalForm').reset();
-  const activeClients = db.clientes.filter(x => String(x.Ativo) !== 'false');
-  const activeItems = db.stock.filter(x => String(x.Ativo) !== 'false');
+  const activeClients = db.clientes.filter(x => isActive(x.Ativo));
+  const activeItems = db.stock.filter(x => isActive(x.Ativo));
 
   const fields = {
     item: `
