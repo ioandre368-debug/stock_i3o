@@ -8,36 +8,81 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
-:root{--navy:#0f172a;--blue:#2563eb;--bg:#f8fafc;--muted:#64748b;--line:#e2e8f0;--green:#15803d;--orange:#c2410c}
+:root{
+  --navy:#0f172a;
+  --blue:#2563eb;
+  --green:#16a34a;
+  --bg:#f8fafc;
+  --muted:#64748b;
+  --line:#e2e8f0;
+  --red-bg:#fef2f2;
+  --red-bd:#ef4444;
+  --red-tx:#991b1b;
+  --amber-bg:#fffbeb;
+  --amber-bd:#f59e0b;
+  --amber-tx:#92400e;
+}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--navy);font-family:'Plus Jakarta Sans',sans-serif}
-header{background:var(--navy);color:white;padding:16px max(16px,calc((100% - 1100px)/2));display:flex;justify-content:space-between;align-items:center;gap:12px;position:sticky;top:0;z-index:5}
-.brand{font-weight:800;font-size:1.15rem;display:flex;gap:10px;align-items:center}.brand i{background:var(--blue);padding:9px;border-radius:10px}
+header{background:var(--navy);color:white;padding:16px max(16px,calc((100% - 1100px)/2));display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;position:sticky;top:0;z-index:5}
+.brand{font-weight:800;font-size:1.15rem;display:flex;gap:10px;align-items:center}
+.brand i{background:var(--blue);padding:9px;border-radius:10px}
+.head-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 main{max-width:1100px;margin:auto;padding:22px 16px}
 .tabs{display:flex;gap:8px;overflow:auto;margin-bottom:18px}
 .tab,.btn{border:0;border-radius:10px;padding:11px 15px;font:600 .88rem 'Plus Jakarta Sans',sans-serif;cursor:pointer;white-space:nowrap}
-.tab{background:white;border:1px solid var(--line);color:var(--muted)}.tab.active,.btn.primary{background:var(--blue);color:white;border-color:var(--blue)}
-.btn{background:white;border:1px solid var(--line);color:var(--navy)}.btn.danger{color:#b91c1c}
-.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}.toolbar input,.toolbar select{flex:1;min-width:180px}
+.tab{background:white;border:1px solid var(--line);color:var(--muted)}
+.tab.active,.btn.primary{background:var(--blue);color:white;border-color:var(--blue)}
+.btn.send-btn{background:var(--green);color:white;border-color:#15803d;box-shadow:0 3px 12px #16a34a40}
+.btn{background:white;border:1px solid var(--line);color:var(--navy)}
+.btn.sm{padding:6px 10px;font-size:.78rem;border-radius:8px}
+.btn.danger{color:#b91c1c}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.toolbar input,.toolbar select{flex:1;min-width:180px}
 input,select,textarea{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:9px;font:inherit;background:white}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
-.card{background:white;border:1px solid var(--line);border-radius:15px;padding:16px;box-shadow:0 3px 14px #0f172a0a}
-.card h3{margin:0 0 5px;font-size:1rem}.muted{color:var(--muted);font-size:.82rem}
-.qty{display:flex;align-items:center;gap:9px;margin-top:12px}.qty strong{min-width:28px;text-align:center}.qty button{width:32px;height:32px;border:0;border-radius:8px;background:#e2e8f0;cursor:pointer;font-weight:800}.qty button.plus{background:var(--blue);color:white}
-.pill{display:inline-block;border-radius:20px;padding:4px 9px;font-size:.72rem;font-weight:700;background:#dbeafe;color:#1d4ed8}.pill.warn{background:#ffedd5;color:#9a3412}.pill.ok{background:#dcfce7;color:#166534}.pill.gray{background:#e2e8f0;color:#475569}
-table{width:100%;border-collapse:collapse;background:white;border-radius:12px;overflow:hidden}th,td{text-align:left;padding:11px;border-bottom:1px solid var(--line);font-size:.82rem}th{background:#f1f5f9;color:#475569}
-.table-wrap{overflow:auto}.empty{padding:35px;text-align:center;color:var(--muted);background:white;border-radius:14px}
-.modal{display:none;position:fixed;inset:0;background:#0f172a99;z-index:10;align-items:center;justify-content:center;padding:16px}.modal.show{display:flex}.modal-box{background:white;width:min(520px,100%);max-height:92vh;overflow:auto;border-radius:17px;padding:22px}
-.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}.modal-head h2{font-size:1.1rem;margin:0}.field{margin-bottom:12px}.field label{display:block;font-size:.76rem;font-weight:700;color:var(--muted);margin-bottom:5px}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
-#status{font-size:.82rem;color:var(--muted);margin:8px 0;padding:10px 12px;background:white;border:1px solid var(--line);border-radius:9px;overflow-wrap:anywhere}
-.hidden{display:none!important}.btn:disabled{opacity:.55;cursor:wait}
+.card{background:white;border:1.5px solid var(--line);border-radius:15px;padding:16px;box-shadow:0 3px 14px #0f172a0a}
+.card.alerta-zero{background:var(--red-bg);border-color:var(--red-bd)}
+.card.alerta-um{background:var(--amber-bg);border-color:var(--amber-bd)}
+.card h3{margin:0 0 5px;font-size:1rem}
+.muted{color:var(--muted);font-size:.82rem}
+.qty{display:flex;align-items:center;gap:9px;margin-top:12px}
+.qty strong{min-width:28px;text-align:center;padding:2px 6px;border-radius:6px}
+.qty strong.zero{background:#fee2e2;color:var(--red-tx)}
+.qty strong.um{background:#fef3c7;color:var(--amber-tx)}
+.qty button{width:32px;height:32px;border:0;border-radius:8px;background:#e2e8f0;cursor:pointer;font-weight:800}
+.qty button.plus{background:var(--blue);color:white}
+.pill{display:inline-block;border-radius:20px;padding:4px 9px;font-size:.72rem;font-weight:700;background:#dbeafe;color:#1d4ed8}
+.pill.warn{background:#ffedd5;color:#9a3412}
+.pill.ok{background:#dcfce7;color:#166534}
+.pill.gray{background:#e2e8f0;color:#475569}
+table{width:100%;border-collapse:collapse;background:white;border-radius:12px;overflow:hidden}
+th,td{text-align:left;padding:11px;border-bottom:1px solid var(--line);font-size:.82rem}
+th{background:#f1f5f9;color:#475569}
+.table-wrap{overflow:auto}
+.empty{padding:35px;text-align:center;color:var(--muted);background:white;border-radius:14px}
+.modal{display:none;position:fixed;inset:0;background:#0f172a99;z-index:10;align-items:center;justify-content:center;padding:16px}
+.modal.show{display:flex}
+.modal-box{background:white;width:min(520px,100%);max-height:92vh;overflow:auto;border-radius:17px;padding:22px}
+.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.modal-head h2{font-size:1.1rem;margin:0}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:.76rem;font-weight:700;color:var(--muted);margin-bottom:5px}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+#status{font-size:.82rem;color:var(--muted);margin:8px 0;padding:10px 12px;background:white;border:1px solid var(--line);border-radius:9px;overflow-wrap:anywhere;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+#status.dirty{background:#fffbeb;border-color:#f59e0b;color:#92400e;font-weight:600}
+.hidden{display:none!important}
+.btn:disabled{opacity:.55;cursor:wait}
 @media(max-width:600px){header{padding:14px 16px}main{padding:16px 12px}.tab{padding:10px 12px}th,td{padding:9px}}
 </style>
 </head>
 <body>
 <header>
   <div class="brand"><i class="fa-solid fa-layer-group"></i> STOCK I3O</div>
-  <button class="btn primary" onclick="openModal('item')"><i class="fa fa-plus"></i> Novo artigo</button>
+  <div class="head-actions">
+    <button class="btn send-btn hidden" id="topSendBtn" onclick="sendChanges()"><i class="fa-solid fa-paper-plane"></i> Enviar alterações (<span id="changeCount">0</span>)</button>
+    <button class="btn primary" onclick="openModal('item')"><i class="fa fa-plus"></i> Novo artigo</button>
+  </div>
 </header>
 <main>
   <nav class="tabs">
@@ -46,7 +91,13 @@ table{width:100%;border-collapse:collapse;background:white;border-radius:12px;ov
     <button class="tab" data-tab="clientes" onclick="showTab('clientes')"><i class="fa fa-users"></i> Clientes</button>
     <button class="tab" data-tab="historico" onclick="showTab('historico')"><i class="fa fa-clock-rotate-left"></i> Histórico</button>
   </nav>
-  <div id="status">A ligar à base de dados...</div>
+  <div id="status">
+    <span id="statusText">A ligar à base de dados...</span>
+    <span id="statusActions" class="hidden">
+      <button class="btn sm" onclick="discardChanges()">Anular</button>
+      <button class="btn sm send-btn" onclick="sendChanges()">Enviar alterações</button>
+    </span>
+  </div>
 
   <section id="view-stock">
     <div class="toolbar">
@@ -93,11 +144,43 @@ table{width:100%;border-collapse:collapse;background:white;border-radius:12px;ov
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwQdaZrq353LGi01xHfnrbwU2zcFHgRox4g92U47I9-hQzfh4lXu7hx-BuLiWl5a-Br/exec';
 
 let db = {stock:[], clientes:[], reservados:[], historico:[]};
+let queue = [];
 let modalMode = '';
-let isSaving = false;
+let isSending = false;
 
 const $ = id => document.getElementById(id);
-function msg(t){ $('status').textContent = t; }
+function msg(t){ $('statusText').textContent = t; }
+
+function updatePendingBanner(){
+  const count = queue.length;
+  const hasPending = count > 0;
+  $('changeCount').textContent = count;
+  $('topSendBtn').classList.toggle('hidden', !hasPending);
+  $('statusActions').classList.toggle('hidden', !hasPending);
+  $('status').classList.toggle('dirty', hasPending);
+  if (hasPending) {
+    msg(`${count} alteração(ões) por enviar. Ajusta à vontade e clica em "Enviar alterações".`);
+  }
+}
+
+function enqueue(actionObj){
+  if (actionObj.action === 'updateQty') {
+    const prev = queue[queue.length - 1];
+    if (
+      prev &&
+      prev.action === 'updateQty' &&
+      String(prev.id) === String(actionObj.id) &&
+      prev.field === actionObj.field
+    ) {
+      prev.change += actionObj.change;
+      if (prev.change === 0) queue.pop();
+      updatePendingBanner();
+      return;
+    }
+  }
+  queue.push(actionObj);
+  updatePendingBanner();
+}
 
 function isActive(v){
   const s = String(v ?? '').trim().toLowerCase();
@@ -107,6 +190,13 @@ function isActive(v){
 function formatTipo(v){
   if (v === '' || v === null || v === undefined || !isNaN(Number(v))) return 'Equipamento';
   return String(v);
+}
+
+function stockLevel(n){
+  const val = Number(n || 0);
+  if (val <= 0) return 'zero';
+  if (val === 1) return 'um';
+  return 'ok';
 }
 
 function validateScriptUrl(){
@@ -121,7 +211,7 @@ function showTab(tab){
 }
 
 function esc(v){
-  return String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  return String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&','<':'<','>':'>','"':'"',"'":'''}[c]));
 }
 
 async function readJsonResponse(response){
@@ -151,44 +241,58 @@ async function loadData(){
       throw new Error('Estrutura de dados inválida recebida do Code.gs.');
     }
     db = data.data;
+    queue = [];
     renderAll();
-    msg(`Sincronizado com Google Sheets (${db.stock.length} artigos).`);
+    updatePendingBanner();
+    if (!queue.length) {
+      msg(`Sincronizado com Google Sheets (${db.stock.length} artigos).`);
+    }
   } catch(e) {
     console.error('Erro ao carregar I3O:', e);
     msg('Falha ao carregar: ' + e.message);
   }
 }
 
-async function post(payload){
-  if (isSaving) return;
+async function discardChanges(){
+  if (!queue.length) return;
+  if (confirm('Anular as alterações ainda não enviadas e repor os valores da folha?')) {
+    await loadData();
+  }
+}
+
+async function sendChanges(){
+  if (!queue.length || isSending) return;
   validateScriptUrl();
-  isSaving = true;
-  $('saveButton').disabled = true;
-  msg('A guardar na Google Sheets...');
+  isSending = true;
+  document.querySelectorAll('.send-btn').forEach(b => b.disabled = true);
+  msg(`A enviar ${queue.length} alteração(ões) para a Google Sheets...`);
+
   try {
-    const response = await fetch(SCRIPT_URL, {
-      method:'POST',
-      redirect:'follow',
-      body: JSON.stringify(payload)
-    });
-    const res = await readJsonResponse(response);
-    if (!res || res.ok !== true) {
-      throw new Error(res && res.error ? res.error : 'Erro ao gravar na folha.');
+    for (const item of queue) {
+      const response = await fetch(SCRIPT_URL, {
+        method:'POST',
+        redirect:'follow',
+        body: JSON.stringify(item)
+      });
+      const res = await readJsonResponse(response);
+      if (!res || res.ok !== true) {
+        throw new Error(res && res.error ? res.error : 'Erro ao gravar na folha.');
+      }
+      if (res.data) {
+        db = res.data;
+      }
     }
-    if (res.data) {
-      db = res.data;
-      renderAll();
-      msg('Alteração gravada e sincronizada com Google Sheets.');
-    } else {
-      await loadData();
-    }
+    queue = [];
+    renderAll();
+    updatePendingBanner();
+    msg(`Alterações enviadas e sincronizadas (${db.stock.length} artigos).`);
   } catch(e) {
-    console.error('Erro ao guardar:', e);
-    msg('Erro ao guardar: ' + e.message);
-    throw e;
+    console.error('Erro ao enviar alterações:', e);
+    msg('Erro ao enviar: ' + e.message + ' (alterações mantidas para nova tentativa)');
+    alert('Erro ao enviar: ' + e.message);
   } finally {
-    isSaving = false;
-    $('saveButton').disabled = false;
+    isSending = false;
+    document.querySelectorAll('.send-btn').forEach(b => b.disabled = false);
   }
 }
 
@@ -216,32 +320,53 @@ function renderStock(){
     (!cat || x.Categoria === cat) &&
     [x.Nome, x.Categoria, formatTipo(x.Tipo)].join(' ').toLowerCase().includes(q)
   );
-  $('stockList').innerHTML = items.length ? items.map(x => `
-    <article class="card">
-      <h3>${esc(x.Nome)}</h3>
-      <div class="muted">${esc(x.Categoria || 'Outros')} · ${esc(formatTipo(x.Tipo))}</div>
-      <div class="qty"><span class="muted">Stock</span>
-        <button onclick="changeQty('${esc(x.ID)}',-1,'stock')">−</button>
-        <strong>${Number(x.Stock)||0}</strong>
-        <button class="plus" onclick="changeQty('${esc(x.ID)}',1,'stock')">+</button>
-      </div>
-      <div class="qty"><span class="muted">Demo</span>
-        <button onclick="changeQty('${esc(x.ID)}',-1,'demo')">−</button>
-        <strong>${Number(x.Demo)||0}</strong>
-        <button class="plus" onclick="changeQty('${esc(x.ID)}',1,'demo')">+</button>
-      </div>
-      <div class="actions">
-        <button class="btn" onclick="reserveThis('${esc(x.ID)}')">Reservar</button>
-        <button class="btn danger" onclick="archiveItem('${esc(x.ID)}')">Arquivar</button>
-      </div>
-    </article>`).join('') : '<div class="empty">Não foram encontrados artigos.</div>';
+  $('stockList').innerHTML = items.length ? items.map(x => {
+    const st = Number(x.Stock || 0);
+    const dm = Number(x.Demo || 0);
+    const lvl = stockLevel(st);
+    const cardCls = lvl === 'zero' ? 'card alerta-zero' : (lvl === 'um' ? 'card alerta-um' : 'card');
+    return `
+      <article class="${cardCls}">
+        <h3>${esc(x.Nome)}</h3>
+        <div class="muted">${esc(x.Categoria || 'Outros')} · ${esc(formatTipo(x.Tipo))}</div>
+        <div class="qty"><span class="muted">Stock</span>
+          <button onclick="changeQty('${esc(x.ID)}',-1,'stock')">−</button>
+          <strong class="${lvl}">${st}</strong>
+          <button class="plus" onclick="changeQty('${esc(x.ID)}',1,'stock')">+</button>
+        </div>
+        <div class="qty"><span class="muted">Demo</span>
+          <button onclick="changeQty('${esc(x.ID)}',-1,'demo')">−</button>
+          <strong>${dm}</strong>
+          <button class="plus" onclick="changeQty('${esc(x.ID)}',1,'demo')">+</button>
+        </div>
+        <div class="actions">
+          <button class="btn" onclick="reserveThis('${esc(x.ID)}')">Reservar</button>
+          <button class="btn danger" onclick="archiveItem('${esc(x.ID)}')">Arquivar</button>
+        </div>
+      </article>`;
+  }).join('') : '<div class="empty">Não foram encontrados artigos.</div>';
 }
 
-function changeQty(id,change,field){
-  post({action:'updateQty',id,change,field}).catch(e => alert(e.message));
+function changeQty(id, change, field){
+  const item = db.stock.find(x => String(x.ID) === String(id));
+  if (!item) return;
+  const prop = field === 'demo' ? 'Demo' : 'Stock';
+  const next = Number(item[prop] || 0) + change;
+  if (next < 0) {
+    alert('Quantidade insuficiente.');
+    return;
+  }
+  item[prop] = next;
+  enqueue({ action:'updateQty', id, change, field });
+  renderStock();
 }
+
 function archiveItem(id){
-  if(confirm('Arquivar este artigo?')) post({action:'deleteItem',id}).catch(e => alert(e.message));
+  if (!confirm('Arquivar este artigo? (Será enviado ao clicar em "Enviar alterações")')) return;
+  const item = db.stock.find(x => String(x.ID) === String(id));
+  if (item) item.Ativo = false;
+  enqueue({ action:'deleteItem', id });
+  renderStock();
 }
 
 function renderReservations(){
@@ -270,11 +395,28 @@ function dateFmt(v){
   const d = new Date(v);
   return isNaN(d) ? esc(v) : d.toLocaleDateString('pt-PT');
 }
-function reservationAction(id,action){
+
+function reservationAction(id, action){
   const question = action === 'cancelReservation'
     ? 'Cancelar a reserva e repor a quantidade no stock?'
     : 'Confirmar que o artigo foi entregue?';
-  if(confirm(question)) post({action,id}).catch(e => alert(e.message));
+  if (!confirm(question)) return;
+
+  const res = db.reservados.find(r => String(r.ID) === String(id));
+  if (res) {
+    if (action === 'cancelReservation' && res.Estado === 'Pendente') {
+      const item = db.stock.find(x => String(x.ID) === String(res.ItemID));
+      if (item) {
+        const prop = res.Origem === 'Demo' ? 'Demo' : 'Stock';
+        item[prop] = Number(item[prop] || 0) + Number(res.Quantidade || 0);
+      }
+      res.Estado = 'Cancelada';
+    } else if (action === 'deliverReservation') {
+      res.Estado = 'Entregue';
+    }
+  }
+  enqueue({ action, id });
+  renderAll();
 }
 
 function renderClients(){
@@ -291,8 +433,13 @@ function renderClients(){
       <div class="actions"><button class="btn danger" onclick="archiveClient('${esc(x.ID)}')">Arquivar</button></div>
     </article>`).join('') : '<div class="empty">Ainda não existem clientes.</div>';
 }
+
 function archiveClient(id){
-  if(confirm('Arquivar este cliente?')) post({action:'deleteClient',id}).catch(e => alert(e.message));
+  if (!confirm('Arquivar este cliente?')) return;
+  const cl = db.clientes.find(x => String(x.ID) === String(id));
+  if (cl) cl.Ativo = false;
+  enqueue({ action:'deleteClient', id });
+  renderClients();
 }
 
 function renderHistory(){
@@ -305,10 +452,10 @@ function renderHistory(){
 
 function reserveThis(id){
   showTab('reservados');
-  openModal('reservation',id);
+  openModal('reservation', id);
 }
 
-function openModal(mode,preselect=''){
+function openModal(mode, preselect=''){
   modalMode = mode;
   $('modalForm').reset();
   const activeClients = db.clientes.filter(x => isActive(x.Ativo));
@@ -344,10 +491,10 @@ function openModal(mode,preselect=''){
 
   $('modalTitle').textContent = ({item:'Adicionar artigo',client:'Adicionar cliente',reservation:'Criar reserva'})[mode] || 'Novo registo';
   $('modalFields').innerHTML = fields[mode] || '';
-  if(mode === 'reservation'){
-    if(!activeClients.length) msg('Para criar uma reserva, primeiro adiciona um cliente.');
-    if(!activeItems.length) msg('Não existem artigos ativos para reservar.');
-    if(preselect && $('reserveItem')) $('reserveItem').value = preselect;
+  if (mode === 'reservation') {
+    if (!activeClients.length) msg('Para criar uma reserva, primeiro adiciona um cliente.');
+    if (!activeItems.length) msg('Não existem artigos ativos para reservar.');
+    if (preselect && $('reserveItem')) $('reserveItem').value = preselect;
   }
   $('modal').classList.add('show');
 }
@@ -356,24 +503,67 @@ function closeModal(){ $('modal').classList.remove('show'); }
 
 async function submitModal(e){
   e.preventDefault();
-  const form = e.target;
-  const f = Object.fromEntries(new FormData(form).entries());
+  const f = Object.fromEntries(new FormData(e.target).entries());
 
   try {
-    if(modalMode === 'item'){
-      f.action = 'addItem';
-      f.stock = Number(f.stock);
-      f.demo = Number(f.demo);
+    if (modalMode === 'item') {
+      const st = Number(f.stock || 0);
+      const dm = Number(f.demo || 0);
+      db.stock.push({
+        ID: 'tmp_' + Date.now(),
+        Nome: f.nome.trim(),
+        Categoria: f.categoria || 'Outros',
+        Tipo: f.tipo || 'Equipamento',
+        Stock: st,
+        Demo: dm,
+        Ativo: true
+      });
+      enqueue({ action:'addItem', ...f, stock: st, demo: dm });
+    } else if (modalMode === 'client') {
+      db.clientes.push({
+        ID: 'tmp_c_' + Date.now(),
+        Nome: f.nome.trim(),
+        NIF: f.nif || '',
+        Contacto: f.contacto || '',
+        Email: f.email || '',
+        Morada: f.morada || '',
+        Ativo: true
+      });
+      enqueue({ action:'addClient', ...f });
+    } else if (modalMode === 'reservation') {
+      if (!f.clienteId) throw new Error('Não existem clientes. Cria primeiro um cliente.');
+      if (!f.itemId) throw new Error('Não existem artigos ativos para reservar.');
+      const qty = Number(f.quantidade || 1);
+      const item = db.stock.find(x => String(x.ID) === String(f.itemId));
+      const client = db.clientes.find(c => String(c.ID) === String(f.clienteId));
+      const prop = f.origem === 'Demo' ? 'Demo' : 'Stock';
+      if (item && Number(item[prop] || 0) < qty) {
+        throw new Error('Quantidade insuficiente. Disponível: ' + Number(item[prop] || 0));
+      }
+      if (item) item[prop] = Number(item[prop] || 0) - qty;
+      db.reservados.push({
+        ID: 'tmp_r_' + Date.now(),
+        DataReserva: new Date().toISOString(),
+        DataPrevista: f.dataPrevista || '',
+        ClienteID: f.clienteId,
+        ClienteNome: client ? client.Nome : '',
+        ItemID: f.itemId,
+        ItemNome: item ? item.Nome : '',
+        Origem: f.origem,
+        TipoArtigo: item ? formatTipo(item.Tipo) : 'Equipamento',
+        Quantidade: qty,
+        Estado: 'Pendente'
+      });
+      enqueue({
+        action:'createReservation',
+        ...f,
+        quantidade: qty,
+        dataReserva: new Date().toISOString()
+      });
     }
-    if(modalMode === 'client') f.action = 'addClient';
-    if(modalMode === 'reservation'){
-      if(!f.clienteId) throw new Error('Não existem clientes. Cria primeiro um cliente.');
-      if(!f.itemId) throw new Error('Não existem artigos ativos para reservar.');
-      f.action = 'createReservation';
-      f.quantidade = Number(f.quantidade);
-      f.dataReserva = new Date().toISOString();
-    }
-    await post(f);
+
+    renderAll();
+    updatePendingBanner();
     closeModal();
   } catch(err) {
     alert(err.message);
