@@ -11,8 +11,9 @@
 :root{--navy:#0f172a;--blue:#2563eb;--bg:#f8fafc;--muted:#64748b;--line:#e2e8f0;--green:#15803d;--orange:#c2410c}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--navy);font-family:'Plus Jakarta Sans',sans-serif}
-header{background:var(--navy);color:white;padding:16px max(16px,calc((100% - 1100px)/2));display:flex;justify-content:space-between;align-items:center;gap:12px;position:sticky;top:0;z-index:5}
+header{background:var(--navy);color:white;padding:16px max(16px,calc((100% - 1100px)/2));display:flex;justify-content:space-between;align-items:center;gap:12px;position:sticky;top:0;z-index:5;flex-wrap:wrap}
 .brand{font-weight:800;font-size:1.15rem;display:flex;gap:10px;align-items:center}.brand i{background:var(--blue);padding:9px;border-radius:10px}
+.header-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 main{max-width:1100px;margin:auto;padding:22px 16px}
 .tabs{display:flex;gap:8px;overflow:auto;margin-bottom:18px}
 .tab,.btn{border:0;border-radius:10px;padding:11px 15px;font:600 .88rem 'Plus Jakarta Sans',sans-serif;cursor:pointer;white-space:nowrap}
@@ -31,13 +32,18 @@ table{width:100%;border-collapse:collapse;background:white;border-radius:12px;ov
 .modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}.modal-head h2{font-size:1.1rem;margin:0}.field{margin-bottom:12px}.field label{display:block;font-size:.76rem;font-weight:700;color:var(--muted);margin-bottom:5px}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
 #status{font-size:.82rem;color:var(--muted);margin:8px 0;padding:10px 12px;background:white;border:1px solid var(--line);border-radius:9px;overflow-wrap:anywhere}
 .hidden{display:none!important}.btn:disabled{opacity:.55;cursor:wait}
-@media(max-width:600px){header{padding:14px 16px}main{padding:16px 12px}.tab{padding:10px 12px}th,td{padding:9px}}
+.pending{font-size:.75rem;color:#fed7aa;font-weight:700;white-space:nowrap}
+@media(max-width:600px){header{padding:14px 16px}main{padding:16px 12px}.tab{padding:10px 12px}th,td{padding:9px}.header-actions{width:100%}.header-actions .btn{flex:1}}
 </style>
 </head>
 <body>
 <header>
   <div class="brand"><i class="fa-solid fa-layer-group"></i> STOCK I3O</div>
-  <button class="btn primary" onclick="openModal('item')"><i class="fa fa-plus"></i> Novo artigo</button>
+  <div class="header-actions">
+    <span class="pending" id="pendingBadge">0 alterações pendentes</span>
+    <button class="btn primary" id="syncButton" onclick="syncNow()"><i class="fa-solid fa-rotate"></i> Sincronizar agora</button>
+    <button class="btn" onclick="openModal('item')"><i class="fa fa-plus"></i> Novo artigo</button>
+  </div>
 </header>
 <main>
   <nav class="tabs">
@@ -46,13 +52,13 @@ table{width:100%;border-collapse:collapse;background:white;border-radius:12px;ov
     <button class="tab" data-tab="clientes" onclick="showTab('clientes')"><i class="fa fa-users"></i> Clientes</button>
     <button class="tab" data-tab="historico" onclick="showTab('historico')"><i class="fa fa-clock-rotate-left"></i> Histórico</button>
   </nav>
-  <div id="status">A ligar à base de dados...</div>
+  <div id="status">Modo local ativo. Clica em «Sincronizar agora» para comunicar com a Google Sheets.</div>
 
   <section id="view-stock">
     <div class="toolbar">
       <input id="stockSearch" placeholder="Pesquisar artigo, marca ou modelo..." oninput="renderStock()">
       <select id="stockCategory" onchange="renderStock()"><option value="">Todas as categorias</option></select>
-      <button class="btn" onclick="loadData()">↻ Atualizar</button>
+      <button class="btn" onclick="renderAll()">↻ Atualizar vista</button>
     </div>
     <div id="stockList" class="grid"></div>
   </section>
@@ -84,303 +90,222 @@ table{width:100%;border-collapse:collapse;background:white;border-radius:12px;ov
     <div class="modal-head"><h2 id="modalTitle">Novo registo</h2><button class="btn" type="button" onclick="closeModal()">✕</button></div>
     <form id="modalForm" onsubmit="submitModal(event)">
       <div id="modalFields"></div>
-      <button class="btn primary" style="width:100%;margin-top:8px" type="submit" id="saveButton">Guardar</button>
+      <button class="btn primary" style="width:100%;margin-top:8px" type="submit" id="saveButton">Guardar localmente</button>
     </form>
   </div>
 </div>
 
 <script>
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwQdaZrq353LGi01xHfnrbwU2zcFHgRox4g92U47I9-hQzfh4lXu7hx-BuLiWl5a-Br/exec';
-
+const STORAGE_KEY = 'i3o_stock_local_v2';
 let db = {stock:[], clientes:[], reservados:[], historico:[]};
+let pending = [];
 let modalMode = '';
-let isSaving = false;
+let isSyncing = false;
 
 const $ = id => document.getElementById(id);
 function msg(t){ $('status').textContent = t; }
-
+function makeId(){ return (crypto && crypto.randomUUID) ? crypto.randomUUID() : 'local-' + Date.now() + '-' + Math.random().toString(16).slice(2); }
+function persist(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({db,pending}));
+  updatePendingBadge();
+}
+function updatePendingBadge(){
+  const n = pending.length;
+  $('pendingBadge').textContent = n + (n===1 ? ' alteração pendente' : ' alterações pendentes');
+  $('syncButton').disabled = isSyncing || n===0;
+  $('syncButton').innerHTML = isSyncing ? '<i class="fa fa-spinner fa-spin"></i> A sincronizar...' : '<i class="fa-solid fa-rotate"></i> Sincronizar agora';
+}
 function isActive(v){
   const s = String(v ?? '').trim().toLowerCase();
   return v !== false && s !== 'false' && s !== 'nao' && s !== 'não' && s !== 'arquivado';
 }
+function formatTipo(v){ if(v===''||v===null||v===undefined||!isNaN(Number(v))) return 'Equipamento'; return String(v); }
+function showTab(tab){
+  document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));
+  ['stock','reservados','clientes','historico'].forEach(x=>$('view-'+x).classList.toggle('hidden',x!==tab));
+}
+function esc(v){ return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function dateFmt(v){ if(!v)return '—'; const d=new Date(v); return isNaN(d)?esc(v):d.toLocaleDateString('pt-PT'); }
 
-function formatTipo(v){
-  if (v === '' || v === null || v === undefined || !isNaN(Number(v))) return 'Equipamento';
-  return String(v);
+function loadLocal(){
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+    if(saved && saved.db){ db=saved.db; pending=Array.isArray(saved.pending)?saved.pending:[]; }
+  } catch(e){ console.warn('Não foi possível ler os dados locais.',e); }
+  renderAll();
+  updatePendingBadge();
+  msg(pending.length ? 'Dados locais carregados. Existem alterações por sincronizar.' : 'Dados locais carregados. Sem ligação à Google Sheets até clicares em «Sincronizar agora».');
 }
 
-function validateScriptUrl(){
-  if (!SCRIPT_URL || !/^https:\/\/script\.google\.com\/macros\/s\/[^/]+\/exec$/.test(SCRIPT_URL)) {
-    throw new Error('Configura o SCRIPT_URL com o endereço da Aplicação Web terminado em /exec.');
+/* Aplica imediatamente no navegador; a Google Sheets só é alterada no botão Sincronizar. */
+function applyLocalAction(p){
+  const stamp=new Date().toISOString();
+  const log=(acao,entidade,id,descricao,quantidade=0)=>db.historico.unshift({ID:makeId(),DataHora:stamp,Acao:acao,Entidade:entidade,EntidadeID:id,Descricao:descricao,Quantidade:quantidade,Utilizador:'Local'});
+  switch(p.action){
+    case 'addItem': {
+      const id=p.id || makeId();
+      db.stock.push({ID:id,Nome:p.nome,Categoria:p.categoria||'Outros',Tipo:p.tipo||'Equipamento',Stock:Number(p.stock)||0,Demo:Number(p.demo)||0,Ativo:true,Min:Number(p.min)||0,CriadoEm:stamp,AtualizadoEm:stamp});
+      log('Criação','Stock',id,'Artigo criado: '+p.nome); break;
+    }
+    case 'addClient': {
+      const id=p.id || makeId();
+      db.clientes.push({ID:id,Nome:p.nome,NIF:p.nif||'',Contacto:p.contacto||'',Email:p.email||'',Morada:p.morada||'',Observacoes:p.observacoes||'',Ativo:true,CriadoEm:stamp,AtualizadoEm:stamp});
+      log('Criação','Clientes',id,'Cliente criado: '+p.nome); break;
+    }
+    case 'updateQty': {
+      const item=db.stock.find(x=>String(x.ID)===String(p.id)); if(!item) throw new Error('Artigo não encontrado localmente.');
+      const field=p.field==='demo'?'Demo':'Stock', next=Number(item[field]||0)+Number(p.change);
+      if(next<0) throw new Error('Quantidade insuficiente.');
+      item[field]=next; item.AtualizadoEm=stamp; log(Number(p.change)>0?'Entrada':'Saída','Stock',p.id,item.Nome+' ('+field+')',Number(p.change)); break;
+    }
+    case 'deleteItem':
+    case 'deleteClient': {
+      const arr=p.action==='deleteItem'?db.stock:db.clientes;
+      const item=arr.find(x=>String(x.ID)===String(p.id)); if(!item) throw new Error('Registo não encontrado localmente.');
+      item.Ativo=false; item.AtualizadoEm=stamp; log('Desativação',p.action==='deleteItem'?'Stock':'Clientes',p.id,'Registo arquivado'); break;
+    }
+    case 'createReservation': {
+      const item=db.stock.find(x=>String(x.ID)===String(p.itemId)&&isActive(x.Ativo));
+      const client=db.clientes.find(x=>String(x.ID)===String(p.clienteId)&&isActive(x.Ativo));
+      if(!item) throw new Error('Artigo inválido.');
+      if(!client) throw new Error('Cliente inválido.');
+      const source=p.origem==='Demo'?'Demo':'Stock', qty=Number(p.quantidade);
+      if(!Number.isInteger(qty)||qty<1) throw new Error('Quantidade inválida.');
+      if(Number(item[source]||0)<qty) throw new Error('Quantidade insuficiente. Disponível: '+Number(item[source]||0));
+      item[source]=Number(item[source]||0)-qty; item.AtualizadoEm=stamp;
+      const id=p.id||makeId();
+      db.reservados.push({ID:id,DataReserva:p.dataReserva||stamp,DataPrevista:p.dataPrevista||'',ClienteID:client.ID,ClienteNome:client.Nome,ItemID:item.ID,ItemNome:item.Nome,Categoria:item.Categoria||'',TipoArtigo:item.Tipo||'Equipamento',Origem:source,Quantidade:qty,Estado:'Pendente',Observacoes:p.observacoes||'',Responsavel:p.responsavel||'',DataEntrega:'',DataCancelamento:'',CriadoEm:stamp,AtualizadoEm:stamp});
+      log('Reserva','Reservados',id,client.Nome+' - '+item.Nome+' ('+source+')',qty); break;
+    }
+    case 'deliverReservation':
+    case 'cancelReservation': {
+      const res=db.reservados.find(x=>String(x.ID)===String(p.id));
+      if(!res||res.Estado!=='Pendente') throw new Error('Apenas reservas pendentes podem ser alteradas.');
+      res.Estado=p.action==='deliverReservation'?'Entregue':'Cancelada'; res.AtualizadoEm=stamp;
+      if(res.Estado==='Entregue') res.DataEntrega=stamp;
+      else {
+        res.DataCancelamento=stamp;
+        const item=db.stock.find(x=>String(x.ID)===String(res.ItemID));
+        if(item){const field=res.Origem==='Demo'?'Demo':'Stock';item[field]=Number(item[field]||0)+Number(res.Quantidade||0);item.AtualizadoEm=stamp;}
+      }
+      log(res.Estado,'Reservados',res.ID,res.ClienteNome+' - '+res.ItemNome,Number(res.Quantidade||0)); break;
+    }
+    default: throw new Error('Ação local não suportada: '+p.action);
   }
 }
-
-function showTab(tab){
-  document.querySelectorAll('.tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
-  ['stock','reservados','clientes','historico'].forEach(x => $('view-'+x).classList.toggle('hidden', x !== tab));
+function queueAction(payload){
+  const p={...payload,_opId:makeId()};
+  applyLocalAction(p);
+  pending.push(p);
+  persist(); renderAll();
+  msg('Alteração guardada neste navegador. Ainda não foi enviada para a Google Sheets.');
 }
-
-function esc(v){
-  return String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-}
+function changeQty(id,change,field){ try{queueAction({action:'updateQty',id,change,field});}catch(e){alert(e.message);} }
+function archiveItem(id){if(confirm('Arquivar este artigo?'))try{queueAction({action:'deleteItem',id});}catch(e){alert(e.message);}}
+function archiveClient(id){if(confirm('Arquivar este cliente?'))try{queueAction({action:'deleteClient',id});}catch(e){alert(e.message);}}
 
 async function readJsonResponse(response){
-  const text = await response.text();
-  try {
-    return JSON.parse(text);
-  } catch (e) {
-    const preview = text.replace(/\s+/g,' ').slice(0,220);
-    if (/^\s*<!doctype html|^\s*<html/i.test(text) || /accounts\.google\.com|ServiceLogin|sign in/i.test(text)) {
-      throw new Error('O Google devolveu uma página HTML em vez de JSON. Confirma a implementação como Aplicação Web (Acesso: Qualquer pessoa) e o URL /exec.');
-    }
-    throw new Error('Resposta inválida do Apps Script: ' + (preview || '(vazia)'));
+  const t=await response.text();
+  try{return JSON.parse(t);}catch(e){
+    if(/^\s*<!doctype html|^\s*<html/i.test(t)||/accounts\.google\.com|ServiceLogin|sign in/i.test(t)) throw new Error('O Google devolveu HTML em vez de JSON. Confirma a implementação como Aplicação Web e o acesso «Qualquer pessoa».');
+    throw new Error('Resposta inválida do Apps Script: '+t.replace(/\s+/g,' ').slice(0,200));
   }
 }
-
-async function loadData(){
-  msg('A carregar dados da Google Sheets...');
-  try {
-    validateScriptUrl();
-    const response = await fetch(SCRIPT_URL + '?t=' + Date.now(), {
-      method:'GET',
-      redirect:'follow'
+async function syncNow(){
+  if(isSyncing||pending.length===0)return;
+  if(!/^https:\/\/script\.google\.com\/macros\/s\/[^/]+\/exec$/.test(SCRIPT_URL)){msg('Configura o SCRIPT_URL com o endereço da Aplicação Web terminado em /exec.');return;}
+  isSyncing=true;updatePendingBadge();msg('A enviar alterações pendentes para a Google Sheets...');
+  const batch=pending.slice();
+  try{
+    const response=await fetch(SCRIPT_URL,{
+      method:'POST',redirect:'follow',
+      headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body:JSON.stringify({action:'syncBatch',operations:batch})
     });
-    const data = await readJsonResponse(response);
-    if (!data || data.ok !== true) throw new Error(data && data.error ? data.error : 'A API respondeu sem confirmação.');
-    if (!data.data || !Array.isArray(data.data.stock)) {
-      throw new Error('Estrutura de dados inválida recebida do Code.gs.');
-    }
-    db = data.data;
-    renderAll();
-    msg(`Sincronizado com Google Sheets (${db.stock.length} artigos).`);
-  } catch(e) {
-    console.error('Erro ao carregar I3O:', e);
-    msg('Falha ao carregar: ' + e.message);
-  }
+    const result=await readJsonResponse(response);
+    if(!result||result.ok!==true)throw new Error(result&&result.error?result.error:'Falha na sincronização.');
+    const done=new Set(result.processedIds||[]);
+    pending=pending.filter(x=>!done.has(x._opId));
+    if(result.data)db=result.data;
+    persist();renderAll();
+    if(pending.length)msg('Sincronização parcial. '+pending.length+' alteração(ões) continuam pendentes. '+(result.error||''));
+    else msg('Sincronização concluída. Google Sheets atualizada.');
+  }catch(e){
+    console.error(e);msg('Não foi possível sincronizar. As alterações continuam guardadas neste navegador. '+e.message);
+  }finally{isSyncing=false;updatePendingBadge();}
 }
 
-async function post(payload){
-  if (isSaving) return;
-  validateScriptUrl();
-  isSaving = true;
-  $('saveButton').disabled = true;
-  msg('A guardar na Google Sheets...');
-  try {
-    const response = await fetch(SCRIPT_URL, {
-      method:'POST',
-      redirect:'follow',
-      body: JSON.stringify(payload)
-    });
-    const res = await readJsonResponse(response);
-    if (!res || res.ok !== true) {
-      throw new Error(res && res.error ? res.error : 'Erro ao gravar na folha.');
-    }
-    if (res.data) {
-      db = res.data;
-      renderAll();
-      msg('Alteração gravada e sincronizada com Google Sheets.');
-    } else {
-      await loadData();
-    }
-  } catch(e) {
-    console.error('Erro ao guardar:', e);
-    msg('Erro ao guardar: ' + e.message);
-    throw e;
-  } finally {
-    isSaving = false;
-    $('saveButton').disabled = false;
-  }
-}
-
-function renderAll(){
-  fillSelects();
-  renderStock();
-  renderReservations();
-  renderClients();
-  renderHistory();
-}
-
+function renderAll(){fillSelects();renderStock();renderReservations();renderClients();renderHistory();updatePendingBadge();}
 function fillSelects(){
-  const current = $('stockCategory').value;
-  const cats = [...new Set(db.stock.filter(x => isActive(x.Ativo)).map(x => x.Categoria).filter(Boolean))].sort();
-  $('stockCategory').innerHTML = '<option value="">Todas as categorias</option>' +
-    cats.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
-  $('stockCategory').value = cats.includes(current) ? current : '';
+  const current=$('stockCategory').value;
+  const cats=[...new Set(db.stock.filter(x=>isActive(x.Ativo)).map(x=>x.Categoria).filter(Boolean))].sort();
+  $('stockCategory').innerHTML='<option value="">Todas as categorias</option>'+cats.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('');
+  $('stockCategory').value=cats.includes(current)?current:'';
 }
-
 function renderStock(){
-  const q = $('stockSearch').value.toLowerCase();
-  const cat = $('stockCategory').value;
-  const items = db.stock.filter(x =>
-    isActive(x.Ativo) &&
-    (!cat || x.Categoria === cat) &&
-    [x.Nome, x.Categoria, formatTipo(x.Tipo)].join(' ').toLowerCase().includes(q)
-  );
-  $('stockList').innerHTML = items.length ? items.map(x => `
-    <article class="card">
-      <h3>${esc(x.Nome)}</h3>
-      <div class="muted">${esc(x.Categoria || 'Outros')} · ${esc(formatTipo(x.Tipo))}</div>
-      <div class="qty"><span class="muted">Stock</span>
-        <button onclick="changeQty('${esc(x.ID)}',-1,'stock')">−</button>
-        <strong>${Number(x.Stock)||0}</strong>
-        <button class="plus" onclick="changeQty('${esc(x.ID)}',1,'stock')">+</button>
-      </div>
-      <div class="qty"><span class="muted">Demo</span>
-        <button onclick="changeQty('${esc(x.ID)}',-1,'demo')">−</button>
-        <strong>${Number(x.Demo)||0}</strong>
-        <button class="plus" onclick="changeQty('${esc(x.ID)}',1,'demo')">+</button>
-      </div>
-      <div class="actions">
-        <button class="btn" onclick="reserveThis('${esc(x.ID)}')">Reservar</button>
-        <button class="btn danger" onclick="archiveItem('${esc(x.ID)}')">Arquivar</button>
-      </div>
-    </article>`).join('') : '<div class="empty">Não foram encontrados artigos.</div>';
+  const q=$('stockSearch').value.toLowerCase(),cat=$('stockCategory').value;
+  const items=db.stock.filter(x=>isActive(x.Ativo)&&(!cat||x.Categoria===cat)&&[x.Nome,x.Categoria,formatTipo(x.Tipo)].join(' ').toLowerCase().includes(q));
+  $('stockList').innerHTML=items.length?items.map(x=>`
+    <article class="card"><h3>${esc(x.Nome)}</h3><div class="muted">${esc(x.Categoria||'Outros')} · ${esc(formatTipo(x.Tipo))}</div>
+    <div class="qty"><span class="muted">Stock</span><button onclick="changeQty('${esc(x.ID)}',-1,'stock')">−</button><strong>${Number(x.Stock)||0}</strong><button class="plus" onclick="changeQty('${esc(x.ID)}',1,'stock')">+</button></div>
+    <div class="qty"><span class="muted">Demo</span><button onclick="changeQty('${esc(x.ID)}',-1,'demo')">−</button><strong>${Number(x.Demo)||0}</strong><button class="plus" onclick="changeQty('${esc(x.ID)}',1,'demo')">+</button></div>
+    <div class="actions"><button class="btn" onclick="reserveThis('${esc(x.ID)}')">Reservar</button><button class="btn danger" onclick="archiveItem('${esc(x.ID)}')">Arquivar</button></div></article>`).join(''):'<div class="empty">Não foram encontrados artigos.</div>';
 }
-
-function changeQty(id,change,field){
-  post({action:'updateQty',id,change,field}).catch(e => alert(e.message));
-}
-function archiveItem(id){
-  if(confirm('Arquivar este artigo?')) post({action:'deleteItem',id}).catch(e => alert(e.message));
-}
-
 function renderReservations(){
-  const q = $('reservationSearch').value.toLowerCase();
-  const state = $('reservationState').value;
-  const rows = db.reservados.filter(x =>
-    (!state || x.Estado === state) &&
-    [x.ClienteNome,x.ItemNome,x.ID].join(' ').toLowerCase().includes(q)
-  ).slice().reverse();
-
-  $('reservationList').innerHTML = rows.length ? `
-    <div class="table-wrap"><table><thead><tr>
-      <th>Reserva</th><th>Cliente / Artigo</th><th>Qtd.</th><th>Estado</th><th>Datas</th><th>Ações</th>
-    </tr></thead><tbody>${rows.map(x => `<tr>
-      <td>${esc(String(x.ID).slice(0,8))}<br><span class="muted">${dateFmt(x.DataReserva)}</span></td>
-      <td><b>${esc(x.ClienteNome)}</b><br>${esc(x.ItemNome)}<br><span class="muted">${esc(x.Origem)} · ${esc(x.TipoArtigo)}</span></td>
-      <td>${esc(x.Quantidade)}</td>
-      <td><span class="pill ${x.Estado==='Pendente'?'warn':x.Estado==='Entregue'?'ok':'gray'}">${esc(x.Estado)}</span></td>
-      <td>${dateFmt(x.DataPrevista)}</td>
-      <td>${x.Estado==='Pendente' ? `<button class="btn" onclick="reservationAction('${esc(x.ID)}','deliverReservation')">Entregue</button> <button class="btn danger" onclick="reservationAction('${esc(x.ID)}','cancelReservation')">Cancelar</button>` : '—'}</td>
-    </tr>`).join('')}</tbody></table></div>` : '<div class="empty">Ainda não existem reservas.</div>';
-}
-
-function dateFmt(v){
-  if(!v) return '—';
-  const d = new Date(v);
-  return isNaN(d) ? esc(v) : d.toLocaleDateString('pt-PT');
+  const q=$('reservationSearch').value.toLowerCase(),state=$('reservationState').value;
+  const rows=db.reservados.filter(x=>(!state||x.Estado===state)&&[x.ClienteNome,x.ItemNome,x.ID].join(' ').toLowerCase().includes(q)).slice().reverse();
+  $('reservationList').innerHTML=rows.length?`<div class="table-wrap"><table><thead><tr><th>Reserva</th><th>Cliente / Artigo</th><th>Qtd.</th><th>Estado</th><th>Datas</th><th>Ações</th></tr></thead><tbody>${rows.map(x=>`<tr>
+  <td>${esc(String(x.ID).slice(0,8))}<br><span class="muted">${dateFmt(x.DataReserva)}</span></td>
+  <td><b>${esc(x.ClienteNome)}</b><br>${esc(x.ItemNome)}<br><span class="muted">${esc(x.Origem)} · ${esc(x.TipoArtigo)}</span></td><td>${esc(x.Quantidade)}</td>
+  <td><span class="pill ${x.Estado==='Pendente'?'warn':x.Estado==='Entregue'?'ok':'gray'}">${esc(x.Estado)}</span></td><td>${dateFmt(x.DataPrevista)}</td>
+  <td>${x.Estado==='Pendente'?`<button class="btn" onclick="reservationAction('${esc(x.ID)}','deliverReservation')">Entregue</button> <button class="btn danger" onclick="reservationAction('${esc(x.ID)}','cancelReservation')">Cancelar</button>`:'—'}</td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">Ainda não existem reservas.</div>';
 }
 function reservationAction(id,action){
-  const question = action === 'cancelReservation'
-    ? 'Cancelar a reserva e repor a quantidade no stock?'
-    : 'Confirmar que o artigo foi entregue?';
-  if(confirm(question)) post({action,id}).catch(e => alert(e.message));
+  const question=action==='cancelReservation'?'Cancelar a reserva e repor a quantidade no stock?':'Confirmar que o artigo foi entregue?';
+  if(confirm(question))try{queueAction({action,id});}catch(e){alert(e.message);}
 }
-
 function renderClients(){
-  const q = $('clientSearch').value.toLowerCase();
-  const rows = db.clientes.filter(x =>
-    isActive(x.Ativo) &&
-    [x.Nome,x.NIF,x.Contacto,x.Email].join(' ').toLowerCase().includes(q)
-  );
-  $('clientList').innerHTML = rows.length ? rows.map(x => `
-    <article class="card">
-      <h3>${esc(x.Nome)}</h3>
-      <div class="muted">NIF: ${esc(x.NIF || '—')}</div>
-      <p style="margin-top:8px">${esc(x.Contacto || '—')}<br>${esc(x.Email || '')}</p>
-      <div class="actions"><button class="btn danger" onclick="archiveClient('${esc(x.ID)}')">Arquivar</button></div>
-    </article>`).join('') : '<div class="empty">Ainda não existem clientes.</div>';
+  const q=$('clientSearch').value.toLowerCase();
+  const rows=db.clientes.filter(x=>isActive(x.Ativo)&&[x.Nome,x.NIF,x.Contacto,x.Email].join(' ').toLowerCase().includes(q));
+  $('clientList').innerHTML=rows.length?rows.map(x=>`<article class="card"><h3>${esc(x.Nome)}</h3><div class="muted">NIF: ${esc(x.NIF||'—')}</div><p style="margin-top:8px">${esc(x.Contacto||'—')}<br>${esc(x.Email||'')}</p><div class="actions"><button class="btn danger" onclick="archiveClient('${esc(x.ID)}')">Arquivar</button></div></article>`).join(''):'<div class="empty">Ainda não existem clientes.</div>';
 }
-function archiveClient(id){
-  if(confirm('Arquivar este cliente?')) post({action:'deleteClient',id}).catch(e => alert(e.message));
-}
-
 function renderHistory(){
-  const rows = db.historico || [];
-  $('historyList').innerHTML = rows.length ? `
-    <div class="table-wrap"><table><thead><tr><th>Data</th><th>Ação</th><th>Descrição</th><th>Qtd.</th></tr></thead>
-    <tbody>${rows.map(x => `<tr><td>${dateFmt(x.DataHora)}</td><td>${esc(x.Acao)}</td><td>${esc(x.Descricao)}</td><td>${esc(x.Quantidade)}</td></tr>`).join('')}</tbody>
-    </table></div>` : '<div class="empty">Sem movimentos registados.</div>';
+  const rows=db.historico||[];
+  $('historyList').innerHTML=rows.length?`<div class="table-wrap"><table><thead><tr><th>Data</th><th>Ação</th><th>Descrição</th><th>Qtd.</th></tr></thead><tbody>${rows.map(x=>`<tr><td>${dateFmt(x.DataHora)}</td><td>${esc(x.Acao)}</td><td>${esc(x.Descricao)}</td><td>${esc(x.Quantidade)}</td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">Sem movimentos registados.</div>';
 }
-
-function reserveThis(id){
-  showTab('reservados');
-  openModal('reservation',id);
-}
-
+function reserveThis(id){showTab('reservados');openModal('reservation',id);}
 function openModal(mode,preselect=''){
-  modalMode = mode;
-  $('modalForm').reset();
-  const activeClients = db.clientes.filter(x => isActive(x.Ativo));
-  const activeItems = db.stock.filter(x => isActive(x.Ativo));
-
-  const fields = {
-    item: `
-      <div class="field"><label>Nome do artigo</label><input name="nome" required></div>
-      <div class="field"><label>Categoria / Marca</label><input name="categoria" placeholder="Huvitz, Nidek, Acessórios..."></div>
-      <div class="field"><label>Tipo de artigo</label><select name="tipo"><option>Equipamento</option><option>Acessório</option><option>Consumível</option><option>Outro</option></select></div>
-      <div class="field"><label>Stock inicial</label><input name="stock" type="number" min="0" step="1" value="0" required></div>
-      <div class="field"><label>Demo inicial</label><input name="demo" type="number" min="0" step="1" value="0" required></div>`,
-    client: `
-      <div class="field"><label>Nome do cliente</label><input name="nome" required></div>
-      <div class="field"><label>NIF</label><input name="nif"></div>
-      <div class="field"><label>Contacto</label><input name="contacto"></div>
-      <div class="field"><label>Email</label><input name="email" type="email"></div>
-      <div class="field"><label>Morada</label><input name="morada"></div>
-      <div class="field"><label>Observações</label><textarea name="observacoes"></textarea></div>`,
-    reservation: `
-      <div class="field"><label>Cliente</label><select name="clienteId" required>
-        ${activeClients.map(x => `<option value="${esc(x.ID)}">${esc(x.Nome)}</option>`).join('')}
-      </select></div>
-      <div class="field"><label>Artigo</label><select name="itemId" id="reserveItem" required>
-        ${activeItems.map(x => `<option value="${esc(x.ID)}">${esc(x.Nome)} (stock ${Number(x.Stock)||0} · demo ${Number(x.Demo)||0})</option>`).join('')}
-      </select></div>
-      <div class="field"><label>Retirar de</label><select name="origem"><option>Stock</option><option>Demo</option></select></div>
-      <div class="field"><label>Quantidade</label><input name="quantidade" type="number" min="1" step="1" value="1" required></div>
-      <div class="field"><label>Data prevista de entrega</label><input name="dataPrevista" type="date"></div>
-      <div class="field"><label>Responsável</label><input name="responsavel"></div>
-      <div class="field"><label>Observações</label><textarea name="observacoes"></textarea></div>`
+  modalMode=mode;$('modalForm').reset();
+  const activeClients=db.clientes.filter(x=>isActive(x.Ativo)),activeItems=db.stock.filter(x=>isActive(x.Ativo));
+  const fields={
+    item:`<div class="field"><label>Nome do artigo</label><input name="nome" required></div><div class="field"><label>Categoria / Marca</label><input name="categoria" placeholder="Huvitz, Nidek, Acessórios..."></div><div class="field"><label>Tipo de artigo</label><select name="tipo"><option>Equipamento</option><option>Acessório</option><option>Consumível</option><option>Outro</option></select></div><div class="field"><label>Stock inicial</label><input name="stock" type="number" min="0" step="1" value="0" required></div><div class="field"><label>Demo inicial</label><input name="demo" type="number" min="0" step="1" value="0" required></div>`,
+    client:`<div class="field"><label>Nome do cliente</label><input name="nome" required></div><div class="field"><label>NIF</label><input name="nif"></div><div class="field"><label>Contacto</label><input name="contacto"></div><div class="field"><label>Email</label><input name="email" type="email"></div><div class="field"><label>Morada</label><input name="morada"></div><div class="field"><label>Observações</label><textarea name="observacoes"></textarea></div>`,
+    reservation:`<div class="field"><label>Cliente</label><select name="clienteId" required>${activeClients.map(x=>`<option value="${esc(x.ID)}">${esc(x.Nome)}</option>`).join('')}</select></div><div class="field"><label>Artigo</label><select name="itemId" id="reserveItem" required>${activeItems.map(x=>`<option value="${esc(x.ID)}">${esc(x.Nome)} (stock ${Number(x.Stock)||0} · demo ${Number(x.Demo)||0})</option>`).join('')}</select></div><div class="field"><label>Retirar de</label><select name="origem"><option>Stock</option><option>Demo</option></select></div><div class="field"><label>Quantidade</label><input name="quantidade" type="number" min="1" step="1" value="1" required></div><div class="field"><label>Data prevista de entrega</label><input name="dataPrevista" type="date"></div><div class="field"><label>Responsável</label><input name="responsavel"></div><div class="field"><label>Observações</label><textarea name="observacoes"></textarea></div>`
   };
-
-  $('modalTitle').textContent = ({item:'Adicionar artigo',client:'Adicionar cliente',reservation:'Criar reserva'})[mode] || 'Novo registo';
-  $('modalFields').innerHTML = fields[mode] || '';
-  if(mode === 'reservation'){
-    if(!activeClients.length) msg('Para criar uma reserva, primeiro adiciona um cliente.');
-    if(!activeItems.length) msg('Não existem artigos ativos para reservar.');
-    if(preselect && $('reserveItem')) $('reserveItem').value = preselect;
+  $('modalTitle').textContent=({item:'Adicionar artigo',client:'Adicionar cliente',reservation:'Criar reserva'})[mode]||'Novo registo';
+  $('modalFields').innerHTML=fields[mode]||'';
+  if(mode==='reservation'){
+    if(!activeClients.length||!activeItems.length){msg('Para criar uma reserva, adiciona primeiro um cliente e um artigo.');}
+    if(preselect&&$('reserveItem'))$('reserveItem').value=preselect;
   }
   $('modal').classList.add('show');
 }
-
-function closeModal(){ $('modal').classList.remove('show'); }
-
-async function submitModal(e){
-  e.preventDefault();
-  const form = e.target;
-  const f = Object.fromEntries(new FormData(form).entries());
-
-  try {
-    if(modalMode === 'item'){
-      f.action = 'addItem';
-      f.stock = Number(f.stock);
-      f.demo = Number(f.demo);
+function closeModal(){$('modal').classList.remove('show');}
+function submitModal(e){
+  e.preventDefault();const f=Object.fromEntries(new FormData(e.target).entries());
+  try{
+    if(modalMode==='item'){f.action='addItem';f.stock=Number(f.stock);f.demo=Number(f.demo);}
+    if(modalMode==='client')f.action='addClient';
+    if(modalMode==='reservation'){
+      if(!f.clienteId)throw new Error('Não existem clientes. Cria primeiro um cliente.');
+      if(!f.itemId)throw new Error('Não existem artigos ativos para reservar.');
+      f.action='createReservation';f.quantidade=Number(f.quantidade);f.dataReserva=new Date().toISOString();
     }
-    if(modalMode === 'client') f.action = 'addClient';
-    if(modalMode === 'reservation'){
-      if(!f.clienteId) throw new Error('Não existem clientes. Cria primeiro um cliente.');
-      if(!f.itemId) throw new Error('Não existem artigos ativos para reservar.');
-      f.action = 'createReservation';
-      f.quantidade = Number(f.quantidade);
-      f.dataReserva = new Date().toISOString();
-    }
-    await post(f);
-    closeModal();
-  } catch(err) {
-    alert(err.message);
-  }
+    queueAction(f);closeModal();
+  }catch(err){alert(err.message);}
 }
-
-loadData();
+loadLocal();
 </script>
 </body>
 </html>
