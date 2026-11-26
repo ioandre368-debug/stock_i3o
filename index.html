@@ -97,6 +97,7 @@ table{width:100%;border-collapse:collapse;background:white;border-radius:12px;ov
 
 <script>
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwQdaZrq353LGi01xHfnrbwU2zcFHgRox4g92U47I9-hQzfh4lXu7hx-BuLiWl5a-Br/exec';
+const STORAGE_KEY = 'i3o_stock_local_v2';
 let db = {stock:[], clientes:[], reservados:[], historico:[]};
 let pending = [];
 let modalMode = '';
@@ -112,7 +113,7 @@ function persist(){
 function updatePendingBadge(){
   const n = pending.length;
   $('pendingBadge').textContent = n + (n===1 ? ' alteração pendente' : ' alterações pendentes');
-  $('syncButton').disabled = isSyncing || n===0;
+  $('syncButton').disabled = isSyncing;
   $('syncButton').innerHTML = isSyncing ? '<i class="fa fa-spinner fa-spin"></i> A sincronizar...' : '<i class="fa-solid fa-rotate"></i> Sincronizar agora';
 }
 function isActive(v){
@@ -195,6 +196,8 @@ function applyLocalAction(p){
 }
 function queueAction(payload){
   const p={...payload,_opId:makeId()};
+  // Os IDs têm de ser iguais no navegador e na Google Sheets.
+  if(['addItem','addClient','createReservation'].includes(p.action) && !p.id) p.id=makeId();
   applyLocalAction(p);
   pending.push(p);
   persist(); renderAll();
@@ -212,27 +215,54 @@ async function readJsonResponse(response){
   }
 }
 async function syncNow(){
-  if(isSyncing||pending.length===0)return;
-  if(!/^https:\/\/script\.google\.com\/macros\/s\/[^/]+\/exec$/.test(SCRIPT_URL)){msg('Configura o SCRIPT_URL com o endereço da Aplicação Web terminado em /exec.');return;}
-  isSyncing=true;updatePendingBadge();msg('A enviar alterações pendentes para a Google Sheets...');
+  if(isSyncing)return;
+  if(!/^https:\/\/script\.google\.com\/macros\/s\/[^/]+\/exec$/.test(SCRIPT_URL)){
+    msg('Configura o SCRIPT_URL com o endereço da Aplicação Web terminado em /exec.');
+    return;
+  }
+  isSyncing=true;
+  updatePendingBadge();
   const batch=pending.slice();
   try{
-    const response=await fetch(SCRIPT_URL,{
-      method:'POST',redirect:'follow',
-      headers:{'Content-Type':'text/plain;charset=utf-8'},
-      body:JSON.stringify({action:'syncBatch',operations:batch})
-    });
-    const result=await readJsonResponse(response);
-    if(!result||result.ok!==true)throw new Error(result&&result.error?result.error:'Falha na sincronização.');
-    const done=new Set(result.processedIds||[]);
-    pending=pending.filter(x=>!done.has(x._opId));
-    if(result.data)db=result.data;
-    persist();renderAll();
-    if(pending.length)msg('Sincronização parcial. '+pending.length+' alteração(ões) continuam pendentes. '+(result.error||''));
-    else msg('Sincronização concluída. Google Sheets atualizada.');
+    let result;
+    if(batch.length){
+      msg('A enviar '+batch.length+' alteração(ões) para a Google Sheets...');
+      const response=await fetch(SCRIPT_URL,{
+        method:'POST',
+        redirect:'follow',
+        headers:{'Content-Type':'text/plain;charset=utf-8'},
+        body:JSON.stringify({action:'syncBatch',operations:batch})
+      });
+      result=await readJsonResponse(response);
+      if(!result||result.ok!==true)throw new Error(result&&result.error?result.error:'Falha na sincronização.');
+      const done=new Set(result.processedIds||[]);
+      pending=pending.filter(x=>!done.has(x._opId));
+      if(result.error)throw new Error(result.error);
+    }else{
+      // Sem alterações locais, o botão descarrega os registos já existentes na folha.
+      msg('A carregar os dados existentes na Google Sheets...');
+      const response=await fetch(SCRIPT_URL+'?t='+Date.now(),{
+        method:'GET',
+        redirect:'follow',
+        cache:'no-store'
+      });
+      result=await readJsonResponse(response);
+      if(!result||result.ok!==true)throw new Error(result&&result.error?result.error:'Não foi possível carregar os dados da Google Sheets.');
+    }
+    if(!result.data||!Array.isArray(result.data.stock))throw new Error('A API respondeu, mas não devolveu a estrutura de dados esperada.');
+    db=result.data;
+    persist();
+    renderAll();
+    msg(pending.length
+      ? 'Dados carregados. '+pending.length+' alteração(ões) continuam por sincronizar.'
+      : 'Sincronização concluída. Dados da Google Sheets carregados.');
   }catch(e){
-    console.error(e);msg('Não foi possível sincronizar. As alterações continuam guardadas neste navegador. '+e.message);
-  }finally{isSyncing=false;updatePendingBadge();}
+    console.error('Erro de sincronização I3O:',e);
+    msg('Erro na sincronização: '+e.message+' As alterações locais continuam guardadas neste navegador.');
+  }finally{
+    isSyncing=false;
+    updatePendingBadge();
+  }
 }
 
 function renderAll(){fillSelects();renderStock();renderReservations();renderClients();renderHistory();updatePendingBadge();}
