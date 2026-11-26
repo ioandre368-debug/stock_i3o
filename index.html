@@ -222,43 +222,43 @@ async function syncNow(){
   }
   isSyncing=true;
   updatePendingBadge();
-  const batch=pending.slice();
   try{
-    let result;
-    if(batch.length){
-      msg('A enviar '+batch.length+' alteração(ões) para a Google Sheets...');
+    // Compatibilidade máxima: envia cada operação individualmente.
+    // Assim não depende de o Apps Script publicado já conhecer "syncBatch".
+    while(pending.length){
+      const op=pending[0];
+      msg('A enviar alteração '+(1)+' de '+pending.length+' para a Google Sheets...');
       const response=await fetch(SCRIPT_URL,{
         method:'POST',
         redirect:'follow',
         headers:{'Content-Type':'text/plain;charset=utf-8'},
-        body:JSON.stringify({action:'syncBatch',operations:batch})
+        body:JSON.stringify(op)
       });
-      result=await readJsonResponse(response);
-      if(!result||result.ok!==true)throw new Error(result&&result.error?result.error:'Falha na sincronização.');
-      const done=new Set(result.processedIds||[]);
-      pending=pending.filter(x=>!done.has(x._opId));
-      if(result.error)throw new Error(result.error);
-    }else{
-      // Sem alterações locais, o botão descarrega os registos já existentes na folha.
-      msg('A carregar os dados existentes na Google Sheets...');
-      const response=await fetch(SCRIPT_URL+'?t='+Date.now(),{
-        method:'GET',
-        redirect:'follow',
-        cache:'no-store'
-      });
-      result=await readJsonResponse(response);
-      if(!result||result.ok!==true)throw new Error(result&&result.error?result.error:'Não foi possível carregar os dados da Google Sheets.');
+      const result=await readJsonResponse(response);
+      if(!result || result.ok!==true){
+        throw new Error(result&&result.error?result.error:'O Apps Script não confirmou a operação.');
+      }
+      // Só remove a operação da fila depois de o servidor confirmar sucesso.
+      pending.shift();
+      persist();
     }
+
+    msg('A carregar os dados atuais da Google Sheets...');
+    const response=await fetch(SCRIPT_URL+'?t='+Date.now(),{
+      method:'GET',
+      redirect:'follow',
+      cache:'no-store'
+    });
+    const result=await readJsonResponse(response);
+    if(!result||result.ok!==true)throw new Error(result&&result.error?result.error:'Não foi possível carregar os dados da Google Sheets.');
     if(!result.data||!Array.isArray(result.data.stock))throw new Error('A API respondeu, mas não devolveu a estrutura de dados esperada.');
     db=result.data;
     persist();
     renderAll();
-    msg(pending.length
-      ? 'Dados carregados. '+pending.length+' alteração(ões) continuam por sincronizar.'
-      : 'Sincronização concluída. Dados da Google Sheets carregados.');
+    msg('Sincronização concluída. Dados da Google Sheets carregados.');
   }catch(e){
     console.error('Erro de sincronização I3O:',e);
-    msg('Erro na sincronização: '+e.message+' As alterações locais continuam guardadas neste navegador.');
+    msg('Erro na sincronização: '+e.message+' As operações ainda não confirmadas continuam guardadas neste navegador.');
   }finally{
     isSyncing=false;
     updatePendingBadge();
