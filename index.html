@@ -3,384 +3,77 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>I3O | Gestão de Stock</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<title>I3O Teste</title>
 <style>
-:root{--navy:#0f172a;--blue:#2563eb;--bg:#f8fafc;--muted:#64748b;--line:#e2e8f0;--green:#15803d;--orange:#c2410c}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--navy);font-family:'Plus Jakarta Sans',sans-serif}
-header{background:var(--navy);color:white;padding:16px max(16px,calc((100% - 1100px)/2));display:flex;justify-content:space-between;align-items:center;gap:12px;position:sticky;top:0;z-index:5}
-.brand{font-weight:800;font-size:1.15rem;display:flex;gap:10px;align-items:center}.brand i{background:var(--blue);padding:9px;border-radius:10px}
-main{max-width:1100px;margin:auto;padding:22px 16px}
-.tabs{display:flex;gap:8px;overflow:auto;margin-bottom:18px}
-.tab,.btn{border:0;border-radius:10px;padding:11px 15px;font:600 .88rem 'Plus Jakarta Sans',sans-serif;cursor:pointer;white-space:nowrap}
-.tab{background:white;border:1px solid var(--line);color:var(--muted)}.tab.active,.btn.primary{background:var(--blue);color:white;border-color:var(--blue)}
-.btn{background:white;border:1px solid var(--line);color:var(--navy)}.btn.danger{color:#b91c1c}
-.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}.toolbar input,.toolbar select{flex:1;min-width:180px}
-input,select,textarea{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:9px;font:inherit;background:white}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
-.card{background:white;border:1px solid var(--line);border-radius:15px;padding:16px;box-shadow:0 3px 14px #0f172a0a}
-.card h3{margin:0 0 5px;font-size:1rem}.muted{color:var(--muted);font-size:.82rem}
-.qty{display:flex;align-items:center;gap:9px;margin-top:12px}.qty strong{min-width:28px;text-align:center}.qty button{width:32px;height:32px;border:0;border-radius:8px;background:#e2e8f0;cursor:pointer;font-weight:800}.qty button.plus{background:var(--blue);color:white}
-.pill{display:inline-block;border-radius:20px;padding:4px 9px;font-size:.72rem;font-weight:700;background:#dbeafe;color:#1d4ed8}.pill.warn{background:#ffedd5;color:#9a3412}.pill.ok{background:#dcfce7;color:#166534}.pill.gray{background:#e2e8f0;color:#475569}
-table{width:100%;border-collapse:collapse;background:white;border-radius:12px;overflow:hidden}th,td{text-align:left;padding:11px;border-bottom:1px solid var(--line);font-size:.82rem}th{background:#f1f5f9;color:#475569}
-.table-wrap{overflow:auto}.empty{padding:35px;text-align:center;color:var(--muted);background:white;border-radius:14px}
-.modal{display:none;position:fixed;inset:0;background:#0f172a99;z-index:10;align-items:center;justify-content:center;padding:16px}.modal.show{display:flex}.modal-box{background:white;width:min(520px,100%);max-height:92vh;overflow:auto;border-radius:17px;padding:22px}
-.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}.modal-head h2{font-size:1.1rem;margin:0}.field{margin-bottom:12px}.field label{display:block;font-size:.76rem;font-weight:700;color:var(--muted);margin-bottom:5px}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
-#status{font-size:.82rem;color:var(--muted);margin:8px 0;padding:10px 12px;background:white;border:1px solid var(--line);border-radius:9px;overflow-wrap:anywhere}
-.hidden{display:none!important}.btn:disabled{opacity:.55;cursor:wait}
-@media(max-width:600px){header{padding:14px 16px}main{padding:16px 12px}.tab{padding:10px 12px}th,td{padding:9px}}
+  body{font-family:system-ui,sans-serif;max-width:720px;margin:30px auto;padding:0 16px;background:#f8fafc;color:#0f172a}
+  .box{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:16px;margin-bottom:16px}
+  input,button{padding:10px 12px;border-radius:8px;border:1px solid #cbd5e1;font:inherit}
+  button{background:#2563eb;color:#fff;border:0;cursor:pointer;font-weight:600}
+  #status{font-size:.9rem;margin-bottom:14px;padding:10px;border-radius:8px;background:#e2e8f0}
 </style>
 </head>
 <body>
-<header>
-  <div class="brand"><i class="fa-solid fa-layer-group"></i> STOCK I3O</div>
-  <button class="btn primary" onclick="openModal('item')"><i class="fa fa-plus"></i> Novo artigo</button>
-</header>
-<main>
-  <nav class="tabs">
-    <button class="tab active" data-tab="stock" onclick="showTab('stock')"><i class="fa fa-boxes-stacked"></i> Stock</button>
-    <button class="tab" data-tab="reservados" onclick="showTab('reservados')"><i class="fa fa-bookmark"></i> Reservados</button>
-    <button class="tab" data-tab="clientes" onclick="showTab('clientes')"><i class="fa fa-users"></i> Clientes</button>
-    <button class="tab" data-tab="historico" onclick="showTab('historico')"><i class="fa fa-clock-rotate-left"></i> Histórico</button>
-  </nav>
-  <div id="status">A ligar à base de dados...</div>
+  <h2>STOCK I3O — Teste do Zero</h2>
+  <div id="status">A ligar...</div>
 
-  <section id="view-stock">
-    <div class="toolbar">
-      <input id="stockSearch" placeholder="Pesquisar artigo, marca ou modelo..." oninput="renderStock()">
-      <select id="stockCategory" onchange="renderStock()"><option value="">Todas as categorias</option></select>
-      <button class="btn" onclick="loadData()">↻ Atualizar</button>
-    </div>
-    <div id="stockList" class="grid"></div>
-  </section>
+  <form class="box" id="formAdd">
+    <input id="nome" placeholder="Nome do artigo de teste" required style="width:65%">
+    <input id="stock" type="number" value="1" min="0" style="width:14%">
+    <button type="submit">Gravar</button>
+  </form>
 
-  <section id="view-reservados" class="hidden">
-    <div class="toolbar">
-      <input id="reservationSearch" placeholder="Pesquisar reserva, cliente ou artigo..." oninput="renderReservations()">
-      <select id="reservationState" onchange="renderReservations()">
-        <option value="">Todos os estados</option><option>Pendente</option><option>Entregue</option><option>Cancelada</option>
-      </select>
-      <button class="btn primary" onclick="openModal('reservation')">+ Nova reserva</button>
-    </div>
-    <div id="reservationList"></div>
-  </section>
-
-  <section id="view-clientes" class="hidden">
-    <div class="toolbar">
-      <input id="clientSearch" placeholder="Pesquisar cliente..." oninput="renderClients()">
-      <button class="btn primary" onclick="openModal('client')">+ Novo cliente</button>
-    </div>
-    <div id="clientList" class="grid"></div>
-  </section>
-
-  <section id="view-historico" class="hidden"><div id="historyList"></div></section>
-</main>
-
-<div class="modal" id="modal">
-  <div class="modal-box">
-    <div class="modal-head"><h2 id="modalTitle">Novo registo</h2><button class="btn" type="button" onclick="closeModal()">✕</button></div>
-    <form id="modalForm" onsubmit="submitModal(event)">
-      <div id="modalFields"></div>
-      <button class="btn primary" style="width:100%;margin-top:8px" type="submit" id="saveButton">Guardar</button>
-    </form>
-  </div>
-</div>
+  <div class="box" id="lista">Sem dados.</div>
 
 <script>
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxws8SlTAbVOUecY8F9sRPaKt-Mpx1kfwUJV1pjnmxvDwxa_xqdKGj3RitPV46j0Tk/exec';
-
-let db = {stock:[], clientes:[], reservados:[], historico:[]};
-let modalMode = '';
-let isSaving = false;
-
+const SCRIPT_URL = 'COLE_AQUI_O_SEU_URL_EXEC';
 const $ = id => document.getElementById(id);
-function msg(t){ $('status').textContent = t; }
+const setStatus = txt => { $('status').textContent = txt; };
 
-function isActive(v){
-  const s = String(v ?? '').trim().toLowerCase();
-  return v !== false && s !== 'false' && s !== 'nao' && s !== 'não' && s !== 'arquivado';
-}
-
-function formatTipo(v){
-  if (v === '' || v === null || v === undefined || !isNaN(Number(v))) return 'Equipamento';
-  return String(v);
-}
-
-function validateScriptUrl(){
-  if (!SCRIPT_URL || !/^https:\/\/script\.google\.com\/macros\/s\/[^/]+\/exec$/.test(SCRIPT_URL)) {
-    throw new Error('Configura o SCRIPT_URL com o endereço da Aplicação Web terminado em /exec.');
-  }
-}
-
-function showTab(tab){
-  document.querySelectorAll('.tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
-  ['stock','reservados','clientes','historico'].forEach(x => $('view-'+x).classList.toggle('hidden', x !== tab));
-}
-
-function esc(v){
-  return String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&','<':'<','>':'>','"':'"',"'":'''}[c]));
-}
-
-async function readJsonResponse(response){
-  const text = await response.text();
+async function parseJson(res) {
+  const raw = await res.text();
   try {
-    return JSON.parse(text);
-  } catch (e) {
-    const preview = text.replace(/\s+/g,' ').slice(0,220);
-    if (/^\s*<!doctype html|^\s*<html/i.test(text) || /accounts\.google\.com|ServiceLogin|sign in/i.test(text)) {
-      throw new Error('O Google devolveu uma página HTML em vez de JSON. Confirma a implementação como Aplicação Web (Acesso: Qualquer pessoa) e o URL /exec.');
-    }
-    throw new Error('Resposta inválida do Apps Script: ' + (preview || '(vazia)'));
+    return JSON.parse(raw);
+  } catch {
+    throw new Error('Não devolveu JSON: ' + raw.slice(0, 160));
   }
 }
 
-async function loadData(){
-  msg('A carregar dados da Google Sheets...');
+async function carregar() {
+  setStatus('A carregar...');
   try {
-    validateScriptUrl();
-    const response = await fetch(SCRIPT_URL + '?t=' + Date.now(), {
-      method:'GET',
-      redirect:'follow'
-    });
-    const data = await readJsonResponse(response);
-    if (!data || data.ok !== true) throw new Error(data && data.error ? data.error : 'A API respondeu sem confirmação.');
-    if (!data.data || !Array.isArray(data.data.stock)) {
-      throw new Error('Estrutura de dados inválida recebida do Code.gs.');
-    }
-    db = data.data;
-    renderAll();
-    msg(`Sincronizado com Google Sheets (${db.stock.length} artigos).`);
-  } catch(e) {
-    console.error('Erro ao carregar I3O:', e);
-    msg('Falha ao carregar: ' + e.message);
+    const res = await fetch(SCRIPT_URL + '?t=' + Date.now(), { method: 'GET', redirect: 'follow' });
+    const json = await parseJson(res);
+    if (!json.ok) throw new Error(json.error || 'Erro no GET');
+    const items = json.data.stock || [];
+    $('lista').innerHTML = items.length
+      ? items.map(i => `<div>• <b>${i.Nome}</b> — Stock: ${i.Stock}</div>`).join('')
+      : 'Sem artigos na folha Stock.';
+    setStatus(`Ligado (${items.length} artigos).`);
+  } catch (err) {
+    setStatus('Erro ao carregar: ' + err.message);
   }
 }
 
-async function post(payload){
-  if (isSaving) return;
-  validateScriptUrl();
-  isSaving = true;
-  $('saveButton').disabled = true;
-  msg('A guardar na Google Sheets...');
-  try {
-    const response = await fetch(SCRIPT_URL, {
-      method:'POST',
-      redirect:'follow',
-      body: JSON.stringify(payload)
-    });
-    const res = await readJsonResponse(response);
-    if (!res || res.ok !== true) {
-      throw new Error(res && res.error ? res.error : 'Erro ao gravar na folha.');
-    }
-    if (res.data) {
-      db = res.data;
-      renderAll();
-      msg('Alteração gravada e sincronizada com Google Sheets.');
-    } else {
-      await loadData();
-    }
-  } catch(e) {
-    console.error('Erro ao guardar:', e);
-    msg('Erro ao guardar: ' + e.message);
-    throw e;
-  } finally {
-    isSaving = false;
-    $('saveButton').disabled = false;
-  }
-}
-
-function renderAll(){
-  fillSelects();
-  renderStock();
-  renderReservations();
-  renderClients();
-  renderHistory();
-}
-
-function fillSelects(){
-  const current = $('stockCategory').value;
-  const cats = [...new Set(db.stock.filter(x => isActive(x.Ativo)).map(x => x.Categoria).filter(Boolean))].sort();
-  $('stockCategory').innerHTML = '<option value="">Todas as categorias</option>' +
-    cats.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
-  $('stockCategory').value = cats.includes(current) ? current : '';
-}
-
-function renderStock(){
-  const q = $('stockSearch').value.toLowerCase();
-  const cat = $('stockCategory').value;
-  const items = db.stock.filter(x =>
-    isActive(x.Ativo) &&
-    (!cat || x.Categoria === cat) &&
-    [x.Nome, x.Categoria, formatTipo(x.Tipo)].join(' ').toLowerCase().includes(q)
-  );
-  $('stockList').innerHTML = items.length ? items.map(x => `
-    <article class="card">
-      <h3>${esc(x.Nome)}</h3>
-      <div class="muted">${esc(x.Categoria || 'Outros')} · ${esc(formatTipo(x.Tipo))}</div>
-      <div class="qty"><span class="muted">Stock</span>
-        <button onclick="changeQty('${esc(x.ID)}',-1,'stock')">−</button>
-        <strong>${Number(x.Stock)||0}</strong>
-        <button class="plus" onclick="changeQty('${esc(x.ID)}',1,'stock')">+</button>
-      </div>
-      <div class="qty"><span class="muted">Demo</span>
-        <button onclick="changeQty('${esc(x.ID)}',-1,'demo')">−</button>
-        <strong>${Number(x.Demo)||0}</strong>
-        <button class="plus" onclick="changeQty('${esc(x.ID)}',1,'demo')">+</button>
-      </div>
-      <div class="actions">
-        <button class="btn" onclick="reserveThis('${esc(x.ID)}')">Reservar</button>
-        <button class="btn danger" onclick="archiveItem('${esc(x.ID)}')">Arquivar</button>
-      </div>
-    </article>`).join('') : '<div class="empty">Não foram encontrados artigos.</div>';
-}
-
-function changeQty(id,change,field){
-  post({action:'updateQty',id,change,field}).catch(e => alert(e.message));
-}
-function archiveItem(id){
-  if(confirm('Arquivar este artigo?')) post({action:'deleteItem',id}).catch(e => alert(e.message));
-}
-
-function renderReservations(){
-  const q = $('reservationSearch').value.toLowerCase();
-  const state = $('reservationState').value;
-  const rows = db.reservados.filter(x =>
-    (!state || x.Estado === state) &&
-    [x.ClienteNome,x.ItemNome,x.ID].join(' ').toLowerCase().includes(q)
-  ).slice().reverse();
-
-  $('reservationList').innerHTML = rows.length ? `
-    <div class="table-wrap"><table><thead><tr>
-      <th>Reserva</th><th>Cliente / Artigo</th><th>Qtd.</th><th>Estado</th><th>Datas</th><th>Ações</th>
-    </tr></thead><tbody>${rows.map(x => `<tr>
-      <td>${esc(String(x.ID).slice(0,8))}<br><span class="muted">${dateFmt(x.DataReserva)}</span></td>
-      <td><b>${esc(x.ClienteNome)}</b><br>${esc(x.ItemNome)}<br><span class="muted">${esc(x.Origem)} · ${esc(x.TipoArtigo)}</span></td>
-      <td>${esc(x.Quantidade)}</td>
-      <td><span class="pill ${x.Estado==='Pendente'?'warn':x.Estado==='Entregue'?'ok':'gray'}">${esc(x.Estado)}</span></td>
-      <td>${dateFmt(x.DataPrevista)}</td>
-      <td>${x.Estado==='Pendente' ? `<button class="btn" onclick="reservationAction('${esc(x.ID)}','deliverReservation')">Entregue</button> <button class="btn danger" onclick="reservationAction('${esc(x.ID)}','cancelReservation')">Cancelar</button>` : '—'}</td>
-    </tr>`).join('')}</tbody></table></div>` : '<div class="empty">Ainda não existem reservas.</div>';
-}
-
-function dateFmt(v){
-  if(!v) return '—';
-  const d = new Date(v);
-  return isNaN(d) ? esc(v) : d.toLocaleDateString('pt-PT');
-}
-function reservationAction(id,action){
-  const question = action === 'cancelReservation'
-    ? 'Cancelar a reserva e repor a quantidade no stock?'
-    : 'Confirmar que o artigo foi entregue?';
-  if(confirm(question)) post({action,id}).catch(e => alert(e.message));
-}
-
-function renderClients(){
-  const q = $('clientSearch').value.toLowerCase();
-  const rows = db.clientes.filter(x =>
-    isActive(x.Ativo) &&
-    [x.Nome,x.NIF,x.Contacto,x.Email].join(' ').toLowerCase().includes(q)
-  );
-  $('clientList').innerHTML = rows.length ? rows.map(x => `
-    <article class="card">
-      <h3>${esc(x.Nome)}</h3>
-      <div class="muted">NIF: ${esc(x.NIF || '—')}</div>
-      <p style="margin-top:8px">${esc(x.Contacto || '—')}<br>${esc(x.Email || '')}</p>
-      <div class="actions"><button class="btn danger" onclick="archiveClient('${esc(x.ID)}')">Arquivar</button></div>
-    </article>`).join('') : '<div class="empty">Ainda não existem clientes.</div>';
-}
-function archiveClient(id){
-  if(confirm('Arquivar este cliente?')) post({action:'deleteClient',id}).catch(e => alert(e.message));
-}
-
-function renderHistory(){
-  const rows = db.historico || [];
-  $('historyList').innerHTML = rows.length ? `
-    <div class="table-wrap"><table><thead><tr><th>Data</th><th>Ação</th><th>Descrição</th><th>Qtd.</th></tr></thead>
-    <tbody>${rows.map(x => `<tr><td>${dateFmt(x.DataHora)}</td><td>${esc(x.Acao)}</td><td>${esc(x.Descricao)}</td><td>${esc(x.Quantidade)}</td></tr>`).join('')}</tbody>
-    </table></div>` : '<div class="empty">Sem movimentos registados.</div>';
-}
-
-function reserveThis(id){
-  showTab('reservados');
-  openModal('reservation',id);
-}
-
-function openModal(mode,preselect=''){
-  modalMode = mode;
-  $('modalForm').reset();
-  const activeClients = db.clientes.filter(x => isActive(x.Ativo));
-  const activeItems = db.stock.filter(x => isActive(x.Ativo));
-
-  const fields = {
-    item: `
-      <div class="field"><label>Nome do artigo</label><input name="nome" required></div>
-      <div class="field"><label>Categoria / Marca</label><input name="categoria" placeholder="Huvitz, Nidek, Acessórios..."></div>
-      <div class="field"><label>Tipo de artigo</label><select name="tipo"><option>Equipamento</option><option>Acessório</option><option>Consumível</option><option>Outro</option></select></div>
-      <div class="field"><label>Stock inicial</label><input name="stock" type="number" min="0" step="1" value="0" required></div>
-      <div class="field"><label>Demo inicial</label><input name="demo" type="number" min="0" step="1" value="0" required></div>`,
-    client: `
-      <div class="field"><label>Nome do cliente</label><input name="nome" required></div>
-      <div class="field"><label>NIF</label><input name="nif"></div>
-      <div class="field"><label>Contacto</label><input name="contacto"></div>
-      <div class="field"><label>Email</label><input name="email" type="email"></div>
-      <div class="field"><label>Morada</label><input name="morada"></div>
-      <div class="field"><label>Observações</label><textarea name="observacoes"></textarea></div>`,
-    reservation: `
-      <div class="field"><label>Cliente</label><select name="clienteId" required>
-        ${activeClients.map(x => `<option value="${esc(x.ID)}">${esc(x.Nome)}</option>`).join('')}
-      </select></div>
-      <div class="field"><label>Artigo</label><select name="itemId" id="reserveItem" required>
-        ${activeItems.map(x => `<option value="${esc(x.ID)}">${esc(x.Nome)} (stock ${Number(x.Stock)||0} · demo ${Number(x.Demo)||0})</option>`).join('')}
-      </select></div>
-      <div class="field"><label>Retirar de</label><select name="origem"><option>Stock</option><option>Demo</option></select></div>
-      <div class="field"><label>Quantidade</label><input name="quantidade" type="number" min="1" step="1" value="1" required></div>
-      <div class="field"><label>Data prevista de entrega</label><input name="dataPrevista" type="date"></div>
-      <div class="field"><label>Responsável</label><input name="responsavel"></div>
-      <div class="field"><label>Observações</label><textarea name="observacoes"></textarea></div>`
-  };
-
-  $('modalTitle').textContent = ({item:'Adicionar artigo',client:'Adicionar cliente',reservation:'Criar reserva'})[mode] || 'Novo registo';
-  $('modalFields').innerHTML = fields[mode] || '';
-  if(mode === 'reservation'){
-    if(!activeClients.length) msg('Para criar uma reserva, primeiro adiciona um cliente.');
-    if(!activeItems.length) msg('Não existem artigos ativos para reservar.');
-    if(preselect && $('reserveItem')) $('reserveItem').value = preselect;
-  }
-  $('modal').classList.add('show');
-}
-
-function closeModal(){ $('modal').classList.remove('show'); }
-
-async function submitModal(e){
+$('formAdd').addEventListener('submit', async e => {
   e.preventDefault();
-  const form = e.target;
-  const f = Object.fromEntries(new FormData(form).entries());
-
+  setStatus('A gravar...');
   try {
-    if(modalMode === 'item'){
-      f.action = 'addItem';
-      f.stock = Number(f.stock);
-      f.demo = Number(f.demo);
-    }
-    if(modalMode === 'client') f.action = 'addClient';
-    if(modalMode === 'reservation'){
-      if(!f.clienteId) throw new Error('Não existem clientes. Cria primeiro um cliente.');
-      if(!f.itemId) throw new Error('Não existem artigos ativos para reservar.');
-      f.action = 'createReservation';
-      f.quantidade = Number(f.quantidade);
-      f.dataReserva = new Date().toISOString();
-    }
-    await post(f);
-    closeModal();
-  } catch(err) {
-    alert(err.message);
+    const payload = { nome: $('nome').value.trim(), stock: Number($('stock').value || 0) };
+    const res = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      redirect: 'follow',
+      body: JSON.stringify({ action: 'addItem', ...payload })
+    });
+    const json = await parseJson(res);
+    if (!json.ok) throw new Error(json.error || 'Erro no POST');
+    $('nome').value = '';
+    carregar();
+  } catch (err) {
+    setStatus('Erro ao gravar: ' + err.message);
   }
-}
+});
 
-loadData();
+carregar();
 </script>
 </body>
 </html>
