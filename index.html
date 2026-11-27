@@ -6,33 +6,39 @@
   <title>Gestão de Stock</title>
   <style>
     :root {
-      --bg: #f4f6f9;
+      --bg: #eef2f7;
       --surface: #ffffff;
       --surface-subtle: #f8fafc;
-      --text: #1e293b;
+      --text: #0f172a;
       --muted: #64748b;
       --border: #e2e8f0;
       --accent: #2563eb;
       --accent-hover: #1d4ed8;
       --accent-soft: #eff6ff;
       --ok-bg: #dcfce7;
-      --ok-fg: #166534;
+      --ok-fg: #15803d;
       --warn-bg: #fef3c7;
-      --warn-fg: #92400e;
+      --warn-fg: #b45309;
       --err-bg: #fee2e2;
-      --err-fg: #991b1b;
-      --radius: 14px;
-      --radius-sm: 9px;
+      --err-fg: #b91c1c;
+      --radius: 16px;
+      --radius-sm: 10px;
+      --shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
+      --shadow-lg: 0 14px 34px rgba(15, 23, 42, 0.09);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      background: var(--bg);
+      background:
+        radial-gradient(circle at 12% 0%, rgba(37, 99, 235, 0.08), transparent 42%),
+        radial-gradient(circle at 90% 8%, rgba(14, 165, 233, 0.07), transparent 38%),
+        var(--bg);
       color: var(--text);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
       line-height: 1.45;
-      padding-bottom: 56px;
+      min-height: 100vh;
+      padding-bottom: 64px;
     }
 
     /* ECRÃ DE LOGIN */
@@ -46,12 +52,18 @@
 
     .login-card {
       width: 100%;
-      max-width: 390px;
+      max-width: 400px;
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 28px 24px;
-      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+      border-radius: 20px;
+      padding: 30px 26px;
+      box-shadow: var(--shadow-lg);
+      animation: popIn 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes popIn {
+      from { opacity: 0; transform: translateY(10px) scale(0.985); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
     }
 
     .login-brand {
@@ -62,9 +74,9 @@
     }
 
     .login-card p {
-      font-size: 0.85rem;
+      font-size: 0.86rem;
       color: var(--muted);
-      margin-bottom: 20px;
+      margin-bottom: 22px;
     }
 
     .login-field { margin-bottom: 14px; }
@@ -72,7 +84,7 @@
     .login-error {
       display: none;
       margin-top: 12px;
-      padding: 9px 12px;
+      padding: 10px 12px;
       border-radius: var(--radius-sm);
       background: var(--err-bg);
       color: var(--err-fg);
@@ -83,13 +95,14 @@
     #app-shell { display: none; }
 
     header {
-      background: var(--surface);
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(10px);
       border-bottom: 1px solid var(--border);
-      padding: 16px 24px;
+      padding: 15px 24px;
     }
 
     .header-inner {
-      max-width: 1120px;
+      max-width: 1140px;
       margin: 0 auto;
       display: flex;
       justify-content: space-between;
@@ -101,21 +114,21 @@
     .brand { display: flex; align-items: center; gap: 12px; }
 
     .brand-dot {
-      width: 12px;
-      height: 12px;
+      width: 11px;
+      height: 11px;
       border-radius: 50%;
-      background: var(--accent);
+      background: linear-gradient(135deg, #2563eb, #0ea5e9);
       box-shadow: 0 0 0 4px var(--accent-soft);
     }
 
-    header h1 { font-size: 1.15rem; font-weight: 700; letter-spacing: -0.015em; }
+    header h1 { font-size: 1.16rem; font-weight: 800; letter-spacing: -0.02em; }
 
     .header-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 
     .role-tag {
       font-size: 0.76rem;
       font-weight: 700;
-      padding: 5px 10px;
+      padding: 6px 11px;
       border-radius: 999px;
       background: var(--surface-subtle);
       border: 1px solid var(--border);
@@ -129,21 +142,26 @@
     }
 
     .btn-refresh {
-      background: var(--surface-subtle);
+      background: var(--surface);
       color: var(--text);
       border: 1px solid var(--border);
       padding: 8px 14px;
       border-radius: var(--radius-sm);
-      font-size: 0.86rem;
+      font-size: 0.85rem;
       font-weight: 600;
       cursor: pointer;
-      transition: background 0.15s ease, border-color 0.15s ease;
+      transition: all 0.16s ease;
     }
 
-    .btn-refresh:hover { background: #eef2f6; border-color: #cbd5e1; }
+    .btn-refresh:hover {
+      background: var(--surface-subtle);
+      border-color: #cbd5e1;
+      transform: translateY(-1px);
+    }
 
     nav {
-      background: var(--surface);
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(10px);
       border-bottom: 1px solid var(--border);
       position: sticky;
       top: 0;
@@ -151,7 +169,7 @@
     }
 
     .nav-inner {
-      max-width: 1120px;
+      max-width: 1140px;
       margin: 0 auto;
       display: flex;
       overflow-x: auto;
@@ -165,39 +183,59 @@
     nav button {
       background: none;
       border: none;
-      padding: 13px 14px;
+      padding: 13px 15px;
       font-size: 0.88rem;
       font-weight: 600;
       color: var(--muted);
       cursor: pointer;
-      border-bottom: 2px solid transparent;
+      border-bottom: 2.5px solid transparent;
       white-space: nowrap;
-      transition: color 0.15s ease, border-color 0.15s ease;
+      transition: color 0.16s ease, border-color 0.16s ease;
     }
 
     nav button:hover { color: var(--text); }
     nav button.active { color: var(--accent); border-bottom-color: var(--accent); }
 
-    main { max-width: 1120px; margin: 24px auto; padding: 0 20px; }
+    main { max-width: 1140px; margin: 24px auto; padding: 0 20px; }
 
     .status-pill {
       display: inline-flex;
       align-items: center;
       gap: 8px;
       font-size: 0.8rem;
+      font-weight: 600;
       color: var(--muted);
       background: var(--surface);
       border: 1px solid var(--border);
-      padding: 5px 12px;
+      padding: 6px 13px;
       border-radius: 999px;
       margin-bottom: 18px;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #10b981;
+      transition: background 0.2s ease;
+    }
+
+    .status-dot.busy {
+      background: var(--accent);
+      animation: pulseDot 0.9s infinite alternate;
+    }
+
+    @keyframes pulseDot {
+      from { transform: scale(0.85); opacity: 0.6; }
+      to { transform: scale(1.2); opacity: 1; }
     }
 
     .tab { display: none; }
-    .tab.active { display: block; animation: fadeIn 0.16s ease; }
+    .tab.active { display: block; animation: fadeUp 0.2s cubic-bezier(0.16, 1, 0.3, 1); }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(3px); }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(6px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
@@ -207,12 +245,15 @@
       border-radius: var(--radius);
       padding: 22px;
       margin-bottom: 20px;
-      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+      box-shadow: var(--shadow);
+      transition: box-shadow 0.2s ease, border-color 0.2s ease;
     }
+
+    .card:hover { box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06); }
 
     .card.highlight {
       border-color: #93c5fd;
-      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.08);
+      box-shadow: 0 8px 24px rgba(37, 99, 235, 0.1);
     }
 
     .card-head {
@@ -224,8 +265,15 @@
       margin-bottom: 16px;
     }
 
-    .card h2 { font-size: 1.02rem; font-weight: 700; letter-spacing: -0.01em; }
-    .card h3 { font-size: 0.9rem; font-weight: 700; color: var(--muted); margin: 16px 0 10px; text-transform: uppercase; letter-spacing: 0.03em; }
+    .card h2 { font-size: 1.03rem; font-weight: 750; letter-spacing: -0.015em; }
+    .card h3 {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--muted);
+      margin: 18px 0 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
 
     .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; }
     .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(185px, 1fr)); gap: 14px; }
@@ -233,7 +281,7 @@
     label {
       display: block;
       font-size: 0.78rem;
-      font-weight: 600;
+      font-weight: 650;
       color: var(--muted);
       margin-bottom: 5px;
     }
@@ -262,7 +310,15 @@
       box-shadow: 0 0 0 3px var(--accent-soft);
     }
 
-    .search-input { max-width: 280px; background: var(--surface-subtle); }
+    .toolbar-filters {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .search-input { width: 240px; max-width: 100%; background: var(--surface-subtle); }
+    .cat-select { width: 175px; max-width: 100%; background: var(--surface-subtle); }
 
     .form-actions { margin-top: 16px; display: flex; gap: 10px; flex-wrap: wrap; }
 
@@ -271,21 +327,21 @@
       border: none;
       border-radius: var(--radius-sm);
       font-size: 0.88rem;
-      font-weight: 600;
+      font-weight: 650;
       cursor: pointer;
-      transition: background 0.15s ease, transform 0.08s ease;
+      transition: all 0.15s ease;
     }
 
-    .btn:active { transform: scale(0.99); }
-    .btn-primary { background: var(--accent); color: #ffffff; }
-    .btn-primary:hover { background: var(--accent-hover); }
+    .btn:hover { filter: brightness(0.98); transform: translateY(-1px); }
+    .btn:active { transform: scale(0.985); }
+    .btn-primary { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #ffffff; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.22); }
     .btn-secondary { background: var(--surface-subtle); color: var(--text); border: 1px solid var(--border); }
     .btn-secondary:hover { background: #eef2f6; }
     .btn-ok { background: var(--ok-bg); color: var(--ok-fg); }
     .btn-ok:hover { background: #bbf7d0; }
     .btn-err { background: var(--err-bg); color: var(--err-fg); }
     .btn-err:hover { background: #fecaca; }
-    .btn-sm { padding: 6px 11px; font-size: 0.78rem; border-radius: 7px; }
+    .btn-sm { padding: 6px 11px; font-size: 0.78rem; border-radius: 8px; }
 
     .table-wrap {
       overflow-x: auto;
@@ -300,20 +356,21 @@
       padding: 11px 14px;
       background: var(--surface-subtle);
       color: var(--muted);
-      font-size: 0.76rem;
-      font-weight: 700;
+      font-size: 0.74rem;
+      font-weight: 750;
       text-transform: uppercase;
-      letter-spacing: 0.03em;
+      letter-spacing: 0.04em;
       border-bottom: 1px solid var(--border);
     }
 
     td { padding: 12px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; }
     tbody tr:last-child td { border-bottom: none; }
-    tbody tr:hover { background: #fafbfd; }
+    tbody tr { transition: background 0.14s ease; }
+    tbody tr:hover { background: #f8faff; }
 
     .badge {
       display: inline-block;
-      padding: 3px 9px;
+      padding: 3px 10px;
       border-radius: 999px;
       font-size: 0.74rem;
       font-weight: 700;
@@ -328,38 +385,79 @@
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 20px;
-      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+      padding: 20px 22px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
     }
 
+    .kpi-card:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(15, 23, 42, 0.07); }
+
     .kpi-lbl {
-      font-size: 0.75rem;
-      font-weight: 700;
+      font-size: 0.74rem;
+      font-weight: 750;
       text-transform: uppercase;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.05em;
       color: var(--muted);
     }
 
     .kpi-num {
-      font-size: 2rem;
-      font-weight: 800;
+      font-size: 2.1rem;
+      font-weight: 850;
       color: var(--text);
       margin-top: 6px;
-      letter-spacing: -0.02em;
+      letter-spacing: -0.025em;
     }
 
     .kpi-num.accent { color: var(--accent); }
     .kpi-num.warn { color: var(--warn-fg); }
     .kpi-num.ok { color: var(--ok-fg); }
 
-    .empty-row { text-align: center; color: var(--muted); padding: 24px 14px; }
+    .bar-track {
+      height: 7px;
+      width: 100%;
+      max-width: 120px;
+      background: #e2e8f0;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+
+    .bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #2563eb, #0ea5e9);
+      border-radius: 999px;
+      transition: width 0.35s ease;
+    }
+
+    .empty-row { text-align: center; color: var(--muted); padding: 26px 14px; }
     .actions-cell { display: flex; gap: 6px; flex-wrap: wrap; }
     .bulk-qty-input { width: 95px; padding: 7px 9px; }
+
+    .toast {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      background: #0f172a;
+      color: #ffffff;
+      padding: 11px 16px;
+      border-radius: 12px;
+      font-size: 0.84rem;
+      font-weight: 600;
+      box-shadow: var(--shadow-lg);
+      opacity: 0;
+      transform: translateY(10px);
+      pointer-events: none;
+      transition: all 0.2s ease;
+      z-index: 60;
+    }
+
+    .toast.show { opacity: 1; transform: translateY(0); }
   </style>
 </head>
 <body>
 
-<!-- ECRÃ DE LOGIN -->
 <div id="login-screen">
   <div class="login-card">
     <div class="login-brand">
@@ -386,7 +484,6 @@
   </div>
 </div>
 
-<!-- APLICAÇÃO -->
 <div id="app-shell">
   <header>
     <div class="header-inner">
@@ -414,14 +511,21 @@
   </nav>
 
   <main>
-    <div class="status-pill" id="status-bar">Pronto.</div>
+    <div class="status-pill" id="status-bar">
+      <span class="status-dot" id="status-dot"></span>
+      <span id="status-text">Pronto.</span>
+    </div>
 
-    <!-- STOCK (INÍCIO) -->
     <section id="stock" class="tab active">
       <div class="card">
         <div class="card-head">
           <h2>Stock Atual</h2>
-          <input type="text" id="filter-stock" class="search-input" placeholder="Pesquisar artigo ou código..." oninput="renderStock()" />
+          <div class="toolbar-filters">
+            <select id="filter-cat" class="cat-select" onchange="renderStock()">
+              <option value="">Todas as categorias</option>
+            </select>
+            <input type="text" id="filter-stock" class="search-input" placeholder="Pesquisar artigo ou código..." oninput="renderStock()" />
+          </div>
         </div>
         <div class="table-wrap">
           <table>
@@ -458,7 +562,6 @@
       </div>
     </section>
 
-    <!-- DEFINIR QUANTIDADE -->
     <section id="mov" class="tab admin-only">
       <div class="card">
         <h2>Definir Quantidade em Stock</h2>
@@ -492,7 +595,6 @@
       </div>
     </section>
 
-    <!-- RESERVADOS -->
     <section id="reservas" class="tab admin-only">
       <div class="card">
         <h2>Nova Reserva Simples</h2>
@@ -560,7 +662,6 @@
       </div>
     </section>
 
-    <!-- DEMONSTRAÇÃO -->
     <section id="demos" class="tab admin-only">
       <div class="card">
         <h2>Colocar em Demonstração</h2>
@@ -597,12 +698,11 @@
       </div>
     </section>
 
-    <!-- CLIENTES -->
     <section id="clientes" class="tab admin-only">
       <div class="card">
         <div class="card-head">
           <h2>Clientes & Equipamentos Alocados</h2>
-          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <div class="toolbar-filters">
             <input type="text" id="filter-cli" class="search-input" placeholder="Pesquisar cliente..." oninput="renderClientes()" />
             <button class="btn btn-secondary btn-sm" type="button" onclick="syncSheetsTabs()">Sincronizar Abas no Sheets</button>
           </div>
@@ -683,7 +783,6 @@
       </div>
     </section>
 
-    <!-- ESTATÍSTICAS -->
     <section id="stats" class="tab admin-only">
       <div class="grid-3" style="margin-bottom: 20px;">
         <div class="kpi-card">
@@ -712,6 +811,7 @@
                 <th>Em Demo</th>
                 <th>Saída Demo</th>
                 <th>Total Ativo</th>
+                <th>Peso Stock</th>
               </tr>
             </thead>
             <tbody id="tb-stats"></tbody>
@@ -722,15 +822,26 @@
   </main>
 </div>
 
+<div class="toast" id="toast"></div>
+
 <script>
   const API_URL = "https://script.google.com/macros/s/AKfycbyEI56ccNkMw9rQRc6YlmoxuDNyNhftDm5Z0Q0ChXU0h74wRoZVF6w7udSbs_orJSp2kw/exec";
   const ADMIN_USER = "admin";
   const ADMIN_PASS = "6969";
 
-  let CURRENT_ROLE = null; // 'admin' | 'user'
+  let CURRENT_ROLE = null;
   let DB = { stock: [], clientes: [], reservas: [], demos: [], historico: [] };
   let BULK_DRAFT = {};
   let SELECTED_CLIENT_ID = null;
+  let toastTimer = null;
+
+  function showToast(msg) {
+    const el = document.getElementById("toast");
+    el.textContent = msg;
+    el.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function() { el.classList.remove("show"); }, 2400);
+  }
 
   function applyRolePermissions(role) {
     CURRENT_ROLE = role;
@@ -794,8 +905,11 @@
     document.getElementById("login-screen").style.display = "flex";
   }
 
-  function setStatus(msg) {
-    document.getElementById('status-bar').textContent = msg;
+  function setStatus(msg, isBusy) {
+    document.getElementById("status-text").textContent = msg;
+    const dot = document.getElementById("status-dot");
+    if (isBusy) dot.classList.add("busy");
+    else dot.classList.remove("busy");
   }
 
   function openTab(id, btn) {
@@ -807,7 +921,7 @@
   }
 
   function loadData() {
-    setStatus('A carregar dados...');
+    setStatus('A carregar dados...', true);
     return new Promise(function(resolve) {
       const cbName = 'gsCallback_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
       const script = document.createElement('script');
@@ -816,11 +930,11 @@
         delete window[cbName];
         script.remove();
         if (!j || j.status !== 'ok') {
-          setStatus('Erro no servidor: ' + (j && j.message ? j.message : 'desconhecido'));
+          setStatus('Erro no servidor: ' + (j && j.message ? j.message : 'desconhecido'), false);
         } else {
           DB = j.data;
           renderAll();
-          setStatus('Dados atualizados');
+          setStatus('Dados atualizados', false);
         }
         resolve();
       };
@@ -828,7 +942,7 @@
       script.onerror = function() {
         delete window[cbName];
         script.remove();
-        setStatus('Falha ao contactar o Google Apps Script. Verifica o URL /exec e a permissão "Qualquer pessoa".');
+        setStatus('Falha ao contactar o Google Apps Script. Verifica o URL /exec e a permissão "Qualquer pessoa".', false);
         resolve();
       };
 
@@ -872,9 +986,10 @@
 
   async function postAction(payload) {
     if (CURRENT_ROLE !== "admin") return false;
-    setStatus('A guardar alterações...');
+    setStatus('A guardar alterações...', true);
     await sendOnePost(payload, 1400);
     await loadData();
+    showToast('Alterações guardadas');
     return true;
   }
 
@@ -886,7 +1001,18 @@
     }
   }
 
+  function renderCategoryFilter() {
+    const sel = document.getElementById("filter-cat");
+    const prev = sel.value;
+    const cats = Array.from(new Set(DB.stock.map(function(i) { return String(i.Categoria || "").trim(); }).filter(Boolean))).sort();
+    sel.innerHTML = '<option value="">Todas as categorias</option>' + cats.map(function(c) {
+      return '<option value="' + c + '">' + c + '</option>';
+    }).join("");
+    if (cats.includes(prev)) sel.value = prev;
+  }
+
   function renderAll() {
+    renderCategoryFilter();
     renderStock();
     if (CURRENT_ROLE === "admin") {
       renderSelects();
@@ -903,14 +1029,17 @@
   function renderStock() {
     const isAdmin = CURRENT_ROLE === "admin";
     const q = (document.getElementById('filter-stock').value || '').toLowerCase();
+    const cat = document.getElementById('filter-cat').value || '';
     const tb = document.getElementById('tb-stock');
     const activeRes = DB.reservas.filter(function(r) { return r.Estado === 'Ativa'; });
     const activeDemo = DB.demos.filter(function(d) { return d.Estado === 'Em Demonstração'; });
 
     const list = DB.stock.filter(function(i) {
-      return String(i.Nome).toLowerCase().includes(q) ||
-             String(i.Codigo).toLowerCase().includes(q) ||
-             String(i.Categoria).toLowerCase().includes(q);
+      const matchCat = !cat || String(i.Categoria || '').trim() === cat;
+      const matchQuery = String(i.Nome).toLowerCase().includes(q) ||
+                       String(i.Codigo).toLowerCase().includes(q) ||
+                       String(i.Categoria).toLowerCase().includes(q);
+      return matchCat && matchQuery;
     });
     const colspan = isAdmin ? 7 : 5;
     if (!list.length) {
@@ -1032,7 +1161,7 @@
 
     for (let idx = 0; idx < selectedItems.length; idx++) {
       const it = selectedItems[idx];
-      setStatus('A reservar ' + (idx + 1) + ' de ' + selectedItems.length + '...');
+      setStatus('A reservar ' + (idx + 1) + ' de ' + selectedItems.length + '...', true);
       await sendOnePost({
         action: 'ADD_RESERVA',
         clienteId: cliSel.value,
@@ -1046,7 +1175,8 @@
     clearBulkSelection();
     document.getElementById('bulk-res-notes').value = '';
     await loadData();
-    setStatus('Reserva em massa concluída.');
+    setStatus('Reserva em massa concluída.', false);
+    showToast('Reserva em massa concluída');
   }
 
   function renderReservas() {
@@ -1172,7 +1302,7 @@
 
   async function syncSheetsTabs() {
     await postAction({ action: 'SYNC_CLIENT_SHEETS' });
-    setStatus('Abas por cliente sincronizadas no Google Sheets.');
+    setStatus('Abas por cliente sincronizadas no Google Sheets.', false);
   }
 
   function renderHistorico() {
@@ -1201,15 +1331,24 @@
 
     const tb = document.getElementById('tb-stats');
     if (!DB.stock.length) {
-      tb.innerHTML = '<tr><td colspan="6" class="empty-row">Sem dados para apresentar.</td></tr>';
+      tb.innerHTML = '<tr><td colspan="7" class="empty-row">Sem dados para apresentar.</td></tr>';
       return;
     }
+    const maxItemTotal = Math.max(1, DB.stock.reduce(function(maxV, i) {
+      const s = Number(i.Quantidade) || 0;
+      const r = activeRes.filter(function(x) { return x.ItemID === i.ID; }).reduce(function(a, x) { return a + (Number(x.Quantidade) || 0); }, 0);
+      const d = activeDemo.filter(function(x) { return x.ItemID === i.ID; }).reduce(function(a, x) { return a + (Number(x.Quantidade) || 0); }, 0);
+      return Math.max(maxV, s + r + d);
+    }, 1));
+
     tb.innerHTML = DB.stock.map(function(i) {
       const s = Number(i.Quantidade) || 0;
       const r = activeRes.filter(function(x) { return x.ItemID === i.ID; }).reduce(function(a, x) { return a + (Number(x.Quantidade) || 0); }, 0);
       const d = activeDemo.filter(function(x) { return x.ItemID === i.ID; }).reduce(function(a, x) { return a + (Number(x.Quantidade) || 0); }, 0);
       const sd = soldDemos.filter(function(x) { return x.ItemID === i.ID; }).reduce(function(a, x) { return a + (Number(x.Quantidade) || 0); }, 0);
-      return '<tr><td><strong>' + i.Nome + '</strong></td><td>' + s + '</td><td>' + r + '</td><td>' + d + '</td><td>' + sd + '</td><td><strong>' + (s + r + d) + '</strong></td></tr>';
+      const totalAtivo = s + r + d;
+      const pct = Math.min(100, Math.round((totalAtivo / maxItemTotal) * 100));
+      return '<tr><td><strong>' + i.Nome + '</strong></td><td>' + s + '</td><td>' + r + '</td><td>' + d + '</td><td>' + sd + '</td><td><strong>' + totalAtivo + '</strong></td><td><div class="bar-track"><div class="bar-fill" style="width:' + pct + '%"></div></div></td></tr>';
     }).join('');
   }
 
