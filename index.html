@@ -1,211 +1,841 @@
+
 <!DOCTYPE html>
 <html lang="pt">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>I3O | Gestão de Stock</title>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
 <style>
-:root{--navy:#0f172a;--blue:#2563eb;--bg:#f8fafc;--muted:#64748b;--line:#e2e8f0}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--navy);font-family:'Plus Jakarta Sans',sans-serif}
-header{background:var(--navy);color:#fff;padding:16px max(16px,calc((100% - 1100px)/2));display:flex;justify-content:space-between;align-items:center;gap:12px;position:sticky;top:0;z-index:5}
-.brand{font-weight:800;font-size:1.15rem;display:flex;gap:10px;align-items:center}
-.brand i{background:var(--blue);padding:9px;border-radius:10px}
-main{max-width:1100px;margin:auto;padding:22px 16px}
-.tabs{display:flex;gap:8px;overflow:auto;margin-bottom:18px}
-.tab,.btn{border:0;border-radius:10px;padding:11px 15px;font:600 .88rem 'Plus Jakarta Sans',sans-serif;cursor:pointer;white-space:nowrap}
-.tab{background:#fff;border:1px solid var(--line);color:var(--muted)}
-.tab.active,.btn.primary{background:var(--blue);color:#fff;border-color:var(--blue)}
-.btn{background:#fff;border:1px solid var(--line);color:var(--navy)}
-.btn.danger{color:#b91c1c}
-.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
-.toolbar input,.toolbar select{flex:1;min-width:180px}
-input,select,textarea{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:9px;font:inherit;background:#fff}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
-.card{background:#fff;border:1px solid var(--line);border-radius:15px;padding:16px}
-.card h3{margin:0 0 5px;font-size:1rem}
-.muted{color:var(--muted);font-size:.82rem}
-.qty{display:flex;align-items:center;gap:9px;margin-top:12px;flex-wrap:wrap}
-.qty input{width:88px;padding:7px 8px;text-align:center}
-.qty button{border:0;border-radius:8px;padding:8px 11px;background:var(--blue);color:#fff;cursor:pointer;font-weight:700}
-.pill{display:inline-block;border-radius:20px;padding:4px 9px;font-size:.72rem;font-weight:700;background:#dbeafe;color:#1d4ed8}
-.pill.warn{background:#ffedd5;color:#9a3412}.pill.ok{background:#dcfce7;color:#166534}.pill.gray{background:#e2e8f0;color:#475569}.pill.demo{background:#ede9fe;color:#6d28d9}
-table{width:100%;border-collapse:collapse;background:#fff;border-radius:12px;overflow:hidden}
-th,td{text-align:left;padding:11px;border-bottom:1px solid var(--line);font-size:.82rem;vertical-align:top}
-th{background:#f1f5f9;color:#475569}.table-wrap{overflow:auto}
-.empty{padding:35px;text-align:center;color:var(--muted);background:#fff;border-radius:14px}
-.modal{display:none;position:fixed;inset:0;background:#0f172a99;z-index:10;align-items:center;justify-content:center;padding:16px}
-.modal.show{display:flex}.modal-box{background:#fff;width:min(520px,100%);max-height:92vh;overflow:auto;border-radius:17px;padding:22px}
-.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}.modal-head h2{font-size:1.1rem;margin:0}
-.field{margin-bottom:12px}.field label{display:block;font-size:.76rem;font-weight:700;color:var(--muted);margin-bottom:5px}
-.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
-#status{font-size:.82rem;color:var(--muted);margin:8px 0;padding:10px 12px;background:#fff;border:1px solid var(--line);border-radius:9px;overflow-wrap:anywhere}
-.hidden{display:none!important}.btn:disabled{opacity:.55;cursor:wait}
-.demo-box{background:#eff6ff;border:1px solid #bfdbfe;padding:14px;border-radius:12px;margin-bottom:14px}
-.demo-box h3{margin:0 0 12px;font-size:.95rem;color:#1d4ed8}
-.destination{margin-top:8px;padding:10px;background:#f1f5f9;border-radius:9px;line-height:1.8}
-@media(max-width:600px){header{padding:14px 16px}main{padding:16px 12px}.tab{padding:10px 12px}th,td{padding:9px}}
+:root {
+  --navy:#0f172a;
+  --blue:#2563eb;
+  --bg:#f8fafc;
+  --muted:#64748b;
+  --line:#e2e8f0;
+}
+* {box-sizing:border-box}
+body {
+  margin:0;background:var(--bg);color:var(--navy);
+  font-family:'Plus Jakarta Sans',sans-serif
+}
+header {
+  background:var(--navy);color:white;padding:16px;
+  display:flex;justify-content:space-between;align-items:center;
+  position:sticky;top:0;z-index:5
+}
+.brand {font-weight:800;font-size:1.15rem;display:flex;gap:10px;align-items:center}
+.brand i {background:var(--blue);padding:10px;border-radius:10px}
+main {max-width:1100px;margin:auto;padding:22px 16px}
+.tabs {display:flex;gap:8px;overflow:auto;margin-bottom:18px}
+.tab,.btn {
+  border:0;border-radius:10px;padding:11px 15px;
+  font:600 .88rem 'Plus Jakarta Sans',sans-serif;
+  cursor:pointer;white-space:nowrap
+}
+.tab {background:white;border:1px solid var(--line);color:var(--muted)}
+.tab.active,.btn.primary {background:var(--blue);color:white}
+.btn {background:white;border:1px solid var(--line);color:var(--navy)}
+.btn.danger {color:#b91c1c}
+.btn:disabled {opacity:.5;cursor:wait}
+.toolbar {display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.toolbar input,.toolbar select {flex:1;min-width:180px}
+input,select,textarea {
+  width:100%;padding:11px 12px;border:1px solid var(--line);
+  border-radius:9px;font:inherit;background:white
+}
+.grid {display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.card {background:white;border:1px solid var(--line);border-radius:15px;padding:16px}
+.card h3 {margin:0 0 5px;font-size:1rem}
+.muted {color:var(--muted);font-size:.82rem}
+.qty {display:flex;align-items:center;gap:9px;margin-top:12px;flex-wrap:wrap}
+.qty input {width:90px;padding:8px;text-align:center}
+.qty button {border:0;border-radius:8px;padding:9px 12px;background:var(--blue);color:white;cursor:pointer;font-weight:700}
+.pill {display:inline-block;border-radius:20px;padding:4px 9px;font-size:.72rem;font-weight:700;background:#dbeafe;color:#1d4ed8}
+.pill.warn {background:#ffedd5;color:#9a3412}
+.pill.ok {background:#dcfce7;color:#166534}
+.pill.gray {background:#e2e8f0;color:#475569}
+.pill.demo {background:#ede9fe;color:#6d28d9}
+table {width:100%;border-collapse:collapse;background:white}
+th,td {text-align:left;padding:11px;border-bottom:1px solid var(--line);font-size:.82rem;vertical-align:top}
+th {background:#f1f5f9;color:#475569}
+.table-wrap {overflow:auto}
+.empty {padding:35px;text-align:center;color:var(--muted);background:white;border-radius:14px}
+.modal {display:none;position:fixed;inset:0;background:#0f172a99;z-index:10;align-items:center;justify-content:center;padding:16px}
+.modal.show {display:flex}
+.modal-box {background:white;width:min(520px,100%);max-height:92vh;overflow:auto;border-radius:17px;padding:22px}
+.modal-head {display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.modal-head h2 {font-size:1.1rem;margin:0}
+.field {margin-bottom:12px}
+.field label {display:block;font-size:.76rem;font-weight:700;color:var(--muted);margin-bottom:5px}
+.actions {display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+#status {font-size:.82rem;color:var(--muted);margin:8px 0;padding:10px 12px;background:white;border:1px solid var(--line);border-radius:9px;overflow-wrap:anywhere}
+.hidden {display:none!important}
+.demo-box {background:#eff6ff;border:1px solid #bfdbfe;padding:14px;border-radius:12px;margin-bottom:14px}
+.demo-box h3 {margin:0 0 12px;font-size:.95rem;color:#1d4ed8}
+.destination {margin-top:8px;padding:10px;background:#f1f5f9;border-radius:9px;line-height:1.8}
+@media(max-width:600px) {
+  header {padding:14px}
+  main {padding:16px 12px}
+  .tab {padding:10px 12px}
+  th,td {padding:9px}
+}
 </style>
 </head>
+
 <body>
-<header><div class="brand"><i class="fa-solid fa-layer-group"></i> STOCK I3O</div><button class="btn primary" onclick="openModal('item')"><i class="fa fa-plus"></i> Novo artigo</button></header>
+
+<header>
+  <div class="brand">
+    <i class="fa-solid fa-layer-group"></i>
+    STOCK I3O
+  </div>
+  <button class="btn primary" onclick="openModal('item')">
+    <i class="fa fa-plus"></i> Novo artigo
+  </button>
+</header>
+
 <main>
+
 <nav class="tabs">
-<button class="tab active" data-tab="stock" onclick="showTab('stock')"><i class="fa fa-boxes-stacked"></i> Stock</button>
-<button class="tab" data-tab="reservados" onclick="showTab('reservados')"><i class="fa fa-bookmark"></i> Reservados e Demonstrações</button>
-<button class="tab" data-tab="clientes" onclick="showTab('clientes')"><i class="fa fa-users"></i> Clientes</button>
-<button class="tab" data-tab="historico" onclick="showTab('historico')"><i class="fa fa-clock-rotate-left"></i> Histórico</button>
+  <button class="tab active" data-tab="stock" onclick="showTab('stock')">Stock</button>
+  <button class="tab" data-tab="reservados" onclick="showTab('reservados')">Reservados e Demonstrações</button>
+  <button class="tab" data-tab="clientes" onclick="showTab('clientes')">Clientes</button>
+  <button class="tab" data-tab="historico" onclick="showTab('historico')">Histórico</button>
 </nav>
+
 <div id="status">A ligar à base de dados...</div>
 
 <section id="view-stock">
-<div class="toolbar"><input id="stockSearch" placeholder="Pesquisar artigo, marca ou modelo..." oninput="renderStock()"><select id="stockCategory" onchange="renderStock()"><option value="">Todas as categorias</option></select><button class="btn" onclick="loadData()">↻ Atualizar</button></div>
-<div id="stockList" class="grid"></div>
+  <div class="toolbar">
+    <input id="stockSearch" placeholder="Pesquisar artigo, marca ou modelo..." oninput="renderStock()">
+    <select id="stockCategory" onchange="renderStock()">
+      <option value="">Todas as categorias</option>
+    </select>
+    <button class="btn" onclick="loadData()">↻ Atualizar</button>
+  </div>
+  <div id="stockList" class="grid"></div>
 </section>
 
 <section id="view-reservados" class="hidden">
-<div class="toolbar">
-<input id="reservationSearch" placeholder="Pesquisar reserva, demonstração, cliente ou artigo..." oninput="renderReservations()">
-<select id="reservationType" onchange="renderReservations()"><option value="">Reservas + Demonstrações</option><option value="Reserva">Só Reservas</option><option value="Demonstracao">Só Demonstrações</option></select>
-<select id="reservationState" onchange="renderReservations()"><option value="">Todos os estados</option><option>Pendente</option><option>Entregue</option><option>Devolvida</option><option>Cancelada</option></select>
-<button class="btn primary" onclick="openModal('reservation')">+ Nova reserva / demonstração</button>
-</div>
-<div id="reservationList"></div>
+  <div class="toolbar">
+    <input id="reservationSearch" placeholder="Pesquisar reserva, demonstração, cliente ou artigo..." oninput="renderReservations()">
+    <select id="reservationType" onchange="renderReservations()">
+      <option value="">Reservas + Demonstrações</option>
+      <option value="Reserva">Só Reservas</option>
+      <option value="Demonstracao">Só Demonstrações</option>
+    </select>
+    <select id="reservationState" onchange="renderReservations()">
+      <option value="">Todos os estados</option>
+      <option>Pendente</option>
+      <option>Entregue</option>
+      <option>Devolvida</option>
+      <option>Cancelada</option>
+    </select>
+    <button class="btn primary" onclick="openModal('reservation')">+ Nova reserva / demonstração</button>
+  </div>
+  <div id="reservationList"></div>
 </section>
 
 <section id="view-clientes" class="hidden">
-<div class="toolbar"><input id="clientSearch" placeholder="Pesquisar cliente..." oninput="renderClients()"><button class="btn primary" onclick="openModal('client')">+ Novo cliente</button></div>
-<div id="clientList" class="grid"></div>
+  <div class="toolbar">
+    <input id="clientSearch" placeholder="Pesquisar cliente..." oninput="renderClients()">
+    <button class="btn primary" onclick="openModal('client')">+ Novo cliente</button>
+  </div>
+  <div id="clientList" class="grid"></div>
 </section>
 
-<section id="view-historico" class="hidden"><div id="historyList"></div></section>
+<section id="view-historico" class="hidden">
+  <div id="historyList"></div>
+</section>
+
 </main>
 
-<div class="modal" id="modal"><div class="modal-box"><div class="modal-head"><h2 id="modalTitle">Novo registo</h2><button class="btn" type="button" onclick="closeModal()">✕</button></div><form id="modalForm" onsubmit="submitModal(event)"><div id="modalFields"></div><button class="btn primary" style="width:100%;margin-top:8px" type="submit" id="saveButton">Guardar</button></form></div></div>
+<div class="modal" id="modal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h2 id="modalTitle">Novo registo</h2>
+      <button class="btn" type="button" onclick="closeModal()">✕</button>
+    </div>
+    <form id="modalForm" onsubmit="submitModal(event)">
+      <div id="modalFields"></div>
+      <button class="btn primary" style="width:100%;margin-top:8px" type="submit" id="saveButton">Guardar</button>
+    </form>
+  </div>
+</div>
 
 <script>
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbynXQerj7yZ5-36fR21JMHh5BqI-poqWUO3lHl0NBdyTDUM_3CjH2bMuBmT4WR8HwgP/exec';
-let db={stock:[],clientes:[],reservados:[],historico:[]};
-let modalMode=''; let isSaving=false;
-const $=id=>document.getElementById(id);
-function msg(t){$('status').textContent=t}
-function isActive(v){const s=String(v??'').trim().toLowerCase();return v!==false&&s!=='false'&&s!=='nao'&&s!=='não'&&s!=='arquivado'}
-function formatTipo(v){if(v===''||v==null||v===undefined||!isNaN(Number(v)))return 'Equipamento';return String(v)}
-function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function showTab(tab){document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));['stock','reservados','clientes','historico'].forEach(x=>$('view-'+x).classList.toggle('hidden',x!==tab))}
-async function readJson(r){const t=await r.text();try{return JSON.parse(t)}catch(e){throw new Error('O Google devolveu HTML. Faz Nova Implementação no Apps Script com acesso Qualquer pessoa.')}}
-async function loadData(){
+let db = {
+  stock:[],
+  clientes:[],
+  reservados:[],
+  historico:[]
+};
+
+let modalMode = '';
+let isSaving = false;
+
+const $ = id => document.getElementById(id);
+
+function msg(t) {
+  $('status').textContent = t;
+}
+
+function esc(v) {
+  return String(v ?? '').replace(/[&<>"']/g, c => ({
+    '&':'&amp;',
+    '<':'&lt;',
+    '>':'&gt;',
+    '"':'&quot;',
+    "'":'&#39;'
+  })[c]);
+}
+
+function isActive(v) {
+  const s = String(v ?? '').trim().toLowerCase();
+  return v !== false && s !== 'false' &&
+    s !== 'nao' && s !== 'não' && s !== 'arquivado';
+}
+
+function formatTipo(v) {
+  if (v === '' || v == null || !isNaN(Number(v))) return 'Equipamento';
+  return String(v);
+}
+
+function showTab(tab) {
+  document.querySelectorAll('.tab').forEach(b =>
+    b.classList.toggle('active', b.dataset.tab === tab)
+  );
+
+  ['stock','reservados','clientes','historico'].forEach(x =>
+    $('view-' + x).classList.toggle('hidden', x !== tab)
+  );
+}
+
+
+/* =====================================================
+   LIGAÇÃO AO GOOGLE APPS SCRIPT
+===================================================== */
+
+function loadData() {
   msg('A carregar dados...');
-  try{
-    const r=await fetch(SCRIPT_URL+'?t='+Date.now());
-    const d=await readJson(r);
-    if(!d||d.ok!==true)throw new Error(d&&d.error?d.error:'API sem confirmação');
-    db=d.data; renderAll(); msg('Sincronizado ('+db.stock.length+' artigos).');
-  }catch(e){msg('Falha ao carregar: '+e.message)}
+
+  google.script.run
+    .withSuccessHandler(result => {
+      if (!result || !result.ok) {
+        msg('Erro ao receber dados.');
+        return;
+      }
+
+      db = result.data;
+      renderAll();
+      msg('Sincronizado. ' + db.stock.length + ' artigos carregados.');
+    })
+    .withFailureHandler(error => {
+      msg('Erro na ligação: ' + error.message);
+    })
+    .apiGetData();
 }
-async function post(payload){
-  if(isSaving)return; isSaving=true; $('saveButton').disabled=true; msg('A guardar...');
-  try{
-    const r=await fetch(SCRIPT_URL,{method:'POST',redirect:'follow',body:JSON.stringify(payload)});
-    const res=await readJson(r);
-    if(!res||res.ok!==true)throw new Error(res&&res.error?res.error:'Erro ao gravar');
-    if(res.data){db=res.data;renderAll();msg('Gravado e sincronizado.')}else await loadData();
-  }catch(e){msg('Erro ao guardar: '+e.message);throw e}
-  finally{isSaving=false;$('saveButton').disabled=false}
+
+
+function post(payload) {
+  return new Promise((resolve, reject) => {
+    if (isSaving) {
+      reject(new Error('Já existe uma operação em curso.'));
+      return;
+    }
+
+    isSaving = true;
+    $('saveButton').disabled = true;
+    msg('A guardar...');
+
+    google.script.run
+      .withSuccessHandler(result => {
+        isSaving = false;
+        $('saveButton').disabled = false;
+
+        if (!result || result.ok !== true) {
+          const error = new Error(result?.error || 'Erro ao guardar.');
+          msg(error.message);
+          reject(error);
+          return;
+        }
+
+        db = result.data;
+        renderAll();
+        msg('Guardado e sincronizado com a Google Sheets.');
+
+        resolve(result);
+      })
+      .withFailureHandler(error => {
+        isSaving = false;
+        $('saveButton').disabled = false;
+        msg('Erro ao guardar: ' + error.message);
+        reject(error);
+      })
+      .apiAction(payload);
+  });
 }
-function renderAll(){fillSelects();renderStock();renderReservations();renderClients();renderHistory()}
-function fillSelects(){
-  const cur=$('stockCategory').value;
-  const cats=[...new Set(db.stock.filter(x=>isActive(x.Ativo)).map(x=>x.Categoria).filter(Boolean))].sort();
-  $('stockCategory').innerHTML='<option value="">Todas as categorias</option>'+cats.map(c=>'<option value="'+esc(c)+'">'+esc(c)+'</option>').join('');
-  $('stockCategory').value=cats.includes(cur)?cur:'';
+
+
+/* =====================================================
+   RENDERIZAÇÃO
+===================================================== */
+
+function renderAll() {
+  fillSelects();
+  renderStock();
+  renderReservations();
+  renderClients();
+  renderHistory();
 }
-/* STOCK - SÓ STOCK */
-function renderStock(){
-  const q=$('stockSearch').value.toLowerCase(); const cat=$('stockCategory').value;
-  const items=db.stock.filter(x=>isActive(x.Ativo)&&(!cat||x.Categoria===cat)&&[x.Nome,x.Categoria,formatTipo(x.Tipo)].join(' ').toLowerCase().includes(q));
-  $('stockList').innerHTML=items.length?items.map(x=>'<article class="card"><h3>'+esc(x.Nome)+'</h3><div class="muted">'+esc(x.Categoria||'Outros')+' · '+esc(formatTipo(x.Tipo))+'</div><div class="qty"><span class="muted">Stock</span><input id="qty-stock-'+esc(x.ID)+'" type="number" min="0" step="1" value="'+(Number(x.Stock)||0)+'"><button onclick="saveQty(\''+esc(x.ID)+'\')">Guardar</button></div><div class="actions"><button class="btn" onclick="reserveThis(\''+esc(x.ID)+'\')">Reservar / Demonstração</button><button class="btn danger" onclick="archiveItem(\''+esc(x.ID)+'\')">Arquivar</button></div></article>').join(''):'<div class="empty">Não foram encontrados artigos.</div>';
+
+
+function fillSelects() {
+  const current = $('stockCategory').value;
+
+  const categories = [...new Set(
+    db.stock
+      .filter(x => isActive(x.Ativo))
+      .map(x => x.Categoria)
+      .filter(Boolean)
+  )].sort();
+
+  $('stockCategory').innerHTML =
+    '<option value="">Todas as categorias</option>' +
+    categories.map(c =>
+      '<option value="' + esc(c) + '">' + esc(c) + '</option>'
+    ).join('');
+
+  $('stockCategory').value = categories.includes(current) ? current : '';
 }
-function saveQty(id){
-  const input=$('qty-stock-'+id); if(!input)return;
-  const value=Number(input.value);
-  if(!Number.isInteger(value)||value<0){alert('Introduz uma quantidade inteira igual ou superior a zero.');return}
-  post({action:'updateQty',id:id,value:value,field:'stock'}).catch(e=>alert(e.message));
+
+
+/* =====================================================
+   STOCK
+===================================================== */
+
+function renderStock() {
+  const q = $('stockSearch').value.toLowerCase();
+  const cat = $('stockCategory').value;
+
+  const items = db.stock.filter(x =>
+    isActive(x.Ativo) &&
+    (!cat || x.Categoria === cat) &&
+    [x.Nome,x.Categoria,formatTipo(x.Tipo)]
+      .join(' ').toLowerCase().includes(q)
+  );
+
+  $('stockList').innerHTML = items.length
+    ? items.map(x => `
+      <article class="card">
+        <h3>${esc(x.Nome)}</h3>
+        <div class="muted">
+          ${esc(x.Categoria || 'Outros')} · ${esc(formatTipo(x.Tipo))}
+        </div>
+
+        <div class="qty">
+          <span class="muted">Stock</span>
+          <input
+            id="qty-stock-${esc(x.ID)}"
+            type="number" min="0" step="1"
+            value="${Number(x.Stock) || 0}">
+          <button onclick="saveQty('${esc(x.ID)}')">Guardar</button>
+        </div>
+
+        <div class="actions">
+          <button class="btn" onclick="reserveThis('${esc(x.ID)}')">
+            Reservar / Demonstração
+          </button>
+          <button class="btn danger" onclick="archiveItem('${esc(x.ID)}')">
+            Arquivar
+          </button>
+        </div>
+      </article>
+    `).join('')
+    : '<div class="empty">Não foram encontrados artigos.</div>';
 }
-function archiveItem(id){if(confirm('Arquivar este artigo?'))post({action:'deleteItem',id:id}).catch(e=>alert(e.message))}
-/* RESERVADOS + DEMONSTRAÇÕES */
-function renderReservations(){
-  const q=$('reservationSearch').value.toLowerCase(); const state=$('reservationState').value; const type=$('reservationType').value;
-  const rows=db.reservados.filter(x=>{const t=x.TipoMovimento||'Reserva';return (!type||t===type)&&(!state||x.Estado===state)&&[x.ClienteNome,x.ItemNome,x.ID,x.Destino,x.Localidade,x.Responsavel].join(' ').toLowerCase().includes(q)}).slice().reverse();
-  $('reservationList').innerHTML=rows.length?'<div class="table-wrap"><table><thead><tr><th>Tipo</th><th>Cliente / Artigo</th><th>Destino</th><th>Qtd.</th><th>Estado</th><th>Datas</th><th>Ações</th></tr></thead><tbody>'+rows.map(x=>{
-    const isDemo=(x.TipoMovimento||'Reserva')==='Demonstracao';
-    const acoes=x.Estado==='Pendente'?(isDemo?'<button class="btn" onclick="reservationAction(\''+esc(x.ID)+'\',\'returnDemo\')">Devolvida</button>':'<button class="btn" onclick="reservationAction(\''+esc(x.ID)+'\',\'deliverReservation\')">Entregue</button>')+'<button class="btn danger" onclick="reservationAction(\''+esc(x.ID)+'\',\'cancelReservation\')">Cancelar</button>':'—';
-    const dest=isDemo?'<div class="destination"><b>'+esc(x.Destino||'Não indicado')+'</b><br><span class="muted">'+esc(x.Localidade||'—')+'</span><br><span class="muted">'+esc(x.Responsavel||'—')+'</span></div>':'<span class="muted">Reserva normal</span>'+(x.Responsavel?'<br><span class="muted">'+esc(x.Responsavel)+'</span>':'');
-    return '<tr><td>'+(isDemo?'<span class="pill demo">Demonstração</span>':'<span class="pill">Reserva</span>')+'<br><span class="muted">'+dateFmt(x.DataReserva)+'</span></td><td><b>'+esc(x.ClienteNome)+'</b><br>'+esc(x.ItemNome)+'</td><td>'+dest+'</td><td>'+esc(x.Quantidade)+'</td><td><span class="pill '+(x.Estado==='Pendente'?'warn':(x.Estado==='Entregue'||x.Estado==='Devolvida')?'ok':'gray')+'">'+esc(x.Estado)+'</span></td><td><span class="muted">Prevista:</span><br>'+dateFmt(x.DataPrevista)+(x.DataEntrega?'<br><span class="muted">Entrega: '+dateFmt(x.DataEntrega)+'</span>':'')+(x.DataDevolucao?'<br><span class="muted">Devolução: '+dateFmt(x.DataDevolucao)+'</span>':'')+'</td><td>'+acoes+'</td></tr>'
-  }).join('')+'</tbody></table></div>':'<div class="empty">Ainda não existem reservas nem demonstrações.</div>';
+
+
+function saveQty(id) {
+  const input = $('qty-stock-' + id);
+  if (!input) return;
+
+  const value = Number(input.value);
+
+  if (!Number.isInteger(value) || value < 0) {
+    alert('Introduz uma quantidade inteira igual ou superior a zero.');
+    return;
+  }
+
+  post({
+    action:'updateQty',
+    id:id,
+    value:value,
+    field:'stock'
+  }).catch(e => alert(e.message));
 }
-function dateFmt(v){if(!v)return '—';const d=new Date(v);return isNaN(d)?esc(v):d.toLocaleDateString('pt-PT')}
-function reservationAction(id,action){
-  const q=action==='cancelReservation'?'Cancelar e repor no stock?':action==='returnDemo'?'Confirmar devolução e repor no stock?':'Confirmar entrega?';
-  if(confirm(q))post({action:action,id:id}).catch(e=>alert(e.message));
+
+
+function archiveItem(id) {
+  if (confirm('Arquivar este artigo?')) {
+    post({action:'deleteItem',id:id})
+      .catch(e => alert(e.message));
+  }
 }
-function renderClients(){
-  const q=$('clientSearch').value.toLowerCase();
-  const rows=db.clientes.filter(x=>isActive(x.Ativo)&&[x.Nome,x.NIF,x.Contacto,x.Email].join(' ').toLowerCase().includes(q));
-  $('clientList').innerHTML=rows.length?rows.map(x=>'<article class="card"><h3>'+esc(x.Nome)+'</h3><div class="muted">NIF: '+esc(x.NIF||'—')+'</div><p style="margin-top:8px">'+esc(x.Contacto||'—')+'<br>'+esc(x.Email||'')+'</p><div class="actions"><button class="btn danger" onclick="archiveClient(\''+esc(x.ID)+'\')">Arquivar</button></div></article>').join(''):'<div class="empty">Ainda não existem clientes.</div>';
+
+
+/* =====================================================
+   RESERVAS E DEMONSTRAÇÕES
+===================================================== */
+
+function dateFmt(v) {
+  if (!v) return '—';
+
+  const d = new Date(v);
+  return isNaN(d) ? esc(v) : d.toLocaleDateString('pt-PT');
 }
-function archiveClient(id){if(confirm('Arquivar este cliente?'))post({action:'deleteClient',id:id}).catch(e=>alert(e.message))}
-function renderHistory(){
-  const rows=db.historico||[];
-  $('historyList').innerHTML=rows.length?'<div class="table-wrap"><table><thead><tr><th>Data</th><th>Ação</th><th>Descrição</th><th>Qtd.</th></tr></thead><tbody>'+rows.map(x=>'<tr><td>'+dateFmt(x.DataHora)+'</td><td>'+esc(x.Acao)+'</td><td>'+esc(x.Descricao)+'</td><td>'+esc(x.Quantidade)+'</td></tr>').join('')+'</tbody></table></div>':'<div class="empty">Sem movimentos registados.</div>';
+
+
+function renderReservations() {
+  const q = $('reservationSearch').value.toLowerCase();
+  const state = $('reservationState').value;
+  const type = $('reservationType').value;
+
+  const rows = db.reservados.filter(x => {
+    const t = x.TipoMovimento || 'Reserva';
+
+    return (!type || t === type) &&
+      (!state || x.Estado === state) &&
+      [
+        x.ClienteNome,x.ItemNome,x.ID,
+        x.Destino,x.Localidade,x.Responsavel
+      ].join(' ').toLowerCase().includes(q);
+  }).slice().reverse();
+
+  if (!rows.length) {
+    $('reservationList').innerHTML =
+      '<div class="empty">Ainda não existem reservas nem demonstrações.</div>';
+    return;
+  }
+
+  $('reservationList').innerHTML = `
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Tipo</th>
+            <th>Cliente / Artigo</th>
+            <th>Destino</th>
+            <th>Qtd.</th>
+            <th>Estado</th>
+            <th>Datas</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows.map(x => {
+            const demo = (x.TipoMovimento || 'Reserva') === 'Demonstracao';
+
+            let actions = '—';
+
+            if (x.Estado === 'Pendente') {
+              actions = demo
+                ? `<button class="btn" onclick="reservationAction('${esc(x.ID)}','returnDemo')">Devolvida</button>`
+                : `<button class="btn" onclick="reservationAction('${esc(x.ID)}','deliverReservation')">Entregue</button>`;
+
+              actions += ` <button class="btn danger" onclick="reservationAction('${esc(x.ID)}','cancelReservation')">Cancelar</button>`;
+            }
+
+            const destination = demo
+              ? `<div class="destination">
+                  <b>${esc(x.Destino || 'Não indicado')}</b><br>
+                  <span class="muted">${esc(x.Localidade || '—')}</span><br>
+                  <span class="muted">${esc(x.Responsavel || '—')}</span>
+                </div>`
+              : '<span class="muted">Reserva normal</span>';
+
+            return `
+              <tr>
+                <td>
+                  ${demo
+                    ? '<span class="pill demo">Demonstração</span>'
+                    : '<span class="pill">Reserva</span>'}
+                  <br><span class="muted">${dateFmt(x.DataReserva)}</span>
+                </td>
+                <td>
+                  <b>${esc(x.ClienteNome)}</b><br>
+                  ${esc(x.ItemNome)}
+                </td>
+                <td>${destination}</td>
+                <td>${esc(x.Quantidade)}</td>
+                <td>
+                  <span class="pill ${
+                    x.Estado === 'Pendente' ? 'warn' :
+                    (x.Estado === 'Entregue' || x.Estado === 'Devolvida') ? 'ok' : 'gray'
+                  }">${esc(x.Estado)}</span>
+                </td>
+                <td>
+                  <span class="muted">Prevista:</span><br>
+                  ${dateFmt(x.DataPrevista)}
+                  ${x.DataEntrega ? '<br>Entrega: ' + dateFmt(x.DataEntrega) : ''}
+                  ${x.DataDevolucao ? '<br>Devolução: ' + dateFmt(x.DataDevolucao) : ''}
+                </td>
+                <td>${actions}</td>
+              </tr>
+            `;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
 }
-function reserveThis(id){showTab('reservados');openModal('reservation',id)}
-function openModal(mode,preselect){
-  modalMode=mode; $('modalForm').reset();
-  const activeClients=db.clientes.filter(x=>isActive(x.Ativo)); const activeItems=db.stock.filter(x=>isActive(x.Ativo));
-  const fields={
-    item:'<div class="field"><label>Nome do artigo</label><input name="nome" required></div><div class="field"><label>Categoria / Marca</label><input name="categoria" placeholder="Huvitz, Nidek, Acessórios..."></div><div class="field"><label>Tipo de artigo</label><select name="tipo"><option>Equipamento</option><option>Acessório</option><option>Consumível</option><option>Outro</option></select></div><div class="field"><label>Stock inicial</label><input name="stock" type="number" min="0" step="1" value="0" required></div>',
-    client:'<div class="field"><label>Nome do cliente</label><input name="nome" required></div><div class="field"><label>NIF</label><input name="nif"></div><div class="field"><label>Contacto</label><input name="contacto"></div><div class="field"><label>Email</label><input name="email" type="email"></div><div class="field"><label>Morada</label><input name="morada"></div><div class="field"><label>Observações</label><textarea name="observacoes"></textarea></div>',
-    reservation:'<div class="field"><label>Tipo</label><select name="tipoMovimento" id="reserveTipo" onchange="toggleDemoFields()"><option value="Reserva">Reserva</option><option value="Demonstracao">Demonstração</option></select></div><div class="field"><label>Cliente</label><select name="clienteId" required><option value="">Selecionar cliente</option>'+activeClients.map(x=>'<option value="'+esc(x.ID)+'">'+esc(x.Nome)+'</option>').join('')+'</select></div><div class="field"><label>Artigo (tira sempre do Stock)</label><select name="itemId" id="reserveItem" required><option value="">Selecionar artigo</option>'+activeItems.map(x=>'<option value="'+esc(x.ID)+'">'+esc(x.Nome)+' (stock '+(Number(x.Stock)||0)+')</option>').join('')+'</select></div><div id="demoDestinationFields" class="demo-box hidden"><h3>Destino da demonstração</h3><div class="field"><label>Para onde vai o equipamento?</label><input name="destino" id="demoDestino" placeholder="Nome da ótica, clínica ou empresa"></div><div class="field"><label>Localidade</label><input name="localidade" id="demoLocalidade" placeholder="Ex.: Oliveira de Azeméis"></div><div class="field"><label>Responsável pelo equipamento</label><input name="responsavel" id="demoResponsavel" placeholder="Nome da pessoa responsável"></div></div><div class="field"><label>Quantidade</label><input name="quantidade" type="number" min="1" step="1" value="1" required></div><div class="field"><label>Data prevista de entrega/devolução</label><input name="dataPrevista" type="date"></div><div class="field" id="normalResponsavel"><label>Responsável</label><input name="responsavelNormal"></div><div class="field"><label>Observações</label><textarea name="observacoes"></textarea></div>'
+
+
+function reservationAction(id, action) {
+  const question =
+    action === 'cancelReservation'
+      ? 'Cancelar e repor no stock?'
+      : action === 'returnDemo'
+      ? 'Confirmar devolução e repor no stock?'
+      : 'Confirmar entrega?';
+
+  if (confirm(question)) {
+    post({action:action,id:id})
+      .catch(e => alert(e.message));
+  }
+}
+
+
+/* =====================================================
+   CLIENTES
+===================================================== */
+
+function renderClients() {
+  const q = $('clientSearch').value.toLowerCase();
+
+  const rows = db.clientes.filter(x =>
+    isActive(x.Ativo) &&
+    [x.Nome,x.NIF,x.Contacto,x.Email]
+      .join(' ').toLowerCase().includes(q)
+  );
+
+  $('clientList').innerHTML = rows.length
+    ? rows.map(x => `
+      <article class="card">
+        <h3>${esc(x.Nome)}</h3>
+        <div class="muted">NIF: ${esc(x.NIF || '—')}</div>
+        <p>
+          ${esc(x.Contacto || '—')}<br>
+          ${esc(x.Email || '')}
+        </p>
+        <div class="actions">
+          <button class="btn danger" onclick="archiveClient('${esc(x.ID)}')">
+            Arquivar
+          </button>
+        </div>
+      </article>
+    `).join('')
+    : '<div class="empty">Ainda não existem clientes.</div>';
+}
+
+
+function archiveClient(id) {
+  if (confirm('Arquivar este cliente?')) {
+    post({action:'deleteClient',id:id})
+      .catch(e => alert(e.message));
+  }
+}
+
+
+/* =====================================================
+   HISTÓRICO
+===================================================== */
+
+function renderHistory() {
+  const rows = (db.historico || []).slice().reverse();
+
+  $('historyList').innerHTML = rows.length
+    ? `
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Ação</th>
+              <th>Descrição</th>
+              <th>Qtd.</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows.map(x => `
+              <tr>
+                <td>${dateFmt(x.DataHora)}</td>
+                <td>${esc(x.Acao)}</td>
+                <td>${esc(x.Descricao)}</td>
+                <td>${esc(x.Quantidade)}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    `
+    : '<div class="empty">Sem movimentos registados.</div>';
+}
+
+
+/* =====================================================
+   MODAIS
+===================================================== */
+
+function reserveThis(id) {
+  showTab('reservados');
+  openModal('reservation',id);
+}
+
+
+function openModal(mode,preselect) {
+  modalMode = mode;
+  $('modalForm').reset();
+
+  const activeClients = db.clientes.filter(x => isActive(x.Ativo));
+  const activeItems = db.stock.filter(x => isActive(x.Ativo));
+
+  const fields = {
+
+    item: `
+      <div class="field">
+        <label>Nome do artigo</label>
+        <input name="nome" required>
+      </div>
+
+      <div class="field">
+        <label>Categoria / Marca</label>
+        <input name="categoria" placeholder="Huvitz, Nidek, Acessórios...">
+      </div>
+
+      <div class="field">
+        <label>Tipo de artigo</label>
+        <select name="tipo">
+          <option>Equipamento</option>
+          <option>Acessório</option>
+          <option>Consumível</option>
+          <option>Outro</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Stock inicial</label>
+        <input name="stock" type="number" min="0" step="1" value="0" required>
+      </div>
+    `,
+
+    client: `
+      <div class="field">
+        <label>Nome do cliente</label>
+        <input name="nome" required>
+      </div>
+
+      <div class="field">
+        <label>NIF</label>
+        <input name="nif">
+      </div>
+
+      <div class="field">
+        <label>Contacto</label>
+        <input name="contacto">
+      </div>
+
+      <div class="field">
+        <label>Email</label>
+        <input name="email" type="email">
+      </div>
+
+      <div class="field">
+        <label>Morada</label>
+        <input name="morada">
+      </div>
+
+      <div class="field">
+        <label>Observações</label>
+        <textarea name="observacoes"></textarea>
+      </div>
+    `,
+
+    reservation: `
+      <div class="field">
+        <label>Tipo</label>
+        <select name="tipoMovimento" id="reserveTipo" onchange="toggleDemoFields()">
+          <option value="Reserva">Reserva</option>
+          <option value="Demonstracao">Demonstração</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Cliente</label>
+        <select name="clienteId" required>
+          <option value="">Selecionar cliente</option>
+          ${activeClients.map(x =>
+            `<option value="${esc(x.ID)}">${esc(x.Nome)}</option>`
+          ).join('')}
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Artigo (retira sempre do stock)</label>
+        <select name="itemId" id="reserveItem" required>
+          <option value="">Selecionar artigo</option>
+          ${activeItems.map(x =>
+            `<option value="${esc(x.ID)}">${esc(x.Nome)} (stock ${Number(x.Stock) || 0})</option>`
+          ).join('')}
+        </select>
+      </div>
+
+      <div id="demoDestinationFields" class="demo-box hidden">
+        <h3>Destino da demonstração</h3>
+
+        <div class="field">
+          <label>Para onde vai o equipamento?</label>
+          <input name="destino" id="demoDestino" placeholder="Nome da ótica, clínica ou empresa">
+        </div>
+
+        <div class="field">
+          <label>Localidade</label>
+          <input name="localidade" id="demoLocalidade" placeholder="Ex.: Oliveira de Azeméis">
+        </div>
+
+        <div class="field">
+          <label>Responsável pelo equipamento</label>
+          <input name="responsavel" id="demoResponsavel" placeholder="Nome da pessoa responsável">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Quantidade</label>
+        <input name="quantidade" type="number" min="1" step="1" value="1" required>
+      </div>
+
+      <div class="field">
+        <label>Data prevista de entrega/devolução</label>
+        <input name="dataPrevista" type="date">
+      </div>
+
+      <div class="field" id="normalResponsavel">
+        <label>Responsável</label>
+        <input name="responsavelNormal">
+      </div>
+
+      <div class="field">
+        <label>Observações</label>
+        <textarea name="observacoes"></textarea>
+      </div>
+    `
   };
-  $('modalTitle').textContent=({item:'Adicionar artigo',client:'Adicionar cliente',reservation:'Criar reserva / demonstração'})[mode]||'Novo registo';
-  $('modalFields').innerHTML=fields[mode]||'';
-  if(mode==='reservation'){if(preselect&&$('reserveItem'))$('reserveItem').value=preselect;toggleDemoFields();}
+
+  $('modalTitle').textContent = {
+    item:'Adicionar artigo',
+    client:'Adicionar cliente',
+    reservation:'Criar reserva / demonstração'
+  }[mode] || 'Novo registo';
+
+  $('modalFields').innerHTML = fields[mode] || '';
+
+  if (mode === 'reservation') {
+    if (preselect) $('reserveItem').value = preselect;
+    toggleDemoFields();
+  }
+
   $('modal').classList.add('show');
 }
-function toggleDemoFields(){
-  const sel=$('reserveTipo'); if(!sel)return; const isDemo=sel.value==='Demonstracao';
-  $('demoDestinationFields').classList.toggle('hidden',!isDemo);
-  ['demoDestino','demoLocalidade','demoResponsavel'].forEach(id=>{$(id).required=isDemo});
-  $('normalResponsavel').classList.toggle('hidden',isDemo);
+
+
+function toggleDemoFields() {
+  const sel = $('reserveTipo');
+  if (!sel) return;
+
+  const demo = sel.value === 'Demonstracao';
+
+  $('demoDestinationFields').classList.toggle('hidden',!demo);
+
+  ['demoDestino','demoLocalidade','demoResponsavel'].forEach(id => {
+    $(id).required = demo;
+  });
+
+  $('normalResponsavel').classList.toggle('hidden',demo);
 }
-function closeModal(){$('modal').classList.remove('show')}
-async function submitModal(e){
-  e.preventDefault(); const f=Object.fromEntries(new FormData(e.target).entries());
-  try{
-    if(modalMode==='item'){f.action='addItem';f.stock=Number(f.stock)}
-    if(modalMode==='client'){f.action='addClient'}
-    if(modalMode==='reservation'){
-      if(!f.clienteId)throw new Error('Cria primeiro um cliente.');
-      if(!f.itemId)throw new Error('Não existem artigos ativos.');
-      // AÇÃO ÚNICA - o Code.gs decide se é Reserva ou Demonstração pelo tipoMovimento
-      f.action='createMovement';
-      f.quantidade=Number(f.quantidade); f.dataReserva=new Date().toISOString();
-      if(f.tipoMovimento==='Demonstracao'){
-        if(!f.destino||!f.destino.trim())throw new Error('Indica o destino da demonstração.');
-        if(!f.localidade||!f.localidade.trim())throw new Error('Indica a localidade.');
-        if(!f.responsavel||!f.responsavel.trim())throw new Error('Indica o responsável.');
-        f.destino=f.destino.trim(); f.localidade=f.localidade.trim(); f.responsavel=f.responsavel.trim();
-      }else{f.responsavel=f.responsavelNormal||'';f.destino='';f.localidade=''}
+
+
+function closeModal() {
+  $('modal').classList.remove('show');
+}
+
+
+/* =====================================================
+   GRAVAÇÃO DOS FORMULÁRIOS
+===================================================== */
+
+async function submitModal(e) {
+  e.preventDefault();
+
+  if (isSaving) return;
+
+  const f = Object.fromEntries(new FormData(e.target).entries());
+
+  try {
+
+    if (modalMode === 'item') {
+      f.action = 'addItem';
+      f.stock = Number(f.stock);
+    }
+
+    if (modalMode === 'client') {
+      f.action = 'addClient';
+    }
+
+    if (modalMode === 'reservation') {
+      if (!f.clienteId) throw new Error('Seleciona um cliente.');
+      if (!f.itemId) throw new Error('Seleciona um artigo.');
+
+      f.action = 'createMovement';
+      f.quantidade = Number(f.quantidade);
+
+      if (f.tipoMovimento === 'Demonstracao') {
+        if (!f.destino?.trim()) throw new Error('Indica o destino.');
+        if (!f.localidade?.trim()) throw new Error('Indica a localidade.');
+        if (!f.responsavel?.trim()) throw new Error('Indica o responsável.');
+
+        f.destino = f.destino.trim();
+        f.localidade = f.localidade.trim();
+        f.responsavel = f.responsavel.trim();
+
+      } else {
+        f.responsavel = f.responsavelNormal || '';
+        f.destino = '';
+        f.localidade = '';
+      }
+
       delete f.responsavelNormal;
     }
-    await post(f); closeModal();
-  }catch(err){alert(err.message)}
+
+    await post(f);
+    closeModal();
+
+  } catch(err) {
+    alert(err.message);
+  }
 }
+
+
+/* =====================================================
+   ARRANQUE
+===================================================== */
+
 loadData();
+
 </script>
 </body>
 </html>
