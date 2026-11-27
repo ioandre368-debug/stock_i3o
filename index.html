@@ -35,6 +35,53 @@
       padding-bottom: 56px;
     }
 
+    /* ECRÃ DE LOGIN */
+    #login-screen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 390px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px 24px;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+    }
+
+    .login-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .login-card p {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-bottom: 20px;
+    }
+
+    .login-field { margin-bottom: 14px; }
+
+    .login-error {
+      display: none;
+      margin-top: 12px;
+      padding: 9px 12px;
+      border-radius: var(--radius-sm);
+      background: var(--err-bg);
+      color: var(--err-fg);
+      font-size: 0.82rem;
+      font-weight: 600;
+    }
+
+    #app-shell { display: none; }
+
     header {
       background: var(--surface);
       border-bottom: 1px solid var(--border);
@@ -62,6 +109,24 @@
     }
 
     header h1 { font-size: 1.15rem; font-weight: 700; letter-spacing: -0.015em; }
+
+    .header-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+    .role-tag {
+      font-size: 0.76rem;
+      font-weight: 700;
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: var(--surface-subtle);
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+
+    .role-tag.admin {
+      background: var(--accent-soft);
+      border-color: #bfdbfe;
+      color: var(--accent);
+    }
 
     .btn-refresh {
       background: var(--surface-subtle);
@@ -294,351 +359,451 @@
 </head>
 <body>
 
-<header>
-  <div class="header-inner">
-    <div class="brand">
+<!-- ECRÃ DE LOGIN -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-brand">
       <span class="brand-dot"></span>
       <h1>Gestão de Stock</h1>
     </div>
-    <button class="btn-refresh" onclick="loadData()">Atualizar</button>
+    <p>Inicia sessão como <strong>admin</strong> para gestão completa ou entra como utilizador normal para ver apenas o stock.</p>
+
+    <form onsubmit="handleLogin(event)">
+      <div class="login-field">
+        <label for="login-user">Utilizador</label>
+        <input id="login-user" type="text" placeholder="Ex: admin ou utilizador" autocomplete="username" />
+      </div>
+      <div class="login-field">
+        <label for="login-pass">Palavra-passe</label>
+        <input id="login-pass" type="password" placeholder="Apenas necessária para admin" autocomplete="current-password" />
+      </div>
+      <div class="form-actions" style="margin-top: 18px;">
+        <button class="btn btn-primary" type="submit" style="flex: 1;">Entrar</button>
+        <button class="btn btn-secondary" type="button" onclick="enterNormalUser()">Apenas Stock</button>
+      </div>
+      <div class="login-error" id="login-error">Palavra-passe incorreta para o utilizador admin.</div>
+    </form>
   </div>
-</header>
+</div>
 
-<nav>
-  <div class="nav-inner">
-    <button class="active" onclick="openTab('stock', this)">Stock</button>
-    <button onclick="openTab('mov', this)">Definir Quantidade</button>
-    <button onclick="openTab('reservas', this)">Reservados</button>
-    <button onclick="openTab('demos', this)">Demonstração</button>
-    <button onclick="openTab('clientes', this)">Clientes</button>
-    <button onclick="openTab('stats', this)">Estatísticas</button>
-  </div>
-</nav>
-
-<main>
-  <div class="status-pill" id="status-bar">Pronto.</div>
-
-  <!-- STOCK (INÍCIO) -->
-  <section id="stock" class="tab active">
-    <div class="card">
-      <div class="card-head">
-        <h2>Stock Atual</h2>
-        <input type="text" id="filter-stock" class="search-input" placeholder="Pesquisar artigo ou código..." oninput="renderStock()" />
+<!-- APLICAÇÃO -->
+<div id="app-shell">
+  <header>
+    <div class="header-inner">
+      <div class="brand">
+        <span class="brand-dot"></span>
+        <h1>Gestão de Stock</h1>
       </div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Código</th>
-              <th>Artigo</th>
-              <th>Categoria</th>
-              <th>Disponível</th>
-              <th>Reservado</th>
-              <th>Em Demo</th>
-              <th>Estado</th>
-            </tr>
-          </thead>
-          <tbody id="tb-stock"></tbody>
-        </table>
+      <div class="header-actions">
+        <span class="role-tag" id="role-badge">Utilizador</span>
+        <button class="btn-refresh" onclick="loadData()">Atualizar</button>
+        <button class="btn-refresh" onclick="logout()">Sair</button>
       </div>
     </div>
+  </header>
 
-    <div class="card">
-      <h2>Novo Artigo</h2>
-      <form onsubmit="createItem(event)">
-        <div class="grid-3">
-          <div><label>Código</label><input id="item-code" placeholder="Ex: ART-01" /></div>
-          <div><label>Nome *</label><input id="item-name" required placeholder="Nome do artigo" /></div>
-          <div><label>Categoria</label><input id="item-cat" placeholder="Categoria" /></div>
-          <div><label>Quantidade Inicial *</label><input id="item-qty" type="number" min="0" value="0" required /></div>
-          <div><label>Stock Mínimo</label><input id="item-min" type="number" min="0" value="1" /></div>
+  <nav id="main-nav">
+    <div class="nav-inner">
+      <button class="active" data-tab="stock" onclick="openTab('stock', this)">Stock</button>
+      <button class="admin-only" data-tab="mov" onclick="openTab('mov', this)">Definir Quantidade</button>
+      <button class="admin-only" data-tab="reservas" onclick="openTab('reservas', this)">Reservados</button>
+      <button class="admin-only" data-tab="demos" onclick="openTab('demos', this)">Demonstração</button>
+      <button class="admin-only" data-tab="clientes" onclick="openTab('clientes', this)">Clientes</button>
+      <button class="admin-only" data-tab="stats" onclick="openTab('stats', this)">Estatísticas</button>
+    </div>
+  </nav>
+
+  <main>
+    <div class="status-pill" id="status-bar">Pronto.</div>
+
+    <!-- STOCK (INÍCIO) -->
+    <section id="stock" class="tab active">
+      <div class="card">
+        <div class="card-head">
+          <h2>Stock Atual</h2>
+          <input type="text" id="filter-stock" class="search-input" placeholder="Pesquisar artigo ou código..." oninput="renderStock()" />
         </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr id="stock-thead-row">
+                <th>Código</th>
+                <th>Artigo</th>
+                <th>Categoria</th>
+                <th>Stock</th>
+                <th class="admin-only">Reservado</th>
+                <th class="admin-only">Em Demo</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody id="tb-stock"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card admin-only">
+        <h2>Novo Artigo</h2>
+        <form onsubmit="createItem(event)">
+          <div class="grid-3">
+            <div><label>Código</label><input id="item-code" placeholder="Ex: ART-01" /></div>
+            <div><label>Nome *</label><input id="item-name" required placeholder="Nome do artigo" /></div>
+            <div><label>Categoria</label><input id="item-cat" placeholder="Categoria" /></div>
+            <div><label>Quantidade Inicial *</label><input id="item-qty" type="number" min="0" value="0" required /></div>
+            <div><label>Stock Mínimo</label><input id="item-min" type="number" min="0" value="1" /></div>
+          </div>
+          <div class="form-actions">
+            <button class="btn btn-primary" type="submit">Guardar Artigo</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- DEFINIR QUANTIDADE -->
+    <section id="mov" class="tab admin-only">
+      <div class="card">
+        <h2>Definir Quantidade em Stock</h2>
+        <form onsubmit="setStockQty(event)">
+          <div class="grid-2">
+            <div><label>Artigo *</label><select id="mov-item" required onchange="syncCurrentQty()"></select></div>
+            <div><label>Nova Quantidade Exata *</label><input id="mov-qty" type="number" min="0" required placeholder="Escreva a quantidade final" /></div>
+          </div>
+          <div class="form-actions">
+            <button class="btn btn-primary" type="submit">Guardar Quantidade</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="card">
+        <h2>Histórico Recente</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Tipo</th>
+                <th>Artigo</th>
+                <th>Qtd.</th>
+                <th>Detalhe</th>
+              </tr>
+            </thead>
+            <tbody id="tb-hist"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- RESERVADOS -->
+    <section id="reservas" class="tab admin-only">
+      <div class="card">
+        <h2>Nova Reserva Simples</h2>
+        <form onsubmit="addReserva(event)">
+          <div class="grid-2">
+            <div><label>Cliente *</label><select id="res-cli" required></select></div>
+            <div><label>Artigo *</label><select id="res-item" required></select></div>
+            <div><label>Quantidade *</label><input id="res-qty" type="number" min="1" value="1" required /></div>
+            <div><label>Notas</label><input id="res-notes" placeholder="Opcional" /></div>
+          </div>
+          <div class="form-actions">
+            <button class="btn btn-primary" type="submit">Reservar</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h2>Reserva em Massa (Vários Artigos)</h2>
+          <input type="text" id="filter-bulk-res" class="search-input" placeholder="Filtrar artigos..." oninput="renderBulkReservas()" />
+        </div>
+
+        <div class="grid-2" style="margin-bottom: 16px;">
+          <div><label>Cliente *</label><select id="bulk-res-cli"></select></div>
+          <div><label>Notas da Reserva em Massa</label><input id="bulk-res-notes" placeholder="Opcional (aplicado a todos os marcados)" /></div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 44px;"><input type="checkbox" id="bulk-res-all" onchange="toggleAllBulkRes(this.checked)" /></th>
+                <th>Artigo</th>
+                <th>Disponível</th>
+                <th>Qtd. a Reservar</th>
+              </tr>
+            </thead>
+            <tbody id="tb-bulk-res"></tbody>
+          </table>
+        </div>
+
         <div class="form-actions">
-          <button class="btn btn-primary" type="submit">Guardar Artigo</button>
-        </div>
-      </form>
-    </div>
-  </section>
-
-  <!-- DEFINIR QUANTIDADE -->
-  <section id="mov" class="tab">
-    <div class="card">
-      <h2>Definir Quantidade em Stock</h2>
-      <form onsubmit="setStockQty(event)">
-        <div class="grid-2">
-          <div><label>Artigo *</label><select id="mov-item" required onchange="syncCurrentQty()"></select></div>
-          <div><label>Nova Quantidade Exata *</label><input id="mov-qty" type="number" min="0" required placeholder="Escreva a quantidade final" /></div>
-        </div>
-        <div class="form-actions">
-          <button class="btn btn-primary" type="submit">Guardar Quantidade</button>
-        </div>
-      </form>
-    </div>
-
-    <div class="card">
-      <h2>Histórico Recente</h2>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Data</th>
-              <th>Tipo</th>
-              <th>Artigo</th>
-              <th>Qtd.</th>
-              <th>Detalhe</th>
-            </tr>
-          </thead>
-          <tbody id="tb-hist"></tbody>
-        </table>
-      </div>
-    </div>
-  </section>
-
-  <!-- RESERVADOS -->
-  <section id="reservas" class="tab">
-    <div class="card">
-      <h2>Nova Reserva Simples</h2>
-      <form onsubmit="addReserva(event)">
-        <div class="grid-2">
-          <div><label>Cliente *</label><select id="res-cli" required></select></div>
-          <div><label>Artigo *</label><select id="res-item" required></select></div>
-          <div><label>Quantidade *</label><input id="res-qty" type="number" min="1" value="1" required /></div>
-          <div><label>Notas</label><input id="res-notes" placeholder="Opcional" /></div>
-        </div>
-        <div class="form-actions">
-          <button class="btn btn-primary" type="submit">Reservar</button>
-        </div>
-      </form>
-    </div>
-
-    <div class="card">
-      <div class="card-head">
-        <h2>Reserva em Massa (Vários Artigos)</h2>
-        <input type="text" id="filter-bulk-res" class="search-input" placeholder="Filtrar artigos..." oninput="renderBulkReservas()" />
-      </div>
-
-      <div class="grid-2" style="margin-bottom: 16px;">
-        <div><label>Cliente *</label><select id="bulk-res-cli"></select></div>
-        <div><label>Notas da Reserva em Massa</label><input id="bulk-res-notes" placeholder="Opcional (aplicado a todos os marcados)" /></div>
-      </div>
-
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th style="width: 44px;"><input type="checkbox" id="bulk-res-all" onchange="toggleAllBulkRes(this.checked)" /></th>
-              <th>Artigo</th>
-              <th>Disponível</th>
-              <th>Qtd. a Reservar</th>
-            </tr>
-          </thead>
-          <tbody id="tb-bulk-res"></tbody>
-        </table>
-      </div>
-
-      <div class="form-actions">
-        <button class="btn btn-primary" type="button" onclick="submitBulkReservas()">Reservar Selecionados</button>
-        <button class="btn btn-secondary" type="button" onclick="clearBulkSelection()">Limpar Seleção</button>
-      </div>
-    </div>
-
-    <div class="card">
-      <h2>Reservas Ativas</h2>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Data</th>
-              <th>Cliente</th>
-              <th>Artigo</th>
-              <th>Qtd.</th>
-              <th>Notas</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-          <tbody id="tb-res"></tbody>
-        </table>
-      </div>
-    </div>
-  </section>
-
-  <!-- DEMONSTRAÇÃO -->
-  <section id="demos" class="tab">
-    <div class="card">
-      <h2>Colocar em Demonstração</h2>
-      <form onsubmit="addDemo(event)">
-        <div class="grid-2">
-          <div><label>Cliente *</label><select id="demo-cli" required></select></div>
-          <div><label>Artigo *</label><select id="demo-item" required></select></div>
-          <div><label>Quantidade *</label><input id="demo-qty" type="number" min="1" value="1" required /></div>
-          <div><label>Notas</label><input id="demo-notes" placeholder="Opcional" /></div>
-        </div>
-        <div class="form-actions">
-          <button class="btn btn-primary" type="submit">Enviar para Demo</button>
-        </div>
-      </form>
-    </div>
-
-    <div class="card">
-      <h2>Em Demonstração</h2>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Data</th>
-              <th>Cliente</th>
-              <th>Artigo</th>
-              <th>Qtd.</th>
-              <th>Notas</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-          <tbody id="tb-demo"></tbody>
-        </table>
-      </div>
-    </div>
-  </section>
-
-  <!-- CLIENTES (INTERATIVO + FICHA DETALHADA) -->
-  <section id="clientes" class="tab">
-    <div class="card">
-      <div class="card-head">
-        <h2>Clientes & Equipamentos Alocados</h2>
-        <div style="display:flex; gap:8px; flex-wrap:wrap;">
-          <input type="text" id="filter-cli" class="search-input" placeholder="Pesquisar cliente..." oninput="renderClientes()" />
-          <button class="btn btn-secondary btn-sm" type="button" onclick="syncSheetsTabs()">Sincronizar Abas no Sheets</button>
+          <button class="btn btn-primary" type="button" onclick="submitBulkReservas()">Reservar Selecionados</button>
+          <button class="btn btn-secondary" type="button" onclick="clearBulkSelection()">Limpar Seleção</button>
         </div>
       </div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Cliente</th>
-              <th>Empresa</th>
-              <th>Contacto</th>
-              <th>Reservados</th>
-              <th>Em Demo</th>
-              <th>Ficha</th>
-            </tr>
-          </thead>
-          <tbody id="tb-cli"></tbody>
-        </table>
-      </div>
-    </div>
 
-    <div id="client-detail-card" class="card highlight" style="display:none;">
-      <div class="card-head">
-        <h2 id="client-detail-title">Ficha do Cliente</h2>
-        <button class="btn btn-secondary btn-sm" type="button" onclick="closeClientDetail()">Fechar Ficha</button>
-      </div>
-      <p id="client-detail-meta" style="font-size:0.85rem; color:var(--muted); margin-bottom:12px;"></p>
-
-      <h3>Reservas deste Cliente</h3>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Data</th>
-              <th>Artigo</th>
-              <th>Qtd.</th>
-              <th>Estado</th>
-              <th>Notas</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-          <tbody id="tb-client-res"></tbody>
-        </table>
-      </div>
-
-      <h3>Equipamentos em Demonstração neste Cliente</h3>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Data Saída</th>
-              <th>Artigo</th>
-              <th>Qtd.</th>
-              <th>Estado</th>
-              <th>Notas</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-          <tbody id="tb-client-demo"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <div class="card">
-      <h2>Criar Novo Cliente</h2>
-      <form onsubmit="addClient(event)">
-        <div class="grid-3">
-          <div><label>Nome *</label><input id="cli-name" required placeholder="Nome do cliente" /></div>
-          <div><label>Empresa</label><input id="cli-comp" placeholder="Empresa" /></div>
-          <div><label>Telefone</label><input id="cli-tel" placeholder="Telefone" /></div>
-          <div><label>Email</label><input id="cli-mail" type="email" placeholder="email@exemplo.com" /></div>
-          <div><label>Notas</label><input id="cli-notes" placeholder="Notas" /></div>
+      <div class="card">
+        <h2>Reservas Ativas</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Cliente</th>
+                <th>Artigo</th>
+                <th>Qtd.</th>
+                <th>Notas</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tb-res"></tbody>
+          </table>
         </div>
-        <div class="form-actions">
-          <button class="btn btn-primary" type="submit">Guardar Cliente</button>
+      </div>
+    </section>
+
+    <!-- DEMONSTRAÇÃO -->
+    <section id="demos" class="tab admin-only">
+      <div class="card">
+        <h2>Colocar em Demonstração</h2>
+        <form onsubmit="addDemo(event)">
+          <div class="grid-2">
+            <div><label>Cliente *</label><select id="demo-cli" required></select></div>
+            <div><label>Artigo *</label><select id="demo-item" required></select></div>
+            <div><label>Quantidade *</label><input id="demo-qty" type="number" min="1" value="1" required /></div>
+            <div><label>Notas</label><input id="demo-notes" placeholder="Opcional" /></div>
+          </div>
+          <div class="form-actions">
+            <button class="btn btn-primary" type="submit">Enviar para Demo</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="card">
+        <h2>Em Demonstração</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Cliente</th>
+                <th>Artigo</th>
+                <th>Qtd.</th>
+                <th>Notas</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tb-demo"></tbody>
+          </table>
         </div>
-      </form>
-    </div>
-  </section>
+      </div>
+    </section>
 
-  <!-- ESTATÍSTICAS -->
-  <section id="stats" class="tab">
-    <div class="grid-3" style="margin-bottom: 20px;">
-      <div class="kpi-card">
-        <div class="kpi-lbl">Em Stock</div>
-        <div class="kpi-num accent" id="st-stock">0</div>
+    <!-- CLIENTES -->
+    <section id="clientes" class="tab admin-only">
+      <div class="card">
+        <div class="card-head">
+          <h2>Clientes & Equipamentos Alocados</h2>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <input type="text" id="filter-cli" class="search-input" placeholder="Pesquisar cliente..." oninput="renderClientes()" />
+            <button class="btn btn-secondary btn-sm" type="button" onclick="syncSheetsTabs()">Sincronizar Abas no Sheets</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Cliente</th>
+                <th>Empresa</th>
+                <th>Contacto</th>
+                <th>Reservados</th>
+                <th>Em Demo</th>
+                <th>Ficha</th>
+              </tr>
+            </thead>
+            <tbody id="tb-cli"></tbody>
+          </table>
+        </div>
       </div>
-      <div class="kpi-card">
-        <div class="kpi-lbl">Reservados</div>
-        <div class="kpi-num warn" id="st-res">0</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-lbl">Em Demonstração</div>
-        <div class="kpi-num ok" id="st-demo">0</div>
-      </div>
-    </div>
 
-    <div class="card">
-      <h2>Detalhe por Artigo</h2>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Artigo</th>
-              <th>Stock</th>
-              <th>Reservado</th>
-              <th>Em Demo</th>
-              <th>Saída Demo</th>
-              <th>Total Ativo</th>
-            </tr>
-          </thead>
-          <tbody id="tb-stats"></tbody>
-        </table>
+      <div id="client-detail-card" class="card highlight" style="display:none;">
+        <div class="card-head">
+          <h2 id="client-detail-title">Ficha do Cliente</h2>
+          <button class="btn btn-secondary btn-sm" type="button" onclick="closeClientDetail()">Fechar Ficha</button>
+        </div>
+        <p id="client-detail-meta" style="font-size:0.85rem; color:var(--muted); margin-bottom:12px;"></p>
+
+        <h3>Reservas deste Cliente</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Artigo</th>
+                <th>Qtd.</th>
+                <th>Estado</th>
+                <th>Notas</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tb-client-res"></tbody>
+          </table>
+        </div>
+
+        <h3>Equipamentos em Demonstração neste Cliente</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Data Saída</th>
+                <th>Artigo</th>
+                <th>Qtd.</th>
+                <th>Estado</th>
+                <th>Notas</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tb-client-demo"></tbody>
+          </table>
+        </div>
       </div>
-    </div>
-  </section>
-</main>
+
+      <div class="card">
+        <h2>Criar Novo Cliente</h2>
+        <form onsubmit="addClient(event)">
+          <div class="grid-3">
+            <div><label>Nome *</label><input id="cli-name" required placeholder="Nome do cliente" /></div>
+            <div><label>Empresa</label><input id="cli-comp" placeholder="Empresa" /></div>
+            <div><label>Telefone</label><input id="cli-tel" placeholder="Telefone" /></div>
+            <div><label>Email</label><input id="cli-mail" type="email" placeholder="email@exemplo.com" /></div>
+            <div><label>Notas</label><input id="cli-notes" placeholder="Notas" /></div>
+          </div>
+          <div class="form-actions">
+            <button class="btn btn-primary" type="submit">Guardar Cliente</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- ESTATÍSTICAS -->
+    <section id="stats" class="tab admin-only">
+      <div class="grid-3" style="margin-bottom: 20px;">
+        <div class="kpi-card">
+          <div class="kpi-lbl">Em Stock</div>
+          <div class="kpi-num accent" id="st-stock">0</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-lbl">Reservados</div>
+          <div class="kpi-num warn" id="st-res">0</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-lbl">Em Demonstração</div>
+          <div class="kpi-num ok" id="st-demo">0</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Detalhe por Artigo</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Artigo</th>
+                <th>Stock</th>
+                <th>Reservado</th>
+                <th>Em Demo</th>
+                <th>Saída Demo</th>
+                <th>Total Ativo</th>
+              </tr>
+            </thead>
+            <tbody id="tb-stats"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
 
 <script>
-  const API_URL = "https://script.google.com/macros/s/AKfycbyEI56ccNkMw9rQRc6YlmoxuDNyNhftDm5Z0Q0ChXU0h74wRoZVF6w7udSbs_orJSp2kw/exec";
+  const API_URL = "https://script.google.com/macros/s/AKfycby8300vop-vx7LV0QuxDsNBFMGY9Nfn2Vd6m5tuG-i8vMejzYQE4RDFBq4qrCBOQWPvEw/exec";
+  const ADMIN_USER = "admin";
+  const ADMIN_PASS = "6969";
 
+  let CURRENT_ROLE = null; // 'admin' | 'user'
   let DB = { stock: [], clientes: [], reservas: [], demos: [], historico: [] };
   let BULK_DRAFT = {};
   let SELECTED_CLIENT_ID = null;
+
+  function applyRolePermissions(role) {
+    CURRENT_ROLE = role;
+    sessionStorage.setItem("stock_role", role);
+
+    const isAdmin = role === "admin";
+    document.getElementById("login-screen").style.display = "none";
+    document.getElementById("app-shell").style.display = "block";
+
+    const badge = document.getElementById("role-badge");
+    badge.textContent = isAdmin ? "Admin" : "Utilizador Normal";
+    badge.className = isAdmin ? "role-tag admin" : "role-tag";
+
+    document.querySelectorAll(".admin-only").forEach(function(el) {
+      el.style.display = isAdmin ? "" : "none";
+    });
+
+    if (!isAdmin) {
+      const stockBtn = document.querySelector('nav button[data-tab="stock"]');
+      openTab("stock", stockBtn);
+    }
+
+    renderAll();
+  }
+
+  function handleLogin(e) {
+    e.preventDefault();
+    const user = (document.getElementById("login-user").value || "").trim().toLowerCase();
+    const pass = document.getElementById("login-pass").value || "";
+    const errEl = document.getElementById("login-error");
+
+    if (user === ADMIN_USER) {
+      if (pass === ADMIN_PASS) {
+        errEl.style.display = "none";
+        applyRolePermissions("admin");
+        loadData();
+      } else {
+        errEl.style.display = "block";
+      }
+      return;
+    }
+
+    errEl.style.display = "none";
+    applyRolePermissions("user");
+    loadData();
+  }
+
+  function enterNormalUser() {
+    document.getElementById("login-error").style.display = "none";
+    applyRolePermissions("user");
+    loadData();
+  }
+
+  function logout() {
+    CURRENT_ROLE = null;
+    sessionStorage.removeItem("stock_role");
+    document.getElementById("login-user").value = "";
+    document.getElementById("login-pass").value = "";
+    document.getElementById("login-error").style.display = "none";
+    document.getElementById("app-shell").style.display = "none";
+    document.getElementById("login-screen").style.display = "flex";
+  }
 
   function setStatus(msg) {
     document.getElementById('status-bar').textContent = msg;
   }
 
   function openTab(id, btn) {
+    if (CURRENT_ROLE !== "admin" && id !== "stock") return;
     document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
     document.querySelectorAll('nav button').forEach(function(b) { b.classList.remove('active'); });
     document.getElementById(id).classList.add('active');
-    btn.classList.add('active');
+    if (btn) btn.classList.add('active');
   }
 
   function loadData() {
@@ -706,6 +871,7 @@
   }
 
   async function postAction(payload) {
+    if (CURRENT_ROLE !== "admin") return false;
     setStatus('A guardar alterações...');
     await sendOnePost(payload, 1400);
     await loadData();
@@ -722,17 +888,20 @@
 
   function renderAll() {
     renderStock();
-    renderSelects();
-    renderBulkReservas();
-    renderReservas();
-    renderDemos();
-    renderClientes();
-    if (SELECTED_CLIENT_ID) openClientDetail(SELECTED_CLIENT_ID, false);
-    renderHistorico();
-    renderStats();
+    if (CURRENT_ROLE === "admin") {
+      renderSelects();
+      renderBulkReservas();
+      renderReservas();
+      renderDemos();
+      renderClientes();
+      if (SELECTED_CLIENT_ID) openClientDetail(SELECTED_CLIENT_ID, false);
+      renderHistorico();
+      renderStats();
+    }
   }
 
   function renderStock() {
+    const isAdmin = CURRENT_ROLE === "admin";
     const q = (document.getElementById('filter-stock').value || '').toLowerCase();
     const tb = document.getElementById('tb-stock');
     const activeRes = DB.reservas.filter(function(r) { return r.Estado === 'Ativa'; });
@@ -743,8 +912,9 @@
              String(i.Codigo).toLowerCase().includes(q) ||
              String(i.Categoria).toLowerCase().includes(q);
     });
+    const colspan = isAdmin ? 7 : 5;
     if (!list.length) {
-      tb.innerHTML = '<tr><td colspan="7" class="empty-row">Sem artigos registados.</td></tr>';
+      tb.innerHTML = '<tr><td colspan="' + colspan + '" class="empty-row">Sem artigos registados.</td></tr>';
       return;
     }
     tb.innerHTML = list.map(function(i) {
@@ -762,8 +932,8 @@
         '<td><strong>' + i.Nome + '</strong></td>' +
         '<td>' + (i.Categoria || '-') + '</td>' +
         '<td><strong>' + qty + '</strong></td>' +
-        '<td>' + (resCount > 0 ? '<span class="badge b-warn">' + resCount + '</span>' : '0') + '</td>' +
-        '<td>' + (demoCount > 0 ? '<span class="badge b-info">' + demoCount + '</span>' : '0') + '</td>' +
+        (isAdmin ? '<td>' + (resCount > 0 ? '<span class="badge b-warn">' + resCount + '</span>' : '0') + '</td>' : '') +
+        (isAdmin ? '<td>' + (demoCount > 0 ? '<span class="badge b-info">' + demoCount + '</span>' : '0') + '</td>' : '') +
         '<td>' + badge + '</td>' +
       '</tr>';
     }).join('');
@@ -1124,7 +1294,13 @@
     await postAction({ action: 'SELL_DEMO', id: id });
   }
 
-  window.addEventListener('DOMContentLoaded', loadData);
+  window.addEventListener('DOMContentLoaded', function() {
+    const savedRole = sessionStorage.getItem("stock_role");
+    if (savedRole === "admin" || savedRole === "user") {
+      applyRolePermissions(savedRole);
+      loadData();
+    }
+  });
 </script>
 </body>
 </html>
