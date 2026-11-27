@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt">
 <head>
@@ -13,7 +14,6 @@
 :root{
   --navy:#0f172a;
   --blue:#2563eb;
-  --purple:#6d28d9;
   --bg:#f8fafc;
   --muted:#64748b;
   --line:#e2e8f0;
@@ -57,12 +57,6 @@ header{
   border-radius:10px;
 }
 
-.header-actions{
-  display:flex;
-  gap:8px;
-  align-items:center;
-}
-
 main{
   max-width:1100px;
   margin:auto;
@@ -97,25 +91,13 @@ main{
   border-color:var(--blue);
 }
 
-.btn.demo-btn{
-  background:var(--purple);
-  color:white;
-  border-color:var(--purple);
-}
-
 .btn{
   background:white;
   border:1px solid var(--line);
   color:var(--navy);
 }
 
-.btn.sm{
-  padding:7px 10px;
-  font-size:.78rem;
-}
-
 .btn.danger{color:#b91c1c}
-.btn.success{color:var(--green)}
 
 .toolbar{
   display:flex;
@@ -126,7 +108,7 @@ main{
 
 .toolbar input,.toolbar select{
   flex:1;
-  min-width:170px;
+  min-width:180px;
 }
 
 input,select,textarea{
@@ -142,43 +124,6 @@ input,select,textarea{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
   gap:12px;
-}
-
-.stats-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-  gap:12px;
-  margin-bottom:16px;
-}
-
-.stat-card{
-  background:white;
-  border:1px solid var(--line);
-  border-radius:14px;
-  padding:14px 16px;
-  box-shadow:0 3px 14px #0f172a08;
-}
-
-.stat-card.res{border-left:4px solid var(--blue)}
-.stat-card.demo{border-left:4px solid var(--purple)}
-
-.stat-label{
-  font-size:.75rem;
-  font-weight:700;
-  color:var(--muted);
-  text-transform:uppercase;
-  letter-spacing:.03em;
-}
-
-.stat-val{
-  font-size:1.6rem;
-  font-weight:800;
-  margin:4px 0 2px;
-}
-
-.stat-sub{
-  font-size:.78rem;
-  color:var(--muted);
 }
 
 .card{
@@ -208,16 +153,15 @@ input,select,textarea{
 }
 
 .qty input{
-  width:92px;
-  padding:8px 10px;
+  width:88px;
+  padding:7px 8px;
   text-align:center;
-  font-weight:700;
 }
 
 .qty button{
   border:0;
   border-radius:8px;
-  padding:8px 12px;
+  padding:8px 11px;
   background:var(--blue);
   color:white;
   cursor:pointer;
@@ -341,7 +285,7 @@ th{
 #status{
   font-size:.82rem;
   color:var(--muted);
-  margin:8px 0 14px;
+  margin:8px 0;
   padding:10px 12px;
   background:white;
   border:1px solid var(--line);
@@ -357,8 +301,8 @@ th{
 }
 
 .demo-box{
-  background:#f5f3ff;
-  border:1px solid #ddd6fe;
+  background:#eff6ff;
+  border:1px solid #bfdbfe;
   padding:14px;
   border-radius:12px;
   margin-bottom:14px;
@@ -367,15 +311,15 @@ th{
 .demo-box h3{
   margin:0 0 12px;
   font-size:.95rem;
-  color:#6d28d9;
+  color:#1d4ed8;
 }
 
 .destination{
-  margin-top:6px;
-  padding:8px 10px;
+  margin-top:8px;
+  padding:10px;
   background:#f1f5f9;
   border-radius:9px;
-  line-height:1.6;
+  line-height:1.8;
 }
 
 @media(max-width:600px){
@@ -395,15 +339,9 @@ th{
     STOCK I3O
   </div>
 
-  <div class="header-actions">
-    <button class="btn" id="syncBtn" onclick="syncData()" title="Sincronizar com Google Sheets">
-      <i class="fa fa-rotate"></i> Sincronizar
-    </button>
-
-    <button class="btn primary" onclick="openModal('item')">
-      <i class="fa fa-plus"></i> Novo artigo
-    </button>
-  </div>
+  <button class="btn primary" onclick="openModal('item')">
+    <i class="fa fa-plus"></i> Novo artigo
+  </button>
 </header>
 
 <main>
@@ -414,7 +352,7 @@ th{
   </button>
 
   <button class="tab" data-tab="reservados" onclick="showTab('reservados')">
-    <i class="fa fa-bookmark"></i> Reservas & Demos
+    <i class="fa fa-bookmark"></i> Reservas
   </button>
 
   <button class="tab" data-tab="clientes" onclick="showTab('clientes')">
@@ -441,7 +379,7 @@ th{
       <option value="">Todas as categorias</option>
     </select>
 
-    <button class="btn" onclick="syncData()">
+    <button class="btn" onclick="loadData()">
       ↻ Atualizar
     </button>
   </div>
@@ -450,38 +388,25 @@ th{
 
 </section>
 
-<!-- RESERVAS E DEMONSTRAÇÕES -->
+<!-- RESERVAS -->
 
 <section id="view-reservados" class="hidden">
-
-  <div id="reservationStats" class="stats-grid"></div>
 
   <div class="toolbar">
 
     <input id="reservationSearch"
-      placeholder="Pesquisar reserva, demo, cliente, destino ou artigo..."
+      placeholder="Pesquisar reserva, cliente ou artigo..."
       oninput="renderReservations()">
-
-    <select id="reservationType" onchange="renderReservations()">
-      <option value="">Reservas e Demos</option>
-      <option value="Stock">Apenas Reservas (Stock)</option>
-      <option value="Demo">Apenas Demonstrações (Demo)</option>
-    </select>
 
     <select id="reservationState" onchange="renderReservations()">
       <option value="">Todos os estados</option>
       <option>Pendente</option>
       <option>Entregue</option>
-      <option>Devolvida</option>
       <option>Cancelada</option>
     </select>
 
     <button class="btn primary" onclick="openModal('reservation')">
       + Nova reserva
-    </button>
-
-    <button class="btn demo-btn" onclick="openModal('demo')">
-      + Nova demonstração
     </button>
 
   </div>
@@ -513,19 +438,7 @@ th{
 <!-- HISTÓRICO -->
 
 <section id="view-historico" class="hidden">
-
-  <div class="toolbar">
-    <input id="historySearch"
-      placeholder="Pesquisar no histórico (ação, artigo, cliente, destino)..."
-      oninput="renderHistory()">
-
-    <button class="btn" onclick="syncData()">
-      ↻ Atualizar
-    </button>
-  </div>
-
   <div id="historyList"></div>
-
 </section>
 
 </main>
@@ -621,11 +534,11 @@ function validateScriptUrl(){
 
 function esc(v){
   return String(v ?? '').replace(/[&<>"']/g,c=>({
-    '&':'&',
-    '<':'<',
-    '>':'>',
-    '"':'"',
-    "'":'''
+    '&':'&amp;',
+    '<':'&lt;',
+    '>':'&gt;',
+    '"':'&quot;',
+    "'":'&#39;'
   }[c]));
 }
 
@@ -666,15 +579,12 @@ async function readJsonResponse(response){
 }
 
 // ==========================================
-// CARREGAR / SINCRONIZAR DADOS
+// CARREGAR DADOS
 // ==========================================
 
 async function loadData(){
 
-  msg('A sincronizar com a Google Sheets...');
-
-  const syncBtn = $('syncBtn');
-  if(syncBtn) syncBtn.disabled = true;
+  msg('A carregar dados da Google Sheets...');
 
   try{
 
@@ -684,8 +594,7 @@ async function loadData(){
       SCRIPT_URL + '?t=' + Date.now(),
       {
         method:'GET',
-        redirect:'follow',
-        cache:'no-store'
+        redirect:'follow'
       }
     );
 
@@ -709,28 +618,16 @@ async function loadData(){
 
     renderAll();
 
-    const nowTime = new Date().toLocaleTimeString('pt-PT',{
-      hour:'2-digit',
-      minute:'2-digit',
-      second:'2-digit'
-    });
-
     msg(
-      `Sincronizado às ${nowTime} · ${db.stock.filter(x=>isActive(x.Ativo)).length} artigos ativos.`
+      `Sincronizado com Google Sheets (${db.stock.length} artigos).`
     );
 
   }catch(e){
 
     console.error('Erro ao carregar I3O:',e);
 
-    msg('Falha na sincronização: ' + e.message);
-  }finally{
-    if(syncBtn) syncBtn.disabled = false;
+    msg('Falha ao carregar: ' + e.message);
   }
-}
-
-function syncData(){
-  return loadData();
 }
 
 // ==========================================
@@ -840,7 +737,7 @@ function fillSelects(){
 }
 
 // ==========================================
-// STOCK (APENAS STOCK NA PÁGINA INICIAL)
+// STOCK
 // ==========================================
 
 function renderStock(){
@@ -873,7 +770,7 @@ function renderStock(){
 
         <div class="qty">
 
-          <span class="muted">Stock:</span>
+          <span class="muted">Stock</span>
 
           <input
             id="qty-stock-${esc(x.ID)}"
@@ -889,17 +786,31 @@ function renderStock(){
 
         </div>
 
+        <div class="qty">
+
+          <span class="muted">Demo</span>
+
+          <input
+            id="qty-demo-${esc(x.ID)}"
+            type="number"
+            min="0"
+            step="1"
+            value="${Number(x.Demo)||0}"
+            aria-label="Quantidade demo">
+
+          <button onclick="saveQty('${esc(x.ID)}','demo')">
+            Guardar
+          </button>
+
+        </div>
+
         <div class="actions">
 
-          <button class="btn sm" onclick="reserveThis('${esc(x.ID)}','reservation')">
+          <button class="btn" onclick="reserveThis('${esc(x.ID)}')">
             Reservar
           </button>
 
-          <button class="btn sm" onclick="reserveThis('${esc(x.ID)}','demo')">
-            Demo
-          </button>
-
-          <button class="btn sm danger" onclick="archiveItem('${esc(x.ID)}')">
+          <button class="btn danger" onclick="archiveItem('${esc(x.ID)}')">
             Arquivar
           </button>
 
@@ -910,6 +821,8 @@ function renderStock(){
     `).join('')
     : '<div class="empty">Não foram encontrados artigos.</div>';
 }
+
+// Quantidades digitadas diretamente
 
 function saveQty(id,field){
 
@@ -934,9 +847,11 @@ function saveQty(id,field){
 
   if(!item) return;
 
-  const current = Number(item.Stock) || 0;
+  const current = Number(
+    field === 'demo' ? item.Demo : item.Stock
+  ) || 0;
 
-  const change = value - current;
+  const change = value-current;
 
   if(change===0){
 
@@ -949,7 +864,7 @@ function saveQty(id,field){
     action:'updateQty',
     id:id,
     change:change,
-    field:'stock'
+    field:field
   }).catch(e=>alert(e.message));
 }
 
@@ -965,63 +880,26 @@ function archiveItem(id){
 }
 
 // ==========================================
-// RESERVAS E DEMONSTRAÇÕES + ESTATÍSTICAS
+// RESERVAS
 // ==========================================
-
-function renderReservationStats(){
-  const nonCancelled = (db.reservados || []).filter(
-    x => x.Estado !== 'Cancelada'
-  );
-
-  const reservas = nonCancelled.filter(x => x.Origem !== 'Demo');
-  const demos = nonCancelled.filter(x => x.Origem === 'Demo');
-
-  const resUnidades = reservas.reduce((s,x)=>s + (Number(x.Quantidade)||0),0);
-  const resPendentes = reservas.filter(x=>x.Estado==='Pendente').length;
-  const resEntregues = reservas.filter(x=>x.Estado==='Entregue').length;
-
-  const demoUnidades = demos.reduce((s,x)=>s + (Number(x.Quantidade)||0),0);
-  const demoAtivas = demos.filter(x=>x.Estado==='Pendente').length;
-  const demoDevolvidas = demos.filter(x=>x.Estado==='Devolvida').length;
-
-  $('reservationStats').innerHTML = `
-    <div class="stat-card res">
-      <div class="stat-label">Reservas (não canceladas)</div>
-      <div class="stat-val">${reservas.length} <span style="font-size:.9rem;font-weight:600;color:var(--muted)">(${resUnidades} un.)</span></div>
-      <div class="stat-sub">${resPendentes} pendentes · ${resEntregues} entregues</div>
-    </div>
-
-    <div class="stat-card demo">
-      <div class="stat-label">Demonstrações (não canceladas)</div>
-      <div class="stat-val">${demos.length} <span style="font-size:.9rem;font-weight:600;color:var(--muted)">(${demoUnidades} un.)</span></div>
-      <div class="stat-sub">${demoAtivas} em curso · ${demoDevolvidas} devolvidas</div>
-    </div>
-  `;
-}
 
 function renderReservations(){
 
-  renderReservationStats();
-
   const q = $('reservationSearch').value.toLowerCase();
-  const typeFilter = $('reservationType').value;
+
   const state = $('reservationState').value;
 
-  const rows = (db.reservados || []).filter(x=>{
-    const isDemo = x.Origem === 'Demo';
-    if(typeFilter === 'Demo' && !isDemo) return false;
-    if(typeFilter === 'Stock' && isDemo) return false;
-    if(state && x.Estado !== state) return false;
-
-    return [
+  const rows = db.reservados.filter(x=>
+    (!state || x.Estado===state) &&
+    [
       x.ClienteNome,
       x.ItemNome,
       x.ID,
       x.Destino,
       x.Localidade,
       x.Responsavel
-    ].join(' ').toLowerCase().includes(q);
-  }).slice().reverse();
+    ].join(' ').toLowerCase().includes(q)
+  ).slice().reverse();
 
   $('reservationList').innerHTML = rows.length
     ? `
@@ -1032,9 +910,9 @@ function renderReservations(){
 
         <thead>
           <tr>
-            <th>Registo</th>
+            <th>Reserva</th>
             <th>Cliente / Artigo</th>
-            <th>Tipo / Destino</th>
+            <th>Destino</th>
             <th>Qtd.</th>
             <th>Estado</th>
             <th>Datas</th>
@@ -1044,15 +922,8 @@ function renderReservations(){
 
         <tbody>
 
-          ${rows.map(x=>{
-            const isDemo = x.Origem === 'Demo';
+          ${rows.map(x=>`
 
-            const pillClass =
-              x.Estado==='Pendente' ? 'warn' :
-              (x.Estado==='Entregue' || x.Estado==='Devolvida') ? 'ok' :
-              'gray';
-
-            return `
             <tr>
 
               <td>
@@ -1067,14 +938,15 @@ function renderReservations(){
                 ${esc(x.ItemNome)}
                 <br>
                 <span class="muted">
-                  ${esc(x.TipoArtigo)}
+                  ${esc(x.Origem)} · ${esc(x.TipoArtigo)}
                 </span>
               </td>
 
               <td>
-                ${isDemo
+
+                ${x.Origem==='Demo'
                   ? `
-                    <span class="pill demo">Demonstração (Demo)</span>
+                    <span class="pill demo">Demonstração</span>
 
                     <div class="destination">
                       <b>${esc(x.Destino || 'Não indicado')}</b>
@@ -1090,76 +962,59 @@ function renderReservations(){
                       </span>
                     </div>
                   `
-                  : `
-                    <span class="pill">Reserva (Stock)</span>
-                    ${x.Responsavel ? `<div class="muted" style="margin-top:4px"><i class="fa fa-user"></i> ${esc(x.Responsavel)}</div>` : ''}
-                  `
+                  : '<span class="muted">Reserva normal</span>'
                 }
+
               </td>
 
-              <td><b>${esc(x.Quantidade)}</b></td>
+              <td>${esc(x.Quantidade)}</td>
 
               <td>
-                <span class="pill ${pillClass}">
+                <span class="pill ${
+                  x.Estado==='Pendente'
+                    ? 'warn'
+                    : x.Estado==='Entregue'
+                      ? 'ok'
+                      : 'gray'
+                }">
                   ${esc(x.Estado)}
                 </span>
               </td>
 
               <td>
-                <span class="muted">Prevista:</span> ${dateFmt(x.DataPrevista)}
+                <span class="muted">Prevista:</span>
+                <br>
+                ${dateFmt(x.DataPrevista)}
                 ${
                   x.DataEntrega
-                    ? `<br><span class="muted">Entrega:</span> ${dateFmt(x.DataEntrega)}`
-                    : ''
-                }
-                ${
-                  x.DataDevolucao
-                    ? `<br><span class="muted">Devolução:</span> ${dateFmt(x.DataDevolucao)}`
-                    : ''
-                }
-                ${
-                  x.DataCancelamento
-                    ? `<br><span class="muted">Cancelada:</span> ${dateFmt(x.DataCancelamento)}`
+                    ? `<br><span class="muted">Entrega: ${dateFmt(x.DataEntrega)}</span>`
                     : ''
                 }
               </td>
 
               <td>
-                <div class="actions" style="margin-top:0">
+
                 ${
                   x.Estado==='Pendente'
-                    ? (
-                      isDemo
-                        ? `
-                          <button class="btn sm success"
-                            onclick="reservationAction('${esc(x.ID)}','returnDemo')">
-                            Devolver
-                          </button>
+                    ? `
+                      <button class="btn"
+                        onclick="reservationAction('${esc(x.ID)}','deliverReservation')">
+                        Entregue
+                      </button>
 
-                          <button class="btn sm danger"
-                            onclick="reservationAction('${esc(x.ID)}','cancelReservation')">
-                            Cancelar
-                          </button>
-                        `
-                        : `
-                          <button class="btn sm success"
-                            onclick="reservationAction('${esc(x.ID)}','deliverReservation')">
-                            Entregue
-                          </button>
-
-                          <button class="btn sm danger"
-                            onclick="reservationAction('${esc(x.ID)}','cancelReservation')">
-                            Cancelar
-                          </button>
-                        `
-                    )
+                      <button class="btn danger"
+                        onclick="reservationAction('${esc(x.ID)}','cancelReservation')">
+                        Cancelar
+                      </button>
+                    `
                     : '—'
                 }
-                </div>
+
               </td>
 
             </tr>
-          `}).join('')}
+
+          `).join('')}
 
         </tbody>
 
@@ -1168,7 +1023,7 @@ function renderReservations(){
     </div>
 
     `
-    : '<div class="empty">Nenhum registo encontrado.</div>';
+    : '<div class="empty">Ainda não existem reservas.</div>';
 }
 
 function dateFmt(v){
@@ -1184,13 +1039,11 @@ function dateFmt(v){
 
 function reservationAction(id,action){
 
-  const questions = {
-    cancelReservation: 'Cancelar este registo e repor automaticamente a quantidade?',
-    deliverReservation: 'Confirmar que a reserva foi entregue ao cliente?',
-    returnDemo: 'Registar devolução da demonstração e repor automaticamente a quantidade em Demo?'
-  };
+  const question = action==='cancelReservation'
+    ? 'Cancelar a reserva e repor a quantidade no stock?'
+    : 'Confirmar que o artigo foi entregue?';
 
-  if(confirm(questions[action] || 'Confirmar ação?')){
+  if(confirm(question)){
 
     post({
       action:action,
@@ -1266,16 +1119,7 @@ function archiveClient(id){
 
 function renderHistory(){
 
-  const q = ($('historySearch')?.value || '').toLowerCase();
-
-  const rows = (db.historico || []).filter(x=>
-    !q || [
-      x.Acao,
-      x.Entidade,
-      x.Descricao,
-      x.Utilizador
-    ].join(' ').toLowerCase().includes(q)
-  );
+  const rows = db.historico || [];
 
   $('historyList').innerHTML = rows.length
     ? `
@@ -1286,9 +1130,8 @@ function renderHistory(){
 
           <thead>
             <tr>
-              <th>Data / Hora</th>
+              <th>Data</th>
               <th>Ação</th>
-              <th>Entidade</th>
               <th>Descrição</th>
               <th>Qtd.</th>
             </tr>
@@ -1299,11 +1142,10 @@ function renderHistory(){
             ${rows.map(x=>`
 
               <tr>
-                <td>${dateTimeFmt(x.DataHora)}</td>
-                <td><span class="pill gray">${esc(x.Acao)}</span></td>
-                <td>${esc(x.Entidade)}</td>
+                <td>${dateFmt(x.DataHora)}</td>
+                <td>${esc(x.Acao)}</td>
                 <td>${esc(x.Descricao)}</td>
-                <td><b>${esc(x.Quantidade)}</b></td>
+                <td>${esc(x.Quantidade)}</td>
               </tr>
 
             `).join('')}
@@ -1318,29 +1160,15 @@ function renderHistory(){
     : '<div class="empty">Sem movimentos registados.</div>';
 }
 
-function dateTimeFmt(v){
-  if(!v) return '—';
-  const d = new Date(v);
-  return isNaN(d)
-    ? esc(v)
-    : d.toLocaleString('pt-PT',{
-        day:'2-digit',
-        month:'2-digit',
-        year:'numeric',
-        hour:'2-digit',
-        minute:'2-digit'
-      });
-}
-
 // ==========================================
-// ABRIR MODAL DIRETAMENTE DE UM ARTIGO
+// ABRIR RESERVA DIRETAMENTE
 // ==========================================
 
-function reserveThis(id,mode='reservation'){
+function reserveThis(id){
 
   showTab('reservados');
 
-  openModal(mode,id);
+  openModal('reservation',id);
 }
 
 // ==========================================
@@ -1373,7 +1201,7 @@ function openModal(mode,preselect=''){
       <div class="field">
         <label>Categoria / Marca</label>
         <input name="categoria"
-          placeholder="Huvitz, iCare, Optomed...">
+          placeholder="Huvitz, Nidek, Acessórios...">
       </div>
 
       <div class="field">
@@ -1393,7 +1221,7 @@ function openModal(mode,preselect=''){
       </div>
 
       <div class="field">
-        <label>Demo inicial (unidades para demonstração)</label>
+        <label>Demo inicial</label>
         <input name="demo" type="number"
           min="0" step="1" value="0" required>
       </div>
@@ -1436,113 +1264,135 @@ function openModal(mode,preselect=''){
 
     reservation:`
 
-      <input type="hidden" name="origem" value="Stock">
-
       <div class="field">
+
         <label>Cliente</label>
-        <select name="clienteId" required>
-          <option value="">Selecionar cliente</option>
-          ${activeClients.map(x=>`
-            <option value="${esc(x.ID)}">${esc(x.Nome)}</option>
-          `).join('')}
-        </select>
-      </div>
 
-      <div class="field">
-        <label>Artigo (desconta do Stock)</label>
-        <select name="itemId" id="reserveItem" required>
-          <option value="">Selecionar artigo</option>
-          ${activeItems.map(x=>`
+        <select name="clienteId" required>
+
+          <option value="">Selecionar cliente</option>
+
+          ${activeClients.map(x=>`
             <option value="${esc(x.ID)}">
-              ${esc(x.Nome)} (Stock disponível: ${Number(x.Stock)||0})
+              ${esc(x.Nome)}
             </option>
           `).join('')}
+
         </select>
+
       </div>
 
       <div class="field">
-        <label>Quantidade a reservar</label>
-        <input name="quantidade" type="number" min="1" step="1" value="1" required>
-      </div>
 
-      <div class="field">
-        <label>Data prevista de entrega</label>
-        <input name="dataPrevista" type="date">
-      </div>
+        <label>Artigo</label>
 
-      <div class="field">
-        <label>Responsável</label>
-        <input name="responsavel" placeholder="Técnico ou comercial responsável">
-      </div>
-
-      <div class="field">
-        <label>Observações</label>
-        <textarea name="observacoes"></textarea>
-      </div>
-
-    `,
-
-    demo:`
-
-      <input type="hidden" name="origem" value="Demo">
-
-      <div class="field">
-        <label>Cliente</label>
-        <select name="clienteId" required>
-          <option value="">Selecionar cliente</option>
-          ${activeClients.map(x=>`
-            <option value="${esc(x.ID)}">${esc(x.Nome)}</option>
-          `).join('')}
-        </select>
-      </div>
-
-      <div class="field">
-        <label>Artigo (desconta de Demo)</label>
         <select name="itemId" id="reserveItem" required>
+
           <option value="">Selecionar artigo</option>
+
           ${activeItems.map(x=>`
             <option value="${esc(x.ID)}">
-              ${esc(x.Nome)} (Demo disponível: ${Number(x.Demo)||0})
+              ${esc(x.Nome)}
+              (stock ${Number(x.Stock)||0} · demo ${Number(x.Demo)||0})
             </option>
           `).join('')}
+
         </select>
+
       </div>
 
-      <div class="demo-box">
+      <div class="field">
+
+        <label>Retirar de</label>
+
+        <select name="origem"
+          id="reserveOrigin"
+          onchange="toggleDemoFields()">
+
+          <option value="Stock">Stock</option>
+          <option value="Demo">Demo</option>
+
+        </select>
+
+      </div>
+
+      <!-- CAMPOS DE DEMONSTRAÇÃO -->
+
+      <div id="demoDestinationFields"
+        class="demo-box hidden">
+
         <h3>
           <i class="fa fa-location-dot"></i>
-          Dados obrigatórios da demonstração
+          Destino da demonstração
         </h3>
 
         <div class="field">
-          <label>Destino (onde fica o equipamento) *</label>
-          <input name="destino" required placeholder="Nome da ótica, clínica ou gabinete">
+
+          <label>Para onde vai o equipamento?</label>
+
+          <input name="destino"
+            id="demoDestino"
+            placeholder="Nome da ótica, clínica ou empresa">
+
         </div>
 
         <div class="field">
-          <label>Localidade *</label>
-          <input name="localidade" required placeholder="Ex.: Oliveira de Azeméis">
+
+          <label>Localidade</label>
+
+          <input name="localidade"
+            id="demoLocalidade"
+            placeholder="Ex.: Oliveira de Azeméis">
+
         </div>
 
-        <div class="field" style="margin-bottom:0">
-          <label>Responsável pelo equipamento *</label>
-          <input name="responsavel" required placeholder="Nome do técnico ou responsável">
+        <div class="field">
+
+          <label>Responsável pelo equipamento</label>
+
+          <input name="responsavel"
+            id="demoResponsavel"
+            placeholder="Nome da pessoa responsável">
+
         </div>
+
       </div>
 
       <div class="field">
+
         <label>Quantidade</label>
-        <input name="quantidade" type="number" min="1" step="1" value="1" required>
+
+        <input name="quantidade"
+          type="number"
+          min="1"
+          step="1"
+          value="1"
+          required>
+
       </div>
 
       <div class="field">
-        <label>Data prevista de devolução</label>
+
+        <label>Data prevista de entrega/devolução</label>
+
         <input name="dataPrevista" type="date">
+
+      </div>
+
+      <div class="field" id="normalResponsavel">
+
+        <label>Responsável</label>
+
+        <input name="responsavelNormal">
+
       </div>
 
       <div class="field">
+
         <label>Observações</label>
+
         <textarea name="observacoes"></textarea>
+
       </div>
 
     `
@@ -1551,30 +1401,53 @@ function openModal(mode,preselect=''){
   $('modalTitle').textContent = ({
     item:'Adicionar artigo',
     client:'Adicionar cliente',
-    reservation:'Nova reserva (Stock)',
-    demo:'Nova demonstração (Demo)'
+    reservation:'Criar reserva'
   })[mode] || 'Novo registo';
-
-  $('saveButton').className = mode === 'demo' ? 'btn demo-btn' : 'btn primary';
 
   $('modalFields').innerHTML = fields[mode] || '';
 
-  if(mode==='reservation' || mode==='demo'){
+  if(mode==='reservation'){
 
     if(!activeClients.length){
-      msg('Para criar um registo, primeiro adiciona um cliente.');
+      msg('Para criar uma reserva, primeiro adiciona um cliente.');
     }
 
     if(!activeItems.length){
-      msg('Não existem artigos ativos.');
+      msg('Não existem artigos ativos para reservar.');
     }
 
     if(preselect && $('reserveItem')){
       $('reserveItem').value = preselect;
     }
+
+    toggleDemoFields();
   }
 
   $('modal').classList.add('show');
+}
+
+// ==========================================
+// MOSTRAR / ESCONDER CAMPOS DEMO
+// ==========================================
+
+function toggleDemoFields(){
+
+  const origin = $('reserveOrigin');
+
+  if(!origin) return;
+
+  const isDemo = origin.value==='Demo';
+
+  $('demoDestinationFields')
+    .classList.toggle('hidden',!isDemo);
+
+  ['demoDestino','demoLocalidade','demoResponsavel']
+    .forEach(id=>{
+      $(id).required = isDemo;
+    });
+
+  $('normalResponsavel')
+    .classList.toggle('hidden',isDemo);
 }
 
 function closeModal(){
@@ -1601,7 +1474,9 @@ async function submitModal(e){
     if(modalMode==='item'){
 
       f.action = 'addItem';
+
       f.stock = Number(f.stock);
+
       f.demo = Number(f.demo);
     }
 
@@ -1610,45 +1485,62 @@ async function submitModal(e){
       f.action = 'addClient';
     }
 
-    if(modalMode==='reservation' || modalMode==='demo'){
+    if(modalMode==='reservation'){
 
       if(!f.clienteId){
-        throw new Error('Seleciona um cliente.');
+        throw new Error(
+          'Não existem clientes. Cria primeiro um cliente.'
+        );
       }
 
       if(!f.itemId){
-        throw new Error('Seleciona um artigo.');
+        throw new Error(
+          'Não existem artigos ativos para reservar.'
+        );
       }
 
       f.action = 'createReservation';
-      f.origem = modalMode === 'demo' ? 'Demo' : 'Stock';
+
       f.quantidade = Number(f.quantidade);
+
       f.dataReserva = new Date().toISOString();
 
       if(f.origem==='Demo'){
 
         if(!f.destino?.trim()){
-          throw new Error('Indica o destino da demonstração.');
+          throw new Error(
+            'Indica o destino da demonstração.'
+          );
         }
 
         if(!f.localidade?.trim()){
-          throw new Error('Indica a localidade.');
+          throw new Error(
+            'Indica a localidade.'
+          );
         }
 
         if(!f.responsavel?.trim()){
-          throw new Error('Indica o responsável pelo equipamento.');
+          throw new Error(
+            'Indica o responsável pelo equipamento.'
+          );
         }
 
         f.destino = f.destino.trim();
+
         f.localidade = f.localidade.trim();
+
         f.responsavel = f.responsavel.trim();
 
       }else{
 
-        f.responsavel = (f.responsavel || '').trim();
+        f.responsavel = f.responsavelNormal || '';
+
         f.destino = '';
+
         f.localidade = '';
       }
+
+      delete f.responsavelNormal;
     }
 
     await post(f);
