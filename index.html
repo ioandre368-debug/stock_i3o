@@ -4,337 +4,1821 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>I3O | Gestão de Stock</title>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
 <style>
-:root{--navy:#0f172a;--blue:#2563eb;--bg:#f8fafc;--muted:#64748b;--line:#e2e8f0;--green:#15803d;--orange:#c2410c}
+:root{
+  --navy:#0f172a;
+  --blue:#2563eb;
+  --bg:#f8fafc;
+  --muted:#64748b;
+  --line:#e2e8f0;
+  --green:#15803d;
+  --red:#b91c1c;
+}
+
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--navy);font-family:'Plus Jakarta Sans',sans-serif}
-header{background:var(--navy);color:white;padding:16px max(16px,calc((100% - 1100px)/2));display:flex;justify-content:space-between;align-items:center;gap:12px;position:sticky;top:0;z-index:5;flex-wrap:wrap}
-.brand{font-weight:800;font-size:1.15rem;display:flex;gap:10px;align-items:center}.brand i{background:var(--blue);padding:9px;border-radius:10px}
-.header-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-main{max-width:1100px;margin:auto;padding:22px 16px}
-.tabs{display:flex;gap:8px;overflow:auto;margin-bottom:18px}
-.tab,.btn{border:0;border-radius:10px;padding:11px 15px;font:600 .88rem 'Plus Jakarta Sans',sans-serif;cursor:pointer;white-space:nowrap}
-.tab{background:white;border:1px solid var(--line);color:var(--muted)}.tab.active,.btn.primary{background:var(--blue);color:white;border-color:var(--blue)}
-.btn{background:white;border:1px solid var(--line);color:var(--navy)}.btn.danger{color:#b91c1c}
-.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}.toolbar input,.toolbar select{flex:1;min-width:180px}
-input,select,textarea{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:9px;font:inherit;background:white}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
-.card{background:white;border:1px solid var(--line);border-radius:15px;padding:16px;box-shadow:0 3px 14px #0f172a0a}
-.card h3{margin:0 0 5px;font-size:1rem}.muted{color:var(--muted);font-size:.82rem}
-.qty{display:flex;align-items:center;gap:9px;margin-top:12px}.qty strong{min-width:28px;text-align:center}.qty button{width:32px;height:32px;border:0;border-radius:8px;background:#e2e8f0;cursor:pointer;font-weight:800}.qty button.plus{background:var(--blue);color:white}
-.pill{display:inline-block;border-radius:20px;padding:4px 9px;font-size:.72rem;font-weight:700;background:#dbeafe;color:#1d4ed8}.pill.warn{background:#ffedd5;color:#9a3412}.pill.ok{background:#dcfce7;color:#166534}.pill.gray{background:#e2e8f0;color:#475569}
-table{width:100%;border-collapse:collapse;background:white;border-radius:12px;overflow:hidden}th,td{text-align:left;padding:11px;border-bottom:1px solid var(--line);font-size:.82rem}th{background:#f1f5f9;color:#475569}
-.table-wrap{overflow:auto}.empty{padding:35px;text-align:center;color:var(--muted);background:white;border-radius:14px}
-.modal{display:none;position:fixed;inset:0;background:#0f172a99;z-index:10;align-items:center;justify-content:center;padding:16px}.modal.show{display:flex}.modal-box{background:white;width:min(520px,100%);max-height:92vh;overflow:auto;border-radius:17px;padding:22px}
-.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}.modal-head h2{font-size:1.1rem;margin:0}.field{margin-bottom:12px}.field label{display:block;font-size:.76rem;font-weight:700;color:var(--muted);margin-bottom:5px}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
-#status{font-size:.82rem;color:var(--muted);margin:8px 0;padding:10px 12px;background:white;border:1px solid var(--line);border-radius:9px;overflow-wrap:anywhere}
-.hidden{display:none!important}.btn:disabled{opacity:.55;cursor:wait}
-.pending{font-size:.75rem;color:#fed7aa;font-weight:700;white-space:nowrap}
-@media(max-width:600px){header{padding:14px 16px}main{padding:16px 12px}.tab{padding:10px 12px}th,td{padding:9px}.header-actions{width:100%}.header-actions .btn{flex:1}}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--navy);
+  font-family:'Plus Jakarta Sans',sans-serif;
+}
+
+header{
+  background:var(--navy);
+  color:white;
+  padding:16px max(16px,calc((100% - 1150px)/2));
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  position:sticky;
+  top:0;
+  z-index:5;
+  flex-wrap:wrap;
+}
+
+.brand{
+  font-weight:800;
+  font-size:1.15rem;
+  display:flex;
+  gap:10px;
+  align-items:center;
+}
+
+.brand i{
+  background:var(--blue);
+  padding:10px;
+  border-radius:10px;
+}
+
+.header-actions{
+  display:flex;
+  gap:8px;
+  align-items:center;
+  flex-wrap:wrap;
+}
+
+main{
+  max-width:1150px;
+  margin:auto;
+  padding:22px 16px;
+}
+
+.tabs{
+  display:flex;
+  gap:8px;
+  overflow:auto;
+  margin-bottom:18px;
+}
+
+.tab,.btn{
+  border:0;
+  border-radius:10px;
+  padding:11px 15px;
+  font:600 .88rem 'Plus Jakarta Sans',sans-serif;
+  cursor:pointer;
+  white-space:nowrap;
+}
+
+.tab{
+  background:white;
+  border:1px solid var(--line);
+  color:var(--muted);
+}
+
+.tab.active,.btn.primary{
+  background:var(--blue);
+  color:white;
+  border-color:var(--blue);
+}
+
+.btn{
+  background:white;
+  border:1px solid var(--line);
+  color:var(--navy);
+}
+
+.btn.danger{color:var(--red)}
+.btn:disabled{opacity:.55;cursor:wait}
+
+.toolbar{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-bottom:14px;
+}
+
+.toolbar input,.toolbar select{
+  flex:1;
+  min-width:180px;
+}
+
+input,select,textarea{
+  width:100%;
+  padding:11px 12px;
+  border:1px solid var(--line);
+  border-radius:9px;
+  font:inherit;
+  background:white;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(270px,1fr));
+  gap:12px;
+}
+
+.card{
+  background:white;
+  border:1px solid var(--line);
+  border-radius:15px;
+  padding:16px;
+  box-shadow:0 3px 14px #0f172a0a;
+}
+
+.card h3{
+  margin:0 0 5px;
+  font-size:1rem;
+}
+
+.muted{
+  color:var(--muted);
+  font-size:.82rem;
+}
+
+.qty{
+  display:grid;
+  grid-template-columns:60px 1fr 90px;
+  align-items:center;
+  gap:8px;
+  margin-top:12px;
+}
+
+.qty input{
+  padding:7px;
+  text-align:center;
+  font-weight:700;
+}
+
+.pill{
+  display:inline-block;
+  border-radius:20px;
+  padding:4px 9px;
+  font-size:.72rem;
+  font-weight:700;
+  background:#dbeafe;
+  color:#1d4ed8;
+}
+
+.pill.warn{
+  background:#ffedd5;
+  color:#9a3412;
+}
+
+.pill.ok{
+  background:#dcfce7;
+  color:#166534;
+}
+
+.pill.gray{
+  background:#e2e8f0;
+  color:#475569;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  background:white;
+  border-radius:12px;
+  overflow:hidden;
+}
+
+th,td{
+  text-align:left;
+  padding:11px;
+  border-bottom:1px solid var(--line);
+  font-size:.82rem;
+}
+
+th{
+  background:#f1f5f9;
+  color:#475569;
+}
+
+.table-wrap{
+  overflow:auto;
+}
+
+.empty{
+  padding:35px;
+  text-align:center;
+  color:var(--muted);
+  background:white;
+  border-radius:14px;
+}
+
+.modal{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:#0f172a99;
+  z-index:10;
+  align-items:center;
+  justify-content:center;
+  padding:16px;
+}
+
+.modal.show{display:flex}
+
+.modal-box{
+  background:white;
+  width:min(560px,100%);
+  max-height:92vh;
+  overflow:auto;
+  border-radius:17px;
+  padding:22px;
+}
+
+.modal-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:16px;
+}
+
+.modal-head h2{
+  font-size:1.1rem;
+  margin:0;
+}
+
+.field{margin-bottom:12px}
+
+.field label{
+  display:block;
+  font-size:.76rem;
+  font-weight:700;
+  color:var(--muted);
+  margin-bottom:5px;
+}
+
+.actions{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:12px;
+}
+
+#status{
+  font-size:.82rem;
+  color:var(--muted);
+  margin:8px 0;
+  padding:10px 12px;
+  background:white;
+  border:1px solid var(--line);
+  border-radius:9px;
+  overflow-wrap:anywhere;
+}
+
+.hidden{display:none!important}
+
+.pending{
+  font-size:.75rem;
+  color:#fed7aa;
+  font-weight:700;
+  white-space:nowrap;
+}
+
+@media(max-width:600px){
+  header{padding:14px 16px}
+  main{padding:16px 12px}
+  .tab{padding:10px 12px}
+  .header-actions{width:100%}
+  .header-actions .btn{flex:1}
+  th,td{padding:9px}
+}
 </style>
 </head>
+
 <body>
+
 <header>
-  <div class="brand"><i class="fa-solid fa-layer-group"></i> STOCK I3O</div>
+  <div class="brand">
+    <i class="fa-solid fa-layer-group"></i>
+    STOCK I3O
+  </div>
+
   <div class="header-actions">
-    <span class="pending" id="pendingBadge">0 alterações pendentes</span>
-    <button class="btn primary" id="syncButton" onclick="syncNow()"><i class="fa-solid fa-rotate"></i> Sincronizar agora</button>
-    <button class="btn" onclick="openModal('item')"><i class="fa fa-plus"></i> Novo artigo</button>
+    <span class="pending" id="pendingBadge">
+      0 alterações pendentes
+    </span>
+
+    <button class="btn primary" id="syncButton" onclick="syncNow()">
+      <i class="fa-solid fa-rotate"></i>
+      Sincronizar agora
+    </button>
+
+    <button class="btn" onclick="openModal('item')">
+      <i class="fa fa-plus"></i>
+      Novo artigo
+    </button>
   </div>
 </header>
+
 <main>
+
   <nav class="tabs">
-    <button class="tab active" data-tab="stock" onclick="showTab('stock')"><i class="fa fa-boxes-stacked"></i> Stock</button>
-    <button class="tab" data-tab="reservados" onclick="showTab('reservados')"><i class="fa fa-bookmark"></i> Reservados</button>
-    <button class="tab" data-tab="clientes" onclick="showTab('clientes')"><i class="fa fa-users"></i> Clientes</button>
-    <button class="tab" data-tab="historico" onclick="showTab('historico')"><i class="fa fa-clock-rotate-left"></i> Histórico</button>
+    <button class="tab active" data-tab="stock" onclick="showTab('stock')">
+      <i class="fa fa-boxes-stacked"></i> Stock
+    </button>
+
+    <button class="tab" data-tab="reservados" onclick="showTab('reservados')">
+      <i class="fa fa-bookmark"></i> Reservas
+    </button>
+
+    <button class="tab" data-tab="clientes" onclick="showTab('clientes')">
+      <i class="fa fa-users"></i> Clientes
+    </button>
+
+    <button class="tab" data-tab="historico" onclick="showTab('historico')">
+      <i class="fa fa-clock-rotate-left"></i> Histórico
+    </button>
   </nav>
-  <div id="status">Modo local ativo. Clica em «Sincronizar agora» para comunicar com a Google Sheets.</div>
+
+  <div id="status">A carregar aplicação...</div>
+
+  <!-- STOCK -->
 
   <section id="view-stock">
+
     <div class="toolbar">
-      <input id="stockSearch" placeholder="Pesquisar artigo, marca ou modelo..." oninput="renderStock()">
-      <select id="stockCategory" onchange="renderStock()"><option value="">Todas as categorias</option></select>
-      <button class="btn" onclick="renderAll()">↻ Atualizar vista</button>
+      <input
+        id="stockSearch"
+        placeholder="Pesquisar artigo, marca ou modelo..."
+        oninput="renderStock()"
+      >
+
+      <select id="stockCategory" onchange="renderStock()">
+        <option value="">Todas as categorias</option>
+      </select>
+
+      <button class="btn" onclick="loadFromServer()">
+        ↻ Atualizar dados
+      </button>
     </div>
+
     <div id="stockList" class="grid"></div>
+
   </section>
+
+  <!-- RESERVAS -->
 
   <section id="view-reservados" class="hidden">
+
     <div class="toolbar">
-      <input id="reservationSearch" placeholder="Pesquisar reserva, cliente ou artigo..." oninput="renderReservations()">
+
+      <input
+        id="reservationSearch"
+        placeholder="Pesquisar reserva, cliente ou artigo..."
+        oninput="renderReservations()"
+      >
+
       <select id="reservationState" onchange="renderReservations()">
-        <option value="">Todos os estados</option><option>Pendente</option><option>Entregue</option><option>Cancelada</option>
+        <option value="">Todos os estados</option>
+        <option>Pendente</option>
+        <option>Entregue</option>
+        <option>Cancelada</option>
       </select>
-      <button class="btn primary" onclick="openModal('reservation')">+ Nova reserva</button>
+
+      <button class="btn primary" onclick="openModal('reservation')">
+        + Nova reserva
+      </button>
+
     </div>
+
     <div id="reservationList"></div>
+
   </section>
+
+  <!-- CLIENTES -->
 
   <section id="view-clientes" class="hidden">
+
     <div class="toolbar">
-      <input id="clientSearch" placeholder="Pesquisar cliente..." oninput="renderClients()">
-      <button class="btn primary" onclick="openModal('client')">+ Novo cliente</button>
+
+      <input
+        id="clientSearch"
+        placeholder="Pesquisar cliente..."
+        oninput="renderClients()"
+      >
+
+      <button class="btn primary" onclick="openModal('client')">
+        + Novo cliente
+      </button>
+
     </div>
+
     <div id="clientList" class="grid"></div>
+
   </section>
 
-  <section id="view-historico" class="hidden"><div id="historyList"></div></section>
+  <!-- HISTÓRICO -->
+
+  <section id="view-historico" class="hidden">
+    <div id="historyList"></div>
+  </section>
+
 </main>
 
+<!-- MODAL -->
+
 <div class="modal" id="modal">
+
   <div class="modal-box">
-    <div class="modal-head"><h2 id="modalTitle">Novo registo</h2><button class="btn" type="button" onclick="closeModal()">✕</button></div>
+
+    <div class="modal-head">
+      <h2 id="modalTitle">Novo registo</h2>
+
+      <button class="btn" type="button" onclick="closeModal()">
+        ✕
+      </button>
+    </div>
+
     <form id="modalForm" onsubmit="submitModal(event)">
+
       <div id="modalFields"></div>
-      <button class="btn primary" style="width:100%;margin-top:8px" type="submit" id="saveButton">Guardar localmente</button>
+
+      <button
+        class="btn primary"
+        style="width:100%;margin-top:8px"
+        type="submit"
+        id="saveButton"
+      >
+        Guardar
+      </button>
+
     </form>
+
   </div>
+
 </div>
 
 <script>
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbynXQerj7yZ5-36fR21JMHh5BqI-poqWUO3lHl0NBdyTDUM_3CjH2bMuBmT4WR8HwgP/exec';
-const STORAGE_KEY = 'i3o_stock_local_v2';
-let db = {stock:[], clientes:[], reservados:[], historico:[]};
+
+/* =================================
+   CONFIGURAÇÃO
+================================= */
+
+const SCRIPT_URL ='https://script.google.com/macros/s/AKfycbynXQerj7yZ5-36fR21JMHh5BqI-poqWUO3lHl0NBdyTDUM_3CjH2bMuBmT4WR8HwgP/exec';
+
+const STORAGE_KEY = 'i3o_stock_local_v3';
+
+let db = {
+  stock: [],
+  clientes: [],
+  reservados: [],
+  historico: []
+};
+
 let pending = [];
 let modalMode = '';
-let isSyncing = false;
+let busy = false;
 
 const $ = id => document.getElementById(id);
-function msg(t){ $('status').textContent = t; }
-function makeId(){ return (crypto && crypto.randomUUID) ? crypto.randomUUID() : 'local-' + Date.now() + '-' + Math.random().toString(16).slice(2); }
-function persist(){
-  localStorage.setItem(STORAGE_KEY, JSON.stringify({db,pending}));
-  updatePendingBadge();
+
+
+/* =================================
+   FUNÇÕES GERAIS
+================================= */
+
+function msg(text){
+  $('status').textContent = text;
 }
-function updatePendingBadge(){
-  const n = pending.length;
-  $('pendingBadge').textContent = n + (n===1 ? ' alteração pendente' : ' alterações pendentes');
-  $('syncButton').disabled = isSyncing;
-  $('syncButton').innerHTML = isSyncing ? '<i class="fa fa-spinner fa-spin"></i> A sincronizar...' : '<i class="fa-solid fa-rotate"></i> Sincronizar agora';
+
+function makeId(){
+  return (crypto && crypto.randomUUID)
+    ? crypto.randomUUID()
+    : 'i3o-' + Date.now() + '-' + Math.random().toString(16).slice(2);
 }
-function isActive(v){
-  const s = String(v ?? '').trim().toLowerCase();
-  return v !== false && s !== 'false' && s !== 'nao' && s !== 'não' && s !== 'arquivado';
+
+function esc(value){
+  return String(value ?? '').replace(/[&<>"']/g, function(char){
+    return {
+      '&':'&amp;',
+      '<':'&lt;',
+      '>':'&gt;',
+      '"':'&quot;',
+      "'":'&#39;'
+    }[char];
+  });
 }
-function formatTipo(v){ if(v===''||v===null||v===undefined||!isNaN(Number(v))) return 'Equipamento'; return String(v); }
-function showTab(tab){
-  document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));
-  ['stock','reservados','clientes','historico'].forEach(x=>$('view-'+x).classList.toggle('hidden',x!==tab));
+
+function isActive(value){
+  const s = String(value ?? '').trim().toLowerCase();
+
+  return value !== false &&
+    s !== 'false' &&
+    s !== 'não' &&
+    s !== 'nao' &&
+    s !== 'arquivado';
 }
-function esc(v){ return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-function dateFmt(v){ if(!v)return '—'; const d=new Date(v); return isNaN(d)?esc(v):d.toLocaleDateString('pt-PT'); }
+
+function fmtDate(value){
+  if(!value) return '—';
+
+  const d = new Date(value);
+
+  return isNaN(d)
+    ? esc(value)
+    : d.toLocaleDateString('pt-PT');
+}
+
+
+/* =================================
+   ARMAZENAMENTO LOCAL
+================================= */
+
+function saveLocal(){
+  try{
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        db: db,
+        pending: pending
+      })
+    );
+  }catch(e){
+    msg('Erro ao guardar localmente: ' + e.message);
+  }
+
+  updateBadge();
+}
 
 function loadLocal(){
-  try {
-    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
-    if(saved && saved.db){ db=saved.db; pending=Array.isArray(saved.pending)?saved.pending:[]; }
-  } catch(e){ console.warn('Não foi possível ler os dados locais.',e); }
+  try{
+    const saved = JSON.parse(
+      localStorage.getItem(STORAGE_KEY) || 'null'
+    );
+
+    if(saved && saved.db){
+      db = saved.db;
+      pending = Array.isArray(saved.pending)
+        ? saved.pending
+        : [];
+    }
+  }catch(e){}
+
   renderAll();
-  updatePendingBadge();
-  msg(pending.length ? 'Dados locais carregados. Existem alterações por sincronizar.' : 'Dados locais carregados. Sem ligação à Google Sheets até clicares em «Sincronizar agora».');
+  updateBadge();
 }
 
-/* Aplica imediatamente no navegador; a Google Sheets só é alterada no botão Sincronizar. */
-function applyLocalAction(p){
-  const stamp=new Date().toISOString();
-  const log=(acao,entidade,id,descricao,quantidade=0)=>db.historico.unshift({ID:makeId(),DataHora:stamp,Acao:acao,Entidade:entidade,EntidadeID:id,Descricao:descricao,Quantidade:quantidade,Utilizador:'Local'});
+function updateBadge(){
+  const n = pending.length;
+
+  $('pendingBadge').textContent =
+    n + (n === 1
+      ? ' alteração pendente'
+      : ' alterações pendentes'
+    );
+
+  $('syncButton').disabled = busy;
+
+  $('syncButton').innerHTML = busy
+    ? '<i class="fa fa-spinner fa-spin"></i> A sincronizar...'
+    : '<i class="fa-solid fa-rotate"></i> Sincronizar agora';
+}
+
+
+/* =================================
+   NAVEGAÇÃO
+================================= */
+
+function showTab(tab){
+
+  document.querySelectorAll('.tab').forEach(function(button){
+    button.classList.toggle(
+      'active',
+      button.dataset.tab === tab
+    );
+  });
+
+  ['stock','reservados','clientes','historico'].forEach(function(name){
+    $('view-' + name).classList.toggle(
+      'hidden',
+      name !== tab
+    );
+  });
+
+}
+
+
+/* =================================
+   RENDERIZAÇÃO
+================================= */
+
+function renderAll(){
+  fillCategories();
+  renderStock();
+  renderReservations();
+  renderClients();
+  renderHistory();
+  updateBadge();
+}
+
+function fillCategories(){
+
+  const old = $('stockCategory').value;
+
+  const categories = [
+    ...new Set(
+      db.stock
+        .filter(x => isActive(x.Ativo))
+        .map(x => x.Categoria)
+        .filter(Boolean)
+    )
+  ].sort();
+
+  $('stockCategory').innerHTML =
+    '<option value="">Todas as categorias</option>' +
+    categories.map(function(x){
+      return `<option value="${esc(x)}">${esc(x)}</option>`;
+    }).join('');
+
+  $('stockCategory').value =
+    categories.includes(old) ? old : '';
+}
+
+
+/* =================================
+   STOCK
+================================= */
+
+function renderStock(){
+
+  const q = $('stockSearch').value.toLowerCase();
+  const cat = $('stockCategory').value;
+
+  const list = db.stock.filter(function(x){
+
+    return isActive(x.Ativo) &&
+      (!cat || x.Categoria === cat) &&
+      [x.Nome,x.Categoria,x.Tipo]
+        .join(' ')
+        .toLowerCase()
+        .includes(q);
+
+  });
+
+  $('stockList').innerHTML = list.length
+    ? list.map(function(x){
+
+      return `
+      <article class="card">
+
+        <h3>${esc(x.Nome)}</h3>
+
+        <div class="muted">
+          ${esc(x.Categoria || 'Outros')}
+          ·
+          ${esc(x.Tipo || 'Equipamento')}
+        </div>
+
+        <div class="qty">
+          <span class="muted">Stock</span>
+
+          <input
+            type="number"
+            min="0"
+            step="1"
+            value="${Number(x.Stock) || 0}"
+            id="stock-${esc(x.ID)}"
+            onchange="setQty('${esc(x.ID)}','stock',this.value)"
+          >
+
+          <span class="muted">unidades</span>
+        </div>
+
+        <div class="qty">
+          <span class="muted">Demo</span>
+
+          <input
+            type="number"
+            min="0"
+            step="1"
+            value="${Number(x.Demo) || 0}"
+            id="demo-${esc(x.ID)}"
+            onchange="setQty('${esc(x.ID)}','demo',this.value)"
+          >
+
+          <span class="muted">unidades</span>
+        </div>
+
+        <div class="actions">
+
+          <button
+            class="btn"
+            onclick="reserveThis('${esc(x.ID)}')"
+          >
+            Reservar
+          </button>
+
+          <button
+            class="btn danger"
+            onclick="archiveItem('${esc(x.ID)}')"
+          >
+            Arquivar
+          </button>
+
+        </div>
+
+      </article>
+      `;
+
+    }).join('')
+    : '<div class="empty">Não foram encontrados artigos.</div>';
+
+}
+
+
+/* =================================
+   RESERVAS
+================================= */
+
+function renderReservations(){
+
+  const q = $('reservationSearch').value.toLowerCase();
+  const state = $('reservationState').value;
+
+  const rows = db.reservados
+    .filter(function(x){
+
+      return (!state || x.Estado === state) &&
+        [
+          x.ClienteNome,
+          x.ItemNome,
+          x.ID,
+          x.Destino,
+          x.Localidade
+        ].join(' ').toLowerCase().includes(q);
+
+    })
+    .slice()
+    .reverse();
+
+  $('reservationList').innerHTML = rows.length
+
+    ? `
+      <div class="table-wrap">
+      <table>
+
+        <thead>
+          <tr>
+            <th>Reserva</th>
+            <th>Cliente / Artigo</th>
+            <th>Qtd.</th>
+            <th>Destino / Responsável</th>
+            <th>Estado</th>
+            <th>Data prevista</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+
+        <tbody>
+
+          ${rows.map(function(x){
+
+            return `
+            <tr>
+
+              <td>
+                ${esc(String(x.ID).slice(0,8))}
+                <br>
+                <span class="muted">${fmtDate(x.DataReserva)}</span>
+              </td>
+
+              <td>
+                <b>${esc(x.ClienteNome)}</b>
+                <br>
+                ${esc(x.ItemNome)}
+                <br>
+                <span class="muted">
+                  ${esc(x.Origem)} · ${esc(x.TipoArtigo)}
+                </span>
+              </td>
+
+              <td>${esc(x.Quantidade)}</td>
+
+              <td>
+                ${esc(x.Destino || '—')}
+                <br>
+                ${esc(x.Localidade || '')}
+                <br>
+                <span class="muted">
+                  ${esc(x.Responsavel || '')}
+                </span>
+              </td>
+
+              <td>
+                <span class="pill ${
+                  x.Estado === 'Pendente'
+                    ? 'warn'
+                    : x.Estado === 'Entregue'
+                      ? 'ok'
+                      : 'gray'
+                }">
+                  ${esc(x.Estado)}
+                </span>
+              </td>
+
+              <td>${fmtDate(x.DataPrevista)}</td>
+
+              <td>
+                ${
+                  x.Estado === 'Pendente'
+                    ? `
+                      <button
+                        class="btn"
+                        onclick="reservationAction('${esc(x.ID)}','deliverReservation')"
+                      >
+                        Entregue
+                      </button>
+
+                      <button
+                        class="btn danger"
+                        onclick="reservationAction('${esc(x.ID)}','cancelReservation')"
+                      >
+                        Cancelar
+                      </button>
+                    `
+                    : '—'
+                }
+              </td>
+
+            </tr>
+            `;
+
+          }).join('')}
+
+        </tbody>
+      </table>
+      </div>
+    `
+
+    : '<div class="empty">Ainda não existem reservas.</div>';
+
+}
+
+
+/* =================================
+   CLIENTES
+================================= */
+
+function renderClients(){
+
+  const q = $('clientSearch').value.toLowerCase();
+
+  const rows = db.clientes.filter(function(x){
+
+    return isActive(x.Ativo) &&
+      [x.Nome,x.NIF,x.Contacto,x.Email]
+        .join(' ')
+        .toLowerCase()
+        .includes(q);
+
+  });
+
+  $('clientList').innerHTML = rows.length
+
+    ? rows.map(function(x){
+
+      return `
+      <article class="card">
+
+        <h3>${esc(x.Nome)}</h3>
+
+        <div class="muted">
+          NIF: ${esc(x.NIF || '—')}
+        </div>
+
+        <p>
+          ${esc(x.Contacto || '—')}
+          <br>
+          ${esc(x.Email || '')}
+          <br>
+          ${esc(x.Morada || '')}
+        </p>
+
+        <div class="actions">
+
+          <button
+            class="btn danger"
+            onclick="archiveClient('${esc(x.ID)}')"
+          >
+            Arquivar
+          </button>
+
+        </div>
+
+      </article>
+      `;
+
+    }).join('')
+
+    : '<div class="empty">Ainda não existem clientes.</div>';
+
+}
+
+
+/* =================================
+   HISTÓRICO
+================================= */
+
+function renderHistory(){
+
+  const rows = db.historico || [];
+
+  $('historyList').innerHTML = rows.length
+
+    ? `
+      <div class="table-wrap">
+      <table>
+
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Ação</th>
+            <th>Descrição</th>
+            <th>Quantidade</th>
+            <th>Utilizador</th>
+          </tr>
+        </thead>
+
+        <tbody>
+
+          ${rows.map(function(x){
+
+            return `
+            <tr>
+              <td>${fmtDate(x.DataHora)}</td>
+              <td>${esc(x.Acao)}</td>
+              <td>${esc(x.Descricao)}</td>
+              <td>${esc(x.Quantidade)}</td>
+              <td>${esc(x.Utilizador || '')}</td>
+            </tr>
+            `;
+
+          }).join('')}
+
+        </tbody>
+
+      </table>
+      </div>
+    `
+
+    : '<div class="empty">Sem movimentos registados.</div>';
+
+}
+
+
+/* =================================
+   ATUALIZAÇÃO LOCAL
+================================= */
+
+function localApply(p){
+
+  const stamp = new Date().toISOString();
+
   switch(p.action){
-    case 'addItem': {
-      const id=p.id || makeId();
-      db.stock.push({ID:id,Nome:p.nome,Categoria:p.categoria||'Outros',Tipo:p.tipo||'Equipamento',Stock:Number(p.stock)||0,Demo:Number(p.demo)||0,Ativo:true,Min:Number(p.min)||0,CriadoEm:stamp,AtualizadoEm:stamp});
-      log('Criação','Stock',id,'Artigo criado: '+p.nome); break;
+
+    case 'addItem':
+
+      db.stock.push({
+        ID:p.id,
+        Nome:p.nome,
+        Categoria:p.categoria || 'Outros',
+        Tipo:p.tipo || 'Equipamento',
+        Stock:Number(p.stock) || 0,
+        Demo:Number(p.demo) || 0,
+        Ativo:true,
+        Min:0,
+        CriadoEm:stamp,
+        AtualizadoEm:stamp
+      });
+
+      break;
+
+
+    case 'addClient':
+
+      db.clientes.push({
+        ID:p.id,
+        Nome:p.nome,
+        NIF:p.nif || '',
+        Contacto:p.contacto || '',
+        Email:p.email || '',
+        Morada:p.morada || '',
+        Observacoes:p.observacoes || '',
+        Ativo:true,
+        CriadoEm:stamp,
+        AtualizadoEm:stamp
+      });
+
+      break;
+
+
+    case 'setItemQty': {
+
+      const item = db.stock.find(
+        x => String(x.ID) === String(p.id)
+      );
+
+      if(!item) throw Error('Artigo não encontrado.');
+
+      const field = p.field === 'demo' ? 'Demo' : 'Stock';
+
+      item[field] = Number(p.value);
+      item.AtualizadoEm = stamp;
+
+      break;
     }
-    case 'addClient': {
-      const id=p.id || makeId();
-      db.clientes.push({ID:id,Nome:p.nome,NIF:p.nif||'',Contacto:p.contacto||'',Email:p.email||'',Morada:p.morada||'',Observacoes:p.observacoes||'',Ativo:true,CriadoEm:stamp,AtualizadoEm:stamp});
-      log('Criação','Clientes',id,'Cliente criado: '+p.nome); break;
-    }
-    case 'updateQty': {
-      const item=db.stock.find(x=>String(x.ID)===String(p.id)); if(!item) throw new Error('Artigo não encontrado localmente.');
-      const field=p.field==='demo'?'Demo':'Stock', next=Number(item[field]||0)+Number(p.change);
-      if(next<0) throw new Error('Quantidade insuficiente.');
-      item[field]=next; item.AtualizadoEm=stamp; log(Number(p.change)>0?'Entrada':'Saída','Stock',p.id,item.Nome+' ('+field+')',Number(p.change)); break;
-    }
+
+
     case 'deleteItem':
     case 'deleteClient': {
-      const arr=p.action==='deleteItem'?db.stock:db.clientes;
-      const item=arr.find(x=>String(x.ID)===String(p.id)); if(!item) throw new Error('Registo não encontrado localmente.');
-      item.Ativo=false; item.AtualizadoEm=stamp; log('Desativação',p.action==='deleteItem'?'Stock':'Clientes',p.id,'Registo arquivado'); break;
+
+      const array = p.action === 'deleteItem'
+        ? db.stock
+        : db.clientes;
+
+      const item = array.find(
+        x => String(x.ID) === String(p.id)
+      );
+
+      if(!item) throw Error('Registo não encontrado.');
+
+      item.Ativo = false;
+
+      break;
     }
+
+
     case 'createReservation': {
-      const item=db.stock.find(x=>String(x.ID)===String(p.itemId)&&isActive(x.Ativo));
-      const client=db.clientes.find(x=>String(x.ID)===String(p.clienteId)&&isActive(x.Ativo));
-      if(!item) throw new Error('Artigo inválido.');
-      if(!client) throw new Error('Cliente inválido.');
-      const source=p.origem==='Demo'?'Demo':'Stock', qty=Number(p.quantidade);
-      if(!Number.isInteger(qty)||qty<1) throw new Error('Quantidade inválida.');
-      if(Number(item[source]||0)<qty) throw new Error('Quantidade insuficiente. Disponível: '+Number(item[source]||0));
-      item[source]=Number(item[source]||0)-qty; item.AtualizadoEm=stamp;
-      const id=p.id||makeId();
-      db.reservados.push({ID:id,DataReserva:p.dataReserva||stamp,DataPrevista:p.dataPrevista||'',ClienteID:client.ID,ClienteNome:client.Nome,ItemID:item.ID,ItemNome:item.Nome,Categoria:item.Categoria||'',TipoArtigo:item.Tipo||'Equipamento',Origem:source,Quantidade:qty,Estado:'Pendente',Observacoes:p.observacoes||'',Responsavel:p.responsavel||'',DataEntrega:'',DataCancelamento:'',CriadoEm:stamp,AtualizadoEm:stamp});
-      log('Reserva','Reservados',id,client.Nome+' - '+item.Nome+' ('+source+')',qty); break;
+
+      const item = db.stock.find(
+        x => String(x.ID) === String(p.itemId) && isActive(x.Ativo)
+      );
+
+      const client = db.clientes.find(
+        x => String(x.ID) === String(p.clienteId) && isActive(x.Ativo)
+      );
+
+      if(!item || !client){
+        throw Error('Seleciona um artigo e um cliente válidos.');
+      }
+
+      const field = p.origem === 'Demo' ? 'Demo' : 'Stock';
+      const amount = Number(p.quantidade);
+
+      if(!Number.isInteger(amount) || amount < 1){
+        throw Error('Quantidade inválida.');
+      }
+
+      if(Number(item[field] || 0) < amount){
+        throw Error('Quantidade insuficiente. Disponível: ' + item[field]);
+      }
+
+      item[field] -= amount;
+
+      db.reservados.push({
+        ID:p.id,
+        DataReserva:stamp,
+        DataPrevista:p.dataPrevista || '',
+        ClienteID:client.ID,
+        ClienteNome:client.Nome,
+        ItemID:item.ID,
+        ItemNome:item.Nome,
+        Categoria:item.Categoria,
+        TipoArtigo:item.Tipo,
+        Origem:field,
+        Quantidade:amount,
+        Estado:'Pendente',
+        Destino:p.destino || '',
+        Localidade:p.localidade || '',
+        Observacoes:p.observacoes || '',
+        Responsavel:p.responsavel || '',
+        CriadoEm:stamp,
+        AtualizadoEm:stamp
+      });
+
+      break;
     }
+
+
     case 'deliverReservation':
     case 'cancelReservation': {
-      const res=db.reservados.find(x=>String(x.ID)===String(p.id));
-      if(!res||res.Estado!=='Pendente') throw new Error('Apenas reservas pendentes podem ser alteradas.');
-      res.Estado=p.action==='deliverReservation'?'Entregue':'Cancelada'; res.AtualizadoEm=stamp;
-      if(res.Estado==='Entregue') res.DataEntrega=stamp;
-      else {
-        res.DataCancelamento=stamp;
-        const item=db.stock.find(x=>String(x.ID)===String(res.ItemID));
-        if(item){const field=res.Origem==='Demo'?'Demo':'Stock';item[field]=Number(item[field]||0)+Number(res.Quantidade||0);item.AtualizadoEm=stamp;}
-      }
-      log(res.Estado,'Reservados',res.ID,res.ClienteNome+' - '+res.ItemNome,Number(res.Quantidade||0)); break;
-    }
-    default: throw new Error('Ação local não suportada: '+p.action);
-  }
-}
-function queueAction(payload){
-  const p={...payload,_opId:makeId()};
-  // Os IDs têm de ser iguais no navegador e na Google Sheets.
-  if(['addItem','addClient','createReservation'].includes(p.action) && !p.id) p.id=makeId();
-  applyLocalAction(p);
-  pending.push(p);
-  persist(); renderAll();
-  msg('Alteração guardada neste navegador. Ainda não foi enviada para a Google Sheets.');
-}
-function changeQty(id,change,field){ try{queueAction({action:'updateQty',id,change,field});}catch(e){alert(e.message);} }
-function archiveItem(id){if(confirm('Arquivar este artigo?'))try{queueAction({action:'deleteItem',id});}catch(e){alert(e.message);}}
-function archiveClient(id){if(confirm('Arquivar este cliente?'))try{queueAction({action:'deleteClient',id});}catch(e){alert(e.message);}}
 
-async function readJsonResponse(response){
-  const t=await response.text();
-  try{return JSON.parse(t);}catch(e){
-    if(/^\s*<!doctype html|^\s*<html/i.test(t)||/accounts\.google\.com|ServiceLogin|sign in/i.test(t)) throw new Error('O Google devolveu HTML em vez de JSON. Confirma a implementação como Aplicação Web e o acesso «Qualquer pessoa».');
-    throw new Error('Resposta inválida do Apps Script: '+t.replace(/\s+/g,' ').slice(0,200));
+      const reservation = db.reservados.find(
+        x => String(x.ID) === String(p.id)
+      );
+
+      if(!reservation || reservation.Estado !== 'Pendente'){
+        throw Error('Apenas reservas pendentes podem ser alteradas.');
+      }
+
+      reservation.Estado =
+        p.action === 'deliverReservation'
+          ? 'Entregue'
+          : 'Cancelada';
+
+      if(reservation.Estado === 'Cancelada'){
+
+        const item = db.stock.find(
+          x => String(x.ID) === String(reservation.ItemID)
+        );
+
+        if(item){
+
+          const field = reservation.Origem === 'Demo'
+            ? 'Demo'
+            : 'Stock';
+
+          item[field] =
+            Number(item[field] || 0) +
+            Number(reservation.Quantidade || 0);
+
+        }
+      }
+
+      break;
+    }
+
   }
+
 }
-async function syncNow(){
-  if(isSyncing)return;
-  if(!/^https:\/\/script\.google\.com\/macros\/s\/[^/]+\/exec$/.test(SCRIPT_URL)){
-    msg('Configura o SCRIPT_URL com o endereço da Aplicação Web terminado em /exec.');
+
+
+/* =================================
+   FILA DE ALTERAÇÕES
+================================= */
+
+function queue(p){
+
+  if(
+    ['addItem','addClient','createReservation'].includes(p.action)
+  ){
+    p.id = p.id || makeId();
+  }
+
+  p._opId = makeId();
+
+  localApply(p);
+
+  pending.push(p);
+
+  saveLocal();
+  renderAll();
+
+  msg(
+    'Alteração guardada. Clica em «Sincronizar agora» para a enviar à Google Sheets.'
+  );
+
+}
+
+
+/* =================================
+   ALTERAR QUANTIDADES
+================================= */
+
+function setQty(id,field,value){
+
+  const number = Number(value);
+
+  if(!Number.isInteger(number) || number < 0){
+    alert('Introduz uma quantidade inteira igual ou superior a zero.');
+    renderStock();
     return;
   }
-  isSyncing=true;
-  updatePendingBadge();
-  try{
-    // Compatibilidade máxima: envia cada operação individualmente.
-    // Assim não depende de o Apps Script publicado já conhecer "syncBatch".
-    while(pending.length){
-      const op=pending[0];
-      msg('A enviar alteração '+(1)+' de '+pending.length+' para a Google Sheets...');
-      const response=await fetch(SCRIPT_URL,{
-        method:'POST',
-        redirect:'follow',
-        headers:{'Content-Type':'text/plain;charset=utf-8'},
-        body:JSON.stringify(op)
-      });
-      const result=await readJsonResponse(response);
-      if(!result || result.ok!==true){
-        throw new Error(result&&result.error?result.error:'O Apps Script não confirmou a operação.');
-      }
-      // Só remove a operação da fila depois de o servidor confirmar sucesso.
-      pending.shift();
-      persist();
-    }
 
-    msg('A carregar os dados atuais da Google Sheets...');
-    const response=await fetch(SCRIPT_URL+'?t='+Date.now(),{
-      method:'GET',
-      redirect:'follow',
-      cache:'no-store'
+  try{
+
+    queue({
+      action:'setItemQty',
+      id:id,
+      field:field,
+      value:number
     });
-    const result=await readJsonResponse(response);
-    if(!result||result.ok!==true)throw new Error(result&&result.error?result.error:'Não foi possível carregar os dados da Google Sheets.');
-    if(!result.data||!Array.isArray(result.data.stock))throw new Error('A API respondeu, mas não devolveu a estrutura de dados esperada.');
-    db=result.data;
-    persist();
-    renderAll();
-    msg('Sincronização concluída. Dados da Google Sheets carregados.');
-  }catch(e){
-    console.error('Erro de sincronização I3O:',e);
-    msg('Erro na sincronização: '+e.message+' As operações ainda não confirmadas continuam guardadas neste navegador.');
-  }finally{
-    isSyncing=false;
-    updatePendingBadge();
+
+  }catch(error){
+
+    alert(error.message);
+    renderStock();
+
   }
+
 }
 
-function renderAll(){fillSelects();renderStock();renderReservations();renderClients();renderHistory();updatePendingBadge();}
-function fillSelects(){
-  const current=$('stockCategory').value;
-  const cats=[...new Set(db.stock.filter(x=>isActive(x.Ativo)).map(x=>x.Categoria).filter(Boolean))].sort();
-  $('stockCategory').innerHTML='<option value="">Todas as categorias</option>'+cats.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('');
-  $('stockCategory').value=cats.includes(current)?current:'';
-}
-function renderStock(){
-  const q=$('stockSearch').value.toLowerCase(),cat=$('stockCategory').value;
-  const items=db.stock.filter(x=>isActive(x.Ativo)&&(!cat||x.Categoria===cat)&&[x.Nome,x.Categoria,formatTipo(x.Tipo)].join(' ').toLowerCase().includes(q));
-  $('stockList').innerHTML=items.length?items.map(x=>`
-    <article class="card"><h3>${esc(x.Nome)}</h3><div class="muted">${esc(x.Categoria||'Outros')} · ${esc(formatTipo(x.Tipo))}</div>
-    <div class="qty"><span class="muted">Stock</span><button onclick="changeQty('${esc(x.ID)}',-1,'stock')">−</button><strong>${Number(x.Stock)||0}</strong><button class="plus" onclick="changeQty('${esc(x.ID)}',1,'stock')">+</button></div>
-    <div class="qty"><span class="muted">Demo</span><button onclick="changeQty('${esc(x.ID)}',-1,'demo')">−</button><strong>${Number(x.Demo)||0}</strong><button class="plus" onclick="changeQty('${esc(x.ID)}',1,'demo')">+</button></div>
-    <div class="actions"><button class="btn" onclick="reserveThis('${esc(x.ID)}')">Reservar</button><button class="btn danger" onclick="archiveItem('${esc(x.ID)}')">Arquivar</button></div></article>`).join(''):'<div class="empty">Não foram encontrados artigos.</div>';
-}
-function renderReservations(){
-  const q=$('reservationSearch').value.toLowerCase(),state=$('reservationState').value;
-  const rows=db.reservados.filter(x=>(!state||x.Estado===state)&&[x.ClienteNome,x.ItemNome,x.ID].join(' ').toLowerCase().includes(q)).slice().reverse();
-  $('reservationList').innerHTML=rows.length?`<div class="table-wrap"><table><thead><tr><th>Reserva</th><th>Cliente / Artigo</th><th>Qtd.</th><th>Estado</th><th>Datas</th><th>Ações</th></tr></thead><tbody>${rows.map(x=>`<tr>
-  <td>${esc(String(x.ID).slice(0,8))}<br><span class="muted">${dateFmt(x.DataReserva)}</span></td>
-  <td><b>${esc(x.ClienteNome)}</b><br>${esc(x.ItemNome)}<br><span class="muted">${esc(x.Origem)} · ${esc(x.TipoArtigo)}</span></td><td>${esc(x.Quantidade)}</td>
-  <td><span class="pill ${x.Estado==='Pendente'?'warn':x.Estado==='Entregue'?'ok':'gray'}">${esc(x.Estado)}</span></td><td>${dateFmt(x.DataPrevista)}</td>
-  <td>${x.Estado==='Pendente'?`<button class="btn" onclick="reservationAction('${esc(x.ID)}','deliverReservation')">Entregue</button> <button class="btn danger" onclick="reservationAction('${esc(x.ID)}','cancelReservation')">Cancelar</button>`:'—'}</td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">Ainda não existem reservas.</div>';
-}
-function reservationAction(id,action){
-  const question=action==='cancelReservation'?'Cancelar a reserva e repor a quantidade no stock?':'Confirmar que o artigo foi entregue?';
-  if(confirm(question))try{queueAction({action,id});}catch(e){alert(e.message);}
-}
-function renderClients(){
-  const q=$('clientSearch').value.toLowerCase();
-  const rows=db.clientes.filter(x=>isActive(x.Ativo)&&[x.Nome,x.NIF,x.Contacto,x.Email].join(' ').toLowerCase().includes(q));
-  $('clientList').innerHTML=rows.length?rows.map(x=>`<article class="card"><h3>${esc(x.Nome)}</h3><div class="muted">NIF: ${esc(x.NIF||'—')}</div><p style="margin-top:8px">${esc(x.Contacto||'—')}<br>${esc(x.Email||'')}</p><div class="actions"><button class="btn danger" onclick="archiveClient('${esc(x.ID)}')">Arquivar</button></div></article>`).join(''):'<div class="empty">Ainda não existem clientes.</div>';
-}
-function renderHistory(){
-  const rows=db.historico||[];
-  $('historyList').innerHTML=rows.length?`<div class="table-wrap"><table><thead><tr><th>Data</th><th>Ação</th><th>Descrição</th><th>Qtd.</th></tr></thead><tbody>${rows.map(x=>`<tr><td>${dateFmt(x.DataHora)}</td><td>${esc(x.Acao)}</td><td>${esc(x.Descricao)}</td><td>${esc(x.Quantidade)}</td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">Sem movimentos registados.</div>';
-}
-function reserveThis(id){showTab('reservados');openModal('reservation',id);}
-function openModal(mode,preselect=''){
-  modalMode=mode;$('modalForm').reset();
-  const activeClients=db.clientes.filter(x=>isActive(x.Ativo)),activeItems=db.stock.filter(x=>isActive(x.Ativo));
-  const fields={
-    item:`<div class="field"><label>Nome do artigo</label><input name="nome" required></div><div class="field"><label>Categoria / Marca</label><input name="categoria" placeholder="Huvitz, Nidek, Acessórios..."></div><div class="field"><label>Tipo de artigo</label><select name="tipo"><option>Equipamento</option><option>Acessório</option><option>Consumível</option><option>Outro</option></select></div><div class="field"><label>Stock inicial</label><input name="stock" type="number" min="0" step="1" value="0" required></div><div class="field"><label>Demo inicial</label><input name="demo" type="number" min="0" step="1" value="0" required></div>`,
-    client:`<div class="field"><label>Nome do cliente</label><input name="nome" required></div><div class="field"><label>NIF</label><input name="nif"></div><div class="field"><label>Contacto</label><input name="contacto"></div><div class="field"><label>Email</label><input name="email" type="email"></div><div class="field"><label>Morada</label><input name="morada"></div><div class="field"><label>Observações</label><textarea name="observacoes"></textarea></div>`,
-    reservation:`<div class="field"><label>Cliente</label><select name="clienteId" required>${activeClients.map(x=>`<option value="${esc(x.ID)}">${esc(x.Nome)}</option>`).join('')}</select></div><div class="field"><label>Artigo</label><select name="itemId" id="reserveItem" required>${activeItems.map(x=>`<option value="${esc(x.ID)}">${esc(x.Nome)} (stock ${Number(x.Stock)||0} · demo ${Number(x.Demo)||0})</option>`).join('')}</select></div><div class="field"><label>Retirar de</label><select name="origem"><option>Stock</option><option>Demo</option></select></div><div class="field"><label>Quantidade</label><input name="quantidade" type="number" min="1" step="1" value="1" required></div><div class="field"><label>Data prevista de entrega</label><input name="dataPrevista" type="date"></div><div class="field"><label>Responsável</label><input name="responsavel"></div><div class="field"><label>Observações</label><textarea name="observacoes"></textarea></div>`
-  };
-  $('modalTitle').textContent=({item:'Adicionar artigo',client:'Adicionar cliente',reservation:'Criar reserva'})[mode]||'Novo registo';
-  $('modalFields').innerHTML=fields[mode]||'';
-  if(mode==='reservation'){
-    if(!activeClients.length||!activeItems.length){msg('Para criar uma reserva, adiciona primeiro um cliente e um artigo.');}
-    if(preselect&&$('reserveItem'))$('reserveItem').value=preselect;
-  }
-  $('modal').classList.add('show');
-}
-function closeModal(){$('modal').classList.remove('show');}
-function submitModal(e){
-  e.preventDefault();const f=Object.fromEntries(new FormData(e.target).entries());
+
+/* =================================
+   ARQUIVAR
+================================= */
+
+function archiveItem(id){
+
+  if(!confirm('Arquivar este artigo?')) return;
+
   try{
-    if(modalMode==='item'){f.action='addItem';f.stock=Number(f.stock);f.demo=Number(f.demo);}
-    if(modalMode==='client')f.action='addClient';
-    if(modalMode==='reservation'){
-      if(!f.clienteId)throw new Error('Não existem clientes. Cria primeiro um cliente.');
-      if(!f.itemId)throw new Error('Não existem artigos ativos para reservar.');
-      f.action='createReservation';f.quantidade=Number(f.quantidade);f.dataReserva=new Date().toISOString();
-    }
-    queueAction(f);closeModal();
-  }catch(err){alert(err.message);}
+    queue({
+      action:'deleteItem',
+      id:id
+    });
+  }catch(error){
+    alert(error.message);
+  }
+
 }
+
+function archiveClient(id){
+
+  if(!confirm('Arquivar este cliente?')) return;
+
+  try{
+    queue({
+      action:'deleteClient',
+      id:id
+    });
+  }catch(error){
+    alert(error.message);
+  }
+
+}
+
+
+/* =================================
+   RESERVAS - AÇÕES
+================================= */
+
+function reservationAction(id,action){
+
+  const question = action === 'cancelReservation'
+    ? 'Cancelar a reserva e repor a quantidade?'
+    : 'Confirmar a entrega?';
+
+  if(!confirm(question)) return;
+
+  try{
+
+    queue({
+      action:action,
+      id:id
+    });
+
+  }catch(error){
+
+    alert(error.message);
+
+  }
+
+}
+
+function reserveThis(id){
+  showTab('reservados');
+  openModal('reservation',id);
+}
+
+
+/* =================================
+   JSONP - COMUNICAÇÃO COM APPS SCRIPT
+================================= */
+
+function jsonp(url,timeoutMs=25000){
+
+  return new Promise(function(resolve,reject){
+
+    const callback =
+      '__i3o_cb_' + makeId().replace(/[^A-Za-z0-9_]/g,'');
+
+    const script = document.createElement('script');
+
+    let done = false;
+
+    const timer = setTimeout(function(){
+
+      finish(
+        new Error(
+          'Tempo de ligação esgotado. Verifica a implementação e a ligação à Internet.'
+        )
+      );
+
+    },timeoutMs);
+
+
+    function finish(error,data){
+
+      if(done) return;
+
+      done = true;
+
+      clearTimeout(timer);
+
+      delete window[callback];
+
+      script.remove();
+
+      if(error){
+        reject(error);
+      }else{
+        resolve(data);
+      }
+
+    }
+
+
+    window[callback] = function(data){
+      finish(null,data);
+    };
+
+    script.onerror = function(){
+      finish(
+        new Error(
+          'Não foi possível contactar a aplicação Google Apps Script.'
+        )
+      );
+    };
+
+    script.src =
+      url +
+      (url.includes('?') ? '&' : '?') +
+      'callback=' + callback +
+      '&_=' + Date.now();
+
+    document.body.appendChild(script);
+
+  });
+
+}
+
+
+/* =================================
+   CARREGAR DADOS DA GOOGLE SHEETS
+================================= */
+
+async function loadFromServer(){
+
+  if(busy) return;
+
+  busy = true;
+  updateBadge();
+
+  try{
+
+    msg('A carregar dados da Google Sheets...');
+
+    const response = await jsonp(SCRIPT_URL);
+
+    if(!response || response.ok !== true || !response.data){
+
+      throw Error(
+        response && response.error
+          ? response.error
+          : 'Resposta inválida da Google Sheets.'
+      );
+
+    }
+
+    if(pending.length){
+
+      msg(
+        'Dados recebidos. Existem alterações locais por sincronizar. Sincroniza primeiro.'
+      );
+
+      return;
+    }
+
+    db = response.data;
+
+    saveLocal();
+    renderAll();
+
+    msg('Dados carregados com sucesso da Google Sheets.');
+
+  }catch(error){
+
+    msg('Erro ao carregar: ' + error.message);
+
+  }finally{
+
+    busy = false;
+    updateBadge();
+
+  }
+
+}
+
+
+/* =================================
+   SINCRONIZAÇÃO MANUAL
+================================= */
+
+async function syncNow(){
+
+  if(busy) return;
+
+  busy = true;
+  updateBadge();
+
+  try{
+
+    while(pending.length){
+
+      const operation = pending[0];
+
+      msg(
+        'A sincronizar alteração. ' +
+        pending.length +
+        ' pendente(s)...'
+      );
+
+      const url =
+        SCRIPT_URL +
+        '?action=mutate&payload=' +
+        encodeURIComponent(JSON.stringify(operation));
+
+      const response = await jsonp(url,30000);
+
+      if(!response || response.ok !== true){
+
+        throw Error(
+          response && response.error
+            ? response.error
+            : 'O servidor não confirmou a alteração.'
+        );
+
+      }
+
+      pending.shift();
+
+      saveLocal();
+
+    }
+
+
+    msg('A atualizar os dados da Google Sheets...');
+
+    const response = await jsonp(SCRIPT_URL);
+
+    if(!response || response.ok !== true || !response.data){
+
+      throw Error(
+        response && response.error
+          ? response.error
+          : 'Não foi possível atualizar os dados.'
+      );
+
+    }
+
+    db = response.data;
+
+    saveLocal();
+    renderAll();
+
+    msg(
+      'Sincronização concluída. Todos os dados estão atualizados.'
+    );
+
+  }catch(error){
+
+    msg(
+      'Erro na sincronização: ' +
+      error.message +
+      ' As alterações ainda não confirmadas continuam guardadas neste navegador.'
+    );
+
+  }finally{
+
+    busy = false;
+    updateBadge();
+
+  }
+
+}
+
+
+/* =================================
+   MODAIS
+================================= */
+
+function openModal(mode,preselect=''){
+
+  modalMode = mode;
+
+  $('modalForm').reset();
+
+  const clients = db.clientes.filter(
+    x => isActive(x.Ativo)
+  );
+
+  const items = db.stock.filter(
+    x => isActive(x.Ativo)
+  );
+
+
+  const fields = {
+
+    item:`
+
+      <div class="field">
+        <label>Nome do artigo</label>
+        <input name="nome" required>
+      </div>
+
+      <div class="field">
+        <label>Categoria / Marca</label>
+        <input
+          name="categoria"
+          placeholder="Huvitz, Nidek, Acessórios..."
+        >
+      </div>
+
+      <div class="field">
+        <label>Tipo de artigo</label>
+        <select name="tipo">
+          <option>Equipamento</option>
+          <option>Acessório</option>
+          <option>Consumível</option>
+          <option>Outro</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Stock inicial</label>
+        <input
+          name="stock"
+          type="number"
+          min="0"
+          step="1"
+          value="0"
+          required
+        >
+      </div>
+
+      <div class="field">
+        <label>Demo inicial</label>
+        <input
+          name="demo"
+          type="number"
+          min="0"
+          step="1"
+          value="0"
+          required
+        >
+      </div>
+
+    `,
+
+
+    client:`
+
+      <div class="field">
+        <label>Nome do cliente</label>
+        <input name="nome" required>
+      </div>
+
+      <div class="field">
+        <label>NIF</label>
+        <input name="nif">
+      </div>
+
+      <div class="field">
+        <label>Contacto</label>
+        <input name="contacto">
+      </div>
+
+      <div class="field">
+        <label>Email</label>
+        <input name="email" type="email">
+      </div>
+
+      <div class="field">
+        <label>Morada</label>
+        <input name="morada">
+      </div>
+
+      <div class="field">
+        <label>Observações</label>
+        <textarea name="observacoes"></textarea>
+      </div>
+
+    `,
+
+
+    reservation:`
+
+      <div class="field">
+        <label>Cliente</label>
+
+        <select name="clienteId" required>
+
+          ${clients.map(function(x){
+            return `
+              <option value="${esc(x.ID)}">
+                ${esc(x.Nome)}
+              </option>
+            `;
+          }).join('')}
+
+        </select>
+      </div>
+
+
+      <div class="field">
+        <label>Artigo</label>
+
+        <select name="itemId" id="reserveItem" required>
+
+          ${items.map(function(x){
+            return `
+              <option value="${esc(x.ID)}">
+                ${esc(x.Nome)}
+                (Stock ${Number(x.Stock)||0}
+                · Demo ${Number(x.Demo)||0})
+              </option>
+            `;
+          }).join('')}
+
+        </select>
+      </div>
+
+
+      <div class="field">
+        <label>Retirar de</label>
+
+        <select name="origem">
+          <option>Stock</option>
+          <option>Demo</option>
+        </select>
+      </div>
+
+
+      <div class="field">
+        <label>Quantidade</label>
+
+        <input
+          name="quantidade"
+          type="number"
+          min="1"
+          step="1"
+          value="1"
+          required
+        >
+      </div>
+
+
+      <div class="field">
+        <label>Data prevista</label>
+        <input name="dataPrevista" type="date">
+      </div>
+
+
+      <div class="field">
+        <label>Destino</label>
+        <input
+          name="destino"
+          placeholder="Ex.: Clínica / cliente"
+        >
+      </div>
+
+
+      <div class="field">
+        <label>Localidade</label>
+        <input name="localidade">
+      </div>
+
+
+      <div class="field">
+        <label>Responsável</label>
+        <input name="responsavel">
+      </div>
+
+
+      <div class="field">
+        <label>Observações</label>
+        <textarea name="observacoes"></textarea>
+      </div>
+
+    `
+
+  };
+
+
+  $('modalTitle').textContent = {
+    item:'Adicionar artigo',
+    client:'Adicionar cliente',
+    reservation:'Criar reserva'
+  }[mode] || 'Novo registo';
+
+
+  $('modalFields').innerHTML = fields[mode] || '';
+
+
+  if(mode === 'reservation'){
+
+    if(!clients.length || !items.length){
+
+      msg(
+        'Adiciona primeiro pelo menos um cliente e um artigo.'
+      );
+
+    }
+
+    if(preselect && $('reserveItem')){
+      $('reserveItem').value = preselect;
+    }
+
+  }
+
+
+  $('modal').classList.add('show');
+
+}
+
+function closeModal(){
+  $('modal').classList.remove('show');
+}
+
+
+/* =================================
+   GUARDAR FORMULÁRIOS
+================================= */
+
+function submitModal(event){
+
+  event.preventDefault();
+
+  const formData = Object.fromEntries(
+    new FormData(event.target).entries()
+  );
+
+  try{
+
+    if(modalMode === 'item'){
+
+      formData.action = 'addItem';
+      formData.stock = Number(formData.stock);
+      formData.demo = Number(formData.demo);
+
+    }
+
+
+    if(modalMode === 'client'){
+
+      formData.action = 'addClient';
+
+    }
+
+
+    if(modalMode === 'reservation'){
+
+      if(!formData.clienteId){
+        throw Error('Cria primeiro um cliente.');
+      }
+
+      if(!formData.itemId){
+        throw Error('Cria primeiro um artigo.');
+      }
+
+      formData.action = 'createReservation';
+      formData.quantidade = Number(formData.quantidade);
+
+    }
+
+
+    queue(formData);
+
+    closeModal();
+
+  }catch(error){
+
+    alert(error.message);
+
+  }
+
+}
+
+
+/* =================================
+   INICIALIZAÇÃO
+================================= */
+
 loadLocal();
+
+loadFromServer();
+
 </script>
+
 </body>
 </html>
