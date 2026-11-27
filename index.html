@@ -25,11 +25,7 @@
       --radius-sm: 9px;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       background: var(--bg);
@@ -55,11 +51,7 @@
       flex-wrap: wrap;
     }
 
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
+    .brand { display: flex; align-items: center; gap: 12px; }
 
     .brand-dot {
       width: 12px;
@@ -69,11 +61,7 @@
       box-shadow: 0 0 0 4px var(--accent-soft);
     }
 
-    header h1 {
-      font-size: 1.15rem;
-      font-weight: 700;
-      letter-spacing: -0.015em;
-    }
+    header h1 { font-size: 1.15rem; font-weight: 700; letter-spacing: -0.015em; }
 
     .btn-refresh {
       background: var(--surface-subtle);
@@ -87,10 +75,7 @@
       transition: background 0.15s ease, border-color 0.15s ease;
     }
 
-    .btn-refresh:hover {
-      background: #eef2f6;
-      border-color: #cbd5e1;
-    }
+    .btn-refresh:hover { background: #eef2f6; border-color: #cbd5e1; }
 
     nav {
       background: var(--surface);
@@ -110,9 +95,7 @@
       scrollbar-width: none;
     }
 
-    .nav-inner::-webkit-scrollbar {
-      display: none;
-    }
+    .nav-inner::-webkit-scrollbar { display: none; }
 
     nav button {
       background: none;
@@ -127,20 +110,10 @@
       transition: color 0.15s ease, border-color 0.15s ease;
     }
 
-    nav button:hover {
-      color: var(--text);
-    }
+    nav button:hover { color: var(--text); }
+    nav button.active { color: var(--accent); border-bottom-color: var(--accent); }
 
-    nav button.active {
-      color: var(--accent);
-      border-bottom-color: var(--accent);
-    }
-
-    main {
-      max-width: 1120px;
-      margin: 24px auto;
-      padding: 0 20px;
-    }
+    main { max-width: 1120px; margin: 24px auto; padding: 0 20px; }
 
     .status-pill {
       display: inline-flex;
@@ -155,14 +128,8 @@
       margin-bottom: 18px;
     }
 
-    .tab {
-      display: none;
-    }
-
-    .tab.active {
-      display: block;
-      animation: fadeIn 0.16s ease;
-    }
+    .tab { display: none; }
+    .tab.active { display: block; animation: fadeIn 0.16s ease; }
 
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(3px); }
@@ -187,23 +154,10 @@
       margin-bottom: 16px;
     }
 
-    .card h2 {
-      font-size: 1.02rem;
-      font-weight: 700;
-      letter-spacing: -0.01em;
-    }
+    .card h2 { font-size: 1.02rem; font-weight: 700; letter-spacing: -0.01em; }
 
-    .grid-2 {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-      gap: 14px;
-    }
-
-    .grid-3 {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(185px, 1fr));
-      gap: 14px;
-    }
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(185px, 1fr)); gap: 14px; }
 
     label {
       display: block;
@@ -213,8 +167,7 @@
       margin-bottom: 5px;
     }
 
-    input,
-    select {
+    input, select {
       width: 100%;
       padding: 10px 12px;
       border: 1px solid var(--border);
@@ -225,23 +178,15 @@
       transition: border-color 0.15s ease, box-shadow 0.15s ease;
     }
 
-    input:focus,
-    select:focus {
+    input:focus, select:focus {
       outline: none;
       border-color: var(--accent);
       box-shadow: 0 0 0 3px var(--accent-soft);
     }
 
-    .search-input {
-      max-width: 280px;
-      background: var(--surface-subtle);
-    }
+    .search-input { max-width: 280px; background: var(--surface-subtle); }
 
-    .form-actions {
-      margin-top: 16px;
-      display: flex;
-      gap: 10px;
-    }
+    .form-actions { margin-top: 16px; display: flex; gap: 10px; }
 
     .btn {
       padding: 10px 18px;
@@ -253,42 +198,14 @@
       transition: background 0.15s ease, transform 0.08s ease;
     }
 
-    .btn:active {
-      transform: scale(0.99);
-    }
-
-    .btn-primary {
-      background: var(--accent);
-      color: #ffffff;
-    }
-
-    .btn-primary:hover {
-      background: var(--accent-hover);
-    }
-
-    .btn-ok {
-      background: var(--ok-bg);
-      color: var(--ok-fg);
-    }
-
-    .btn-ok:hover {
-      background: #bbf7d0;
-    }
-
-    .btn-err {
-      background: var(--err-bg);
-      color: var(--err-fg);
-    }
-
-    .btn-err:hover {
-      background: #fecaca;
-    }
-
-    .btn-sm {
-      padding: 6px 11px;
-      font-size: 0.78rem;
-      border-radius: 7px;
-    }
+    .btn:active { transform: scale(0.99); }
+    .btn-primary { background: var(--accent); color: #ffffff; }
+    .btn-primary:hover { background: var(--accent-hover); }
+    .btn-ok { background: var(--ok-bg); color: var(--ok-fg); }
+    .btn-ok:hover { background: #bbf7d0; }
+    .btn-err { background: var(--err-bg); color: var(--err-fg); }
+    .btn-err:hover { background: #fecaca; }
+    .btn-sm { padding: 6px 11px; font-size: 0.78rem; border-radius: 7px; }
 
     .table-wrap {
       overflow-x: auto;
@@ -296,11 +213,7 @@
       border-radius: var(--radius-sm);
     }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.88rem;
-    }
+    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
 
     th {
       text-align: left;
@@ -314,19 +227,9 @@
       border-bottom: 1px solid var(--border);
     }
 
-    td {
-      padding: 12px 14px;
-      border-bottom: 1px solid var(--border);
-      vertical-align: middle;
-    }
-
-    tbody tr:last-child td {
-      border-bottom: none;
-    }
-
-    tbody tr:hover {
-      background: #fafbfd;
-    }
+    td { padding: 12px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: #fafbfd; }
 
     .badge {
       display: inline-block;
@@ -369,17 +272,8 @@
     .kpi-num.warn { color: var(--warn-fg); }
     .kpi-num.ok { color: var(--ok-fg); }
 
-    .empty-row {
-      text-align: center;
-      color: var(--muted);
-      padding: 24px 14px;
-    }
-
-    .actions-cell {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-    }
+    .empty-row { text-align: center; color: var(--muted); padding: 24px 14px; }
+    .actions-cell { display: flex; gap: 6px; flex-wrap: wrap; }
   </style>
 </head>
 <body>
@@ -397,7 +291,7 @@
 <nav>
   <div class="nav-inner">
     <button class="active" onclick="openTab('stock', this)">Stock</button>
-    <button onclick="openTab('mov', this)">Adicionar / Retirar</button>
+    <button onclick="openTab('mov', this)">Definir Quantidade</button>
     <button onclick="openTab('reservas', this)">Reservados</button>
     <button onclick="openTab('demos', this)">Demonstração</button>
     <button onclick="openTab('clientes', this)">Criar Cliente</button>
@@ -448,25 +342,17 @@
     </div>
   </section>
 
-  <!-- ADICIONAR / RETIRAR -->
+  <!-- DEFINIR QUANTIDADE -->
   <section id="mov" class="tab">
     <div class="card">
-      <h2>Adicionar ou Retirar Stock</h2>
-      <form onsubmit="moveStock(event)">
+      <h2>Definir Quantidade em Stock</h2>
+      <form onsubmit="setStockQty(event)">
         <div class="grid-2">
-          <div><label>Artigo *</label><select id="mov-item" required></select></div>
-          <div>
-            <label>Operação *</label>
-            <select id="mov-type" required>
-              <option value="ENTRADA">Adicionar ao Stock</option>
-              <option value="SAIDA">Retirar do Stock</option>
-            </select>
-          </div>
-          <div><label>Quantidade *</label><input id="mov-qty" type="number" min="1" required placeholder="Escreva a quantidade" /></div>
-          <div><label>Motivo</label><input id="mov-reason" placeholder="Opcional" /></div>
+          <div><label>Artigo *</label><select id="mov-item" required onchange="syncCurrentQty()"></select></div>
+          <div><label>Nova Quantidade Exata *</label><input id="mov-qty" type="number" min="0" required placeholder="Escreva a quantidade final" /></div>
         </div>
         <div class="form-actions">
-          <button class="btn btn-primary" type="submit">Executar Movimento</button>
+          <button class="btn btn-primary" type="submit">Guardar Quantidade</button>
         </div>
       </form>
     </div>
@@ -639,7 +525,7 @@
 </main>
 
 <script>
-  const API_URL = "https://script.google.com/macros/s/AKfycbyEI56ccNkMw9rQRc6YlmoxuDNyNhftDm5Z0Q0ChXU0h74wRoZVF6w7udSbs_orJSp2kw/exec";
+  const API_URL = "https://script.google.com/macros/s/AKfycby8300vop-vx7LV0QuxDsNBFMGY9Nfn2Vd6m5tuG-i8vMejzYQE4RDFBq4qrCBOQWPvEw/exec";
 
   let DB = { stock: [], clientes: [], reservas: [], demos: [], historico: [] };
 
@@ -720,6 +606,14 @@
         resolve(true);
       }, 1600);
     });
+  }
+
+  function syncCurrentQty() {
+    const sel = document.getElementById('mov-item');
+    const found = DB.stock.find(function(i) { return String(i.ID) === String(sel.value); });
+    if (found) {
+      document.getElementById('mov-qty').value = Number(found.Quantidade) || 0;
+    }
   }
 
   function renderAll() {
@@ -858,14 +752,12 @@
     if (ok) e.target.reset();
   }
 
-  async function moveStock(e) {
+  async function setStockQty(e) {
     e.preventDefault();
     const ok = await postAction({
-      action: 'MOVE_STOCK',
+      action: 'SET_STOCK',
       itemId: document.getElementById('mov-item').value,
-      tipo: document.getElementById('mov-type').value,
-      quantidade: document.getElementById('mov-qty').value,
-      motivo: document.getElementById('mov-reason').value
+      quantidade: document.getElementById('mov-qty').value
     });
     if (ok) e.target.reset();
   }
