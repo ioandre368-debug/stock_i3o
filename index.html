@@ -272,11 +272,6 @@
   }
 
   function loadData() {
-    if (!API_URL || API_URL.includes('COLE_AQUI')) {
-      setStatus('Cola primeiro o URL /exec em API_URL.');
-      return Promise.resolve();
-    }
-
     setStatus('A carregar dados...');
     return new Promise(function(resolve) {
       const cbName = 'gsCallback_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
@@ -310,12 +305,6 @@
 
   function postAction(payload) {
     return new Promise(function(resolve) {
-      if (!API_URL || API_URL.includes('COLE_AQUI')) {
-        alert('Cola primeiro o URL /exec em API_URL.');
-        resolve(false);
-        return;
-      }
-
       setStatus('A enviar para o Google Sheets...');
       const frameName = 'hidden_gs_frame';
       let iframe = document.getElementById(frameName);
