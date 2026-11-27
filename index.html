@@ -490,7 +490,7 @@
               <th>Artigo</th>
               <th>Qtd.</th>
               <th>Notas</th>
-              <th>Ação</th>
+              <th>Ações</th>
             </tr>
           </thead>
           <tbody id="tb-demo"></tbody>
@@ -526,7 +526,6 @@
       </div>
     </div>
 
-    <!-- FICHA INTERATIVA DO CLIENTE SELECIONADO -->
     <div id="client-detail-card" class="card highlight" style="display:none;">
       <div class="card-head">
         <h2 id="client-detail-title">Ficha do Cliente</h2>
@@ -561,7 +560,7 @@
               <th>Qtd.</th>
               <th>Estado</th>
               <th>Notas</th>
-              <th>Ação</th>
+              <th>Ações</th>
             </tr>
           </thead>
           <tbody id="tb-client-demo"></tbody>
@@ -612,8 +611,9 @@
               <th>Artigo</th>
               <th>Stock</th>
               <th>Reservado</th>
-              <th>Demonstração</th>
-              <th>Total</th>
+              <th>Em Demo</th>
+              <th>Saída Demo</th>
+              <th>Total Ativo</th>
             </tr>
           </thead>
           <tbody id="tb-stats"></tbody>
@@ -901,7 +901,8 @@
       return;
     }
     tb.innerHTML = list.map(function(d) {
-      return '<tr><td>' + String(d.DataInicio).slice(0, 10) + '</td><td><strong>' + d.ClienteNome + '</strong></td><td>' + d.ItemNome + '</td><td><span class="badge b-info">' + d.Quantidade + '</span></td><td>' + (d.Notas || '-') + '</td><td>' +
+      return '<tr><td>' + String(d.DataInicio).slice(0, 10) + '</td><td><strong>' + d.ClienteNome + '</strong></td><td>' + d.ItemNome + '</td><td><span class="badge b-info">' + d.Quantidade + '</span></td><td>' + (d.Notas || '-') + '</td><td class="actions-cell">' +
+        '<button class="btn btn-primary btn-sm" onclick="sellDemo(\'' + d.ID + '\')">Dar Saída</button>' +
         '<button class="btn btn-ok btn-sm" onclick="devDemo(\'' + d.ID + '\')">Devolver</button></td></tr>';
     }).join('');
   }
@@ -979,9 +980,13 @@
     } else {
       tbDemo.innerHTML = cliDemos.map(function(d) {
         const isAtiva = d.Estado === 'Em Demonstração';
-        const statusBadge = isAtiva ? '<span class="badge b-info">Em Demonstração</span>' : '<span class="badge b-ok">Devolvido</span>';
-        const action = isAtiva ? '<button class="btn btn-ok btn-sm" onclick="devDemo(\'' + d.ID + '\')">Devolver</button>' : '-';
-        return '<tr><td>' + String(d.DataInicio).slice(0, 10) + '</td><td><strong>' + d.ItemNome + '</strong></td><td>' + d.Quantidade + '</td><td>' + statusBadge + '</td><td>' + (d.Notas || '-') + '</td><td>' + action + '</td></tr>';
+        const statusBadge = isAtiva
+          ? '<span class="badge b-info">Em Demonstração</span>'
+          : (d.Estado === 'Saída Efetuada' ? '<span class="badge b-ok">Saída Efetuada</span>' : '<span class="badge b-warn">Devolvido</span>');
+        const actions = isAtiva
+          ? '<button class="btn btn-primary btn-sm" onclick="sellDemo(\'' + d.ID + '\')">Dar Saída</button> <button class="btn btn-ok btn-sm" onclick="devDemo(\'' + d.ID + '\')">Devolver</button>'
+          : '-';
+        return '<tr><td>' + String(d.DataInicio).slice(0, 10) + '</td><td><strong>' + d.ItemNome + '</strong></td><td>' + d.Quantidade + '</td><td>' + statusBadge + '</td><td>' + (d.Notas || '-') + '</td><td class="actions-cell">' + actions + '</td></tr>';
       }).join('');
     }
 
@@ -1014,6 +1019,7 @@
   function renderStats() {
     const activeRes = DB.reservas.filter(function(r) { return r.Estado === 'Ativa'; });
     const activeDemo = DB.demos.filter(function(d) { return d.Estado === 'Em Demonstração'; });
+    const soldDemos = DB.demos.filter(function(d) { return d.Estado === 'Saída Efetuada'; });
 
     const totStock = DB.stock.reduce(function(a, i) { return a + (Number(i.Quantidade) || 0); }, 0);
     const totRes = activeRes.reduce(function(a, r) { return a + (Number(r.Quantidade) || 0); }, 0);
@@ -1025,14 +1031,15 @@
 
     const tb = document.getElementById('tb-stats');
     if (!DB.stock.length) {
-      tb.innerHTML = '<tr><td colspan="5" class="empty-row">Sem dados para apresentar.</td></tr>';
+      tb.innerHTML = '<tr><td colspan="6" class="empty-row">Sem dados para apresentar.</td></tr>';
       return;
     }
     tb.innerHTML = DB.stock.map(function(i) {
       const s = Number(i.Quantidade) || 0;
       const r = activeRes.filter(function(x) { return x.ItemID === i.ID; }).reduce(function(a, x) { return a + (Number(x.Quantidade) || 0); }, 0);
       const d = activeDemo.filter(function(x) { return x.ItemID === i.ID; }).reduce(function(a, x) { return a + (Number(x.Quantidade) || 0); }, 0);
-      return '<tr><td><strong>' + i.Nome + '</strong></td><td>' + s + '</td><td>' + r + '</td><td>' + d + '</td><td><strong>' + (s + r + d) + '</strong></td></tr>';
+      const sd = soldDemos.filter(function(x) { return x.ItemID === i.ID; }).reduce(function(a, x) { return a + (Number(x.Quantidade) || 0); }, 0);
+      return '<tr><td><strong>' + i.Nome + '</strong></td><td>' + s + '</td><td>' + r + '</td><td>' + d + '</td><td>' + sd + '</td><td><strong>' + (s + r + d) + '</strong></td></tr>';
     }).join('');
   }
 
@@ -1110,6 +1117,11 @@
   async function devDemo(id) {
     if (!confirm('Registar devolução ao stock?')) return;
     await postAction({ action: 'RETURN_DEMO', id: id });
+  }
+
+  async function sellDemo(id) {
+    if (!confirm('Dar saída definitiva deste equipamento em demonstração (sem repor stock)?')) return;
+    await postAction({ action: 'SELL_DEMO', id: id });
   }
 
   window.addEventListener('DOMContentLoaded', loadData);
