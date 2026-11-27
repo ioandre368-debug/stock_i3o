@@ -1,397 +1,846 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>I3O | Gestão de Stock</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<style>
-:root{--navy:#0f172a;--blue:#2563eb;--bg:#f8fafc;--muted:#64748b;--line:#e2e8f0;--green:#15803d;--orange:#c2410c}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--navy);font-family:'Plus Jakarta Sans',sans-serif}
-header{background:var(--navy);color:white;padding:16px max(16px,calc((100% - 1100px)/2));display:flex;justify-content:space-between;align-items:center;gap:12px;position:sticky;top:0;z-index:5}
-.brand{font-weight:800;font-size:1.15rem;display:flex;gap:10px;align-items:center}.brand i{background:var(--blue);padding:9px;border-radius:10px}
-main{max-width:1100px;margin:auto;padding:22px 16px}
-.tabs{display:flex;gap:8px;overflow:auto;margin-bottom:18px}
-.tab,.btn{border:0;border-radius:10px;padding:11px 15px;font:600 .88rem 'Plus Jakarta Sans',sans-serif;cursor:pointer;white-space:nowrap}
-.tab{background:white;border:1px solid var(--line);color:var(--muted)}.tab.active,.btn.primary{background:var(--blue);color:white;border-color:var(--blue)}
-.btn{background:white;border:1px solid var(--line);color:var(--navy)}.btn.danger{color:#b91c1c}
-.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}.toolbar input,.toolbar select{flex:1;min-width:180px}
-input,select,textarea{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:9px;font:inherit;background:white}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
-.card{background:white;border:1px solid var(--line);border-radius:15px;padding:16px;box-shadow:0 3px 14px #0f172a0a}
-.card h3{margin:0 0 5px;font-size:1rem}.muted{color:var(--muted);font-size:.82rem}
-.qty{display:flex;align-items:center;gap:9px;margin-top:12px;flex-wrap:wrap}.qty input{width:88px;padding:7px 8px;text-align:center}.qty button{border:0;border-radius:8px;padding:8px 11px;background:var(--blue);color:white;cursor:pointer;font-weight:700}
-.pill{display:inline-block;border-radius:20px;padding:4px 9px;font-size:.72rem;font-weight:700;background:#dbeafe;color:#1d4ed8}.pill.warn{background:#ffedd5;color:#9a3412}.pill.ok{background:#dcfce7;color:#166534}.pill.gray{background:#e2e8f0;color:#475569}
-table{width:100%;border-collapse:collapse;background:white;border-radius:12px;overflow:hidden}th,td{text-align:left;padding:11px;border-bottom:1px solid var(--line);font-size:.82rem}th{background:#f1f5f9;color:#475569}
-.table-wrap{overflow:auto}.empty{padding:35px;text-align:center;color:var(--muted);background:white;border-radius:14px}
-.modal{display:none;position:fixed;inset:0;background:#0f172a99;z-index:10;align-items:center;justify-content:center;padding:16px}.modal.show{display:flex}.modal-box{background:white;width:min(520px,100%);max-height:92vh;overflow:auto;border-radius:17px;padding:22px}
-.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}.modal-head h2{font-size:1.1rem;margin:0}.field{margin-bottom:12px}.field label{display:block;font-size:.76rem;font-weight:700;color:var(--muted);margin-bottom:5px}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
-#status{font-size:.82rem;color:var(--muted);margin:8px 0;padding:10px 12px;background:white;border:1px solid var(--line);border-radius:9px;overflow-wrap:anywhere}
-.hidden{display:none!important}.btn:disabled{opacity:.55;cursor:wait}
-@media(max-width:600px){header{padding:14px 16px}main{padding:16px 12px}.tab{padding:10px 12px}th,td{padding:9px}}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gestão de Stock, Reservas & Demonstrações</title>
+  <style>
+    :root {
+      --primary: #1e40af;
+      --primary-light: #3b82f6;
+      --bg: #f1f5f9;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --success: #16a34a;
+      --warning: #d97706;
+      --danger: #dc2626;
+      --radius: 12px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background: var(--bg); color: var(--text); padding-bottom: 40px; }
+
+    /* Header & Nav */
+    header {
+      background: var(--primary);
+      color: #fff;
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    header h1 { font-size: 1.25rem; font-weight: 700; }
+    .btn-refresh {
+      background: rgba(255,255,255,0.18);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.3);
+      padding: 6px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .btn-refresh:hover { background: rgba(255,255,255,0.28); }
+
+    nav {
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      overflow-x: auto;
+      padding: 0 12px;
+      gap: 4px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    nav button {
+      background: none;
+      border: none;
+      padding: 14px 16px;
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      white-space: nowrap;
+      transition: 0.2s;
+    }
+    nav button.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    main { max-width: 1100px; margin: 20px auto; padding: 0 16px; }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* Cards & Forms */
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      margin-bottom: 20px;
+      border: 1px solid var(--border);
+    }
+    .card h2 { font-size: 1.1rem; margin-bottom: 14px; color: var(--text); }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; }
+
+    label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 5px; color: var(--muted); }
+    input, select, textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.95rem;
+      background: #fff;
+    }
+    input:focus, select:focus { outline: none; border-color: var(--primary-light); }
+
+    .btn {
+      padding: 10px 18px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.92rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: #1e3a8a; }
+    .btn-success { background: var(--success); color: #fff; }
+    .btn-danger { background: var(--danger); color: #fff; }
+    .btn-sm { padding: 6px 10px; font-size: 0.8rem; }
+
+    /* Tables */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    th {
+      background: #f8fafc;
+      text-align: left;
+      padding: 11px 12px;
+      font-weight: 700;
+      color: var(--muted);
+      border-bottom: 2px solid var(--border);
+    }
+    td { padding: 11px 12px; border-bottom: 1px solid var(--border); }
+
+    /* Badges */
+    .badge {
+      padding: 3px 9px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      display: inline-block;
+    }
+    .badge-ok { background: #dcfce7; color: #166534; }
+    .badge-low { background: #fef3c7; color: #92400e; }
+    .badge-zero { background: #fee2e2; color: #991b1b; }
+    .badge-info { background: #dbeafe; color: #1e40af; }
+
+    /* Stats KPIs */
+    .kpi-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+      text-align: center;
+    }
+    .kpi-value { font-size: 2rem; font-weight: 800; color: var(--primary); margin: 6px 0; }
+    .kpi-label { font-size: 0.85rem; font-weight: 600; color: var(--muted); text-transform: uppercase; }
+
+    /* Loader & Toast */
+    #loader {
+      position: fixed; inset: 0; background: rgba(255,255,255,0.75);
+      display: none; align-items: center; justify-content: center; z-index: 999;
+      font-weight: 700; color: var(--primary); font-size: 1.1rem;
+    }
+    #toast {
+      position: fixed; bottom: 20px; right: 20px; background: #0f172a; color: #fff;
+      padding: 12px 18px; border-radius: 10px; font-size: 0.9rem; display: none; z-index: 1000;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+  </style>
 </head>
 <body>
+
+<div id="loader">A sincronizar com Google Sheets...</div>
+<div id="toast"></div>
+
 <header>
-  <div class="brand"><i class="fa-solid fa-layer-group"></i> STOCK I3O</div>
-  <button class="btn primary" onclick="openModal('item')"><i class="fa fa-plus"></i> Novo artigo</button>
+  <h1>📦 Gestão de Stock & Equipamentos</h1>
+  <button class="btn-refresh" onclick="loadAllData()">↻ Atualizar Dados</button>
 </header>
+
+<nav>
+  <button class="active" onclick="switchTab('tab-stock', this)">1. Stock (Início)</button>
+  <button onclick="switchTab('tab-mov', this)">2. Adicionar / Retirar</button>
+  <button onclick="switchTab('tab-reservas', this)">3. Reservados</button>
+  <button onclick="switchTab('tab-demos', this)">4. Demonstração</button>
+  <button onclick="switchTab('tab-clientes', this)">5. Clientes</button>
+  <button onclick="switchTab('tab-stats', this)">6. Estatísticas</button>
+</nav>
+
 <main>
-  <nav class="tabs">
-    <button class="tab active" data-tab="stock" onclick="showTab('stock')"><i class="fa fa-boxes-stacked"></i> Stock</button>
-    <button class="tab" data-tab="reservados" onclick="showTab('reservados')"><i class="fa fa-bookmark"></i> Reservados</button>
-    <button class="tab" data-tab="clientes" onclick="showTab('clientes')"><i class="fa fa-users"></i> Clientes</button>
-    <button class="tab" data-tab="historico" onclick="showTab('historico')"><i class="fa fa-clock-rotate-left"></i> Histórico</button>
-  </nav>
-  <div id="status">A ligar à base de dados...</div>
 
-  <section id="view-stock">
-    <div class="toolbar">
-      <input id="stockSearch" placeholder="Pesquisar artigo, marca ou modelo..." oninput="renderStock()">
-      <select id="stockCategory" onchange="renderStock()"><option value="">Todas as categorias</option></select>
-      <button class="btn" onclick="loadData()">↻ Atualizar</button>
+  <!-- ABA 1: STOCK (PÁGINA INICIAL) -->
+  <section id="tab-stock" class="tab-content active">
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
+        <h2 style="margin:0;">Inventário Atual</h2>
+        <input type="text" id="search-stock" placeholder="Pesquisar por nome, código ou categoria..." style="max-width:300px;" onkeyup="renderStockTable()" />
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Artigo</th>
+              <th>Categoria</th>
+              <th>Qtd. Disponível</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-stock"></tbody>
+        </table>
+      </div>
     </div>
-    <div id="stockList" class="grid"></div>
+
+    <div class="card">
+      <h2>Cadastrar Novo Artigo no Stock</h2>
+      <form onsubmit="handleAddItem(event)">
+        <div class="grid-3">
+          <div>
+            <label>Código / Ref.</label>
+            <input type="text" id="new-item-code" placeholder="Ex: REF-001" />
+          </div>
+          <div>
+            <label>Nome do Artigo *</label>
+            <input type="text" id="new-item-name" required placeholder="Ex: Equipamento X" />
+          </div>
+          <div>
+            <label>Categoria</label>
+            <input type="text" id="new-item-cat" placeholder="Ex: Óptica / Oficina" />
+          </div>
+          <div>
+            <label>Quantidade Inicial *</label>
+            <input type="number" id="new-item-qty" min="0" value="1" required />
+          </div>
+          <div>
+            <label>Alerta Stock Mínimo</label>
+            <input type="number" id="new-item-min" min="0" value="2" />
+          </div>
+        </div>
+        <div style="margin-top:14px;">
+          <button type="submit" class="btn btn-primary">+ Criar Artigo</button>
+        </div>
+      </form>
+    </div>
   </section>
 
-  <section id="view-reservados" class="hidden">
-    <div class="toolbar">
-      <input id="reservationSearch" placeholder="Pesquisar reserva, cliente ou artigo..." oninput="renderReservations()">
-      <select id="reservationState" onchange="renderReservations()">
-        <option value="">Todos os estados</option><option>Pendente</option><option>Entregue</option><option>Cancelada</option>
-      </select>
-      <button class="btn primary" onclick="openModal('reservation')">+ Nova reserva</button>
+  <!-- ABA 2: ADICIONAR E RETIRAR (SELECIONAR E ESCREVER QUANTIDADE) -->
+  <section id="tab-mov" class="tab-content">
+    <div class="card">
+      <h2>Movimentar Stock (Entrada / Saída Direta)</h2>
+      <form onsubmit="handleMoveStock(event)">
+        <div class="grid-2">
+          <div>
+            <label>Selecionar Artigo *</label>
+            <select id="mov-item" required></select>
+          </div>
+          <div>
+            <label>Tipo de Movimento *</label>
+            <select id="mov-type" required>
+              <option value="ENTRADA">Adicionar ao Stock (+)</option>
+              <option value="SAIDA">Retirar do Stock (-)</option>
+            </select>
+          </div>
+          <div>
+            <label>Escrever Quantidade *</label>
+            <input type="number" id="mov-qty" min="1" placeholder="Escreva a quantidade..." required />
+          </div>
+          <div>
+            <label>Motivo / Observação</label>
+            <input type="text" id="mov-reason" placeholder="Ex: Compra fornecedor, venda direta, ajuste..." />
+          </div>
+        </div>
+        <div style="margin-top:16px;">
+          <button type="submit" class="btn btn-primary">Confirmar Movimento</button>
+        </div>
+      </form>
     </div>
-    <div id="reservationList"></div>
+
+    <div class="card">
+      <h2>Últimos Movimentos Registados</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Operação</th>
+              <th>Artigo</th>
+              <th>Qtd.</th>
+              <th>Cliente / Motivo</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-history"></tbody>
+        </table>
+      </div>
+    </div>
   </section>
 
-  <section id="view-clientes" class="hidden">
-    <div class="toolbar">
-      <input id="clientSearch" placeholder="Pesquisar cliente..." oninput="renderClients()">
-      <button class="btn primary" onclick="openModal('client')">+ Novo cliente</button>
+  <!-- ABA 3: RESERVADOS (RETIRA DO STOCK AO RESERVAR) -->
+  <section id="tab-reservas" class="tab-content">
+    <div class="card">
+      <h2>Nova Reserva (Retira do Stock Automaticamente)</h2>
+      <form onsubmit="handleAddReserva(event)">
+        <div class="grid-2">
+          <div>
+            <label>Selecionar Cliente *</label>
+            <select id="res-client" required></select>
+          </div>
+          <div>
+            <label>Selecionar Artigo *</label>
+            <select id="res-item" required></select>
+          </div>
+          <div>
+            <label>Quantidade a Reservar *</label>
+            <input type="number" id="res-qty" min="1" value="1" required />
+          </div>
+          <div>
+            <label>Notas da Reserva</label>
+            <input type="text" id="res-notes" placeholder="Ex: Aguarda adjudicação / sinal pago" />
+          </div>
+        </div>
+        <div style="margin-top:16px;">
+          <button type="submit" class="btn btn-primary">Reservar e Abater Stock</button>
+        </div>
+      </form>
     </div>
-    <div id="clientList" class="grid"></div>
+
+    <div class="card">
+      <h2>Artigos Atualmente Reservados</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Cliente</th>
+              <th>Artigo</th>
+              <th>Qtd.</th>
+              <th>Notas</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-reservas"></tbody>
+        </table>
+      </div>
+    </div>
   </section>
 
-  <section id="view-historico" class="hidden"><div id="historyList"></div></section>
+  <!-- ABA 4: DEMONSTRAÇÃO (RETIRA DO STOCK AO COLOCAR EM DEMO) -->
+  <section id="tab-demos" class="tab-content">
+    <div class="card">
+      <h2>Colocar Equipamento em Demonstração (Retira do Stock)</h2>
+      <form onsubmit="handleAddDemo(event)">
+        <div class="grid-2">
+          <div>
+            <label>Cliente em Demonstração *</label>
+            <select id="demo-client" required></select>
+          </div>
+          <div>
+            <label>Selecionar Artigo *</label>
+            <select id="demo-item" required></select>
+          </div>
+          <div>
+            <label>Quantidade *</label>
+            <input type="number" id="demo-qty" min="1" value="1" required />
+          </div>
+          <div>
+            <label>Observações / Prazo Previsto</label>
+            <input type="text" id="demo-notes" placeholder="Ex: Em teste por 15 dias" />
+          </div>
+        </div>
+        <div style="margin-top:16px;">
+          <button type="submit" class="btn btn-primary">Enviar para Demonstração</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="card">
+      <h2>Equipamentos Atualmente em Demonstração</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Data Saída</th>
+              <th>Cliente</th>
+              <th>Artigo</th>
+              <th>Qtd.</th>
+              <th>Notas</th>
+              <th>Ação</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-demos"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABA 5: CRIAR CLIENTE -->
+  <section id="tab-clientes" class="tab-content">
+    <div class="card">
+      <h2>Criar Novo Cliente</h2>
+      <form onsubmit="handleAddClient(event)">
+        <div class="grid-3">
+          <div>
+            <label>Nome do Contacto / Ótica *</label>
+            <input type="text" id="cli-name" required placeholder="Ex: Ótica Central" />
+          </div>
+          <div>
+            <label>Empresa / Sociedade</label>
+            <input type="text" id="cli-company" placeholder="Ex: Central Óptica Lda." />
+          </div>
+          <div>
+            <label>Telefone</label>
+            <input type="text" id="cli-phone" placeholder="Ex: 912 345 678" />
+          </div>
+          <div>
+            <label>Email</label>
+            <input type="email" id="cli-email" placeholder="cliente@exemplo.pt" />
+          </div>
+          <div>
+            <label>Localidade / Notas</label>
+            <input type="text" id="cli-notes" placeholder="Ex: Aveiro" />
+          </div>
+        </div>
+        <div style="margin-top:16px;">
+          <button type="submit" class="btn btn-primary">+ Guardar Cliente</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="card">
+      <h2>Lista de Clientes Registados</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Empresa</th>
+              <th>Telefone</th>
+              <th>Email</th>
+              <th>Notas</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-clientes"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABA 6: ESTATÍSTICAS -->
+  <section id="tab-stats" class="tab-content">
+    <div class="grid-3" style="margin-bottom:20px;">
+      <div class="kpi-box">
+        <div class="kpi-label">Total Unidades em Stock</div>
+        <div class="kpi-value" id="stat-total-stock">0</div>
+      </div>
+      <div class="kpi-box">
+        <div class="kpi-label">Unidades Reservadas</div>
+        <div class="kpi-value" style="color:var(--warning);" id="stat-total-res">0</div>
+      </div>
+      <div class="kpi-box">
+        <div class="kpi-label">Unidades em Demonstração</div>
+        <div class="kpi-value" style="color:var(--success);" id="stat-total-demo">0</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Resumo por Artigo (Stock vs. Reservado vs. Demonstração)</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Artigo</th>
+              <th>Disponível em Stock</th>
+              <th>Reservado</th>
+              <th>Em Demonstração</th>
+              <th>Património Total</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-stats"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
 </main>
 
-<div class="modal" id="modal">
-  <div class="modal-box">
-    <div class="modal-head"><h2 id="modalTitle">Novo registo</h2><button class="btn" type="button" onclick="closeModal()">✕</button></div>
-    <form id="modalForm" onsubmit="submitModal(event)">
-      <div id="modalFields"></div>
-      <button class="btn primary" style="width:100%;margin-top:8px" type="submit" id="saveButton">Guardar</button>
-    </form>
-  </div>
-</div>
-
 <script>
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbynXQerj7yZ5-36fR21JMHh5BqI-poqWUO3lHl0NBdyTDUM_3CjH2bMuBmT4WR8HwgP/exec';
+  // ⚠️ COLE AQUI O URL DA SUA APP DA WEB DO GOOGLE APPS SCRIPT:
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby8300vop-vx7LV0QuxDsNBFMGY9Nfn2Vd6m5tuG-i8vMejzYQE4RDFBq4qrCBOQWPvEw/exec";
 
-let db = {stock:[], clientes:[], reservados:[], historico:[]};
-let modalMode = '';
-let isSaving = false;
-
-const $ = id => document.getElementById(id);
-function msg(t){ $('status').textContent = t; }
-
-function isActive(v){
-  const s = String(v ?? '').trim().toLowerCase();
-  return v !== false && s !== 'false' && s !== 'nao' && s !== 'não' && s !== 'arquivado';
-}
-
-function formatTipo(v){
-  if (v === '' || v === null || v === undefined || !isNaN(Number(v))) return 'Equipamento';
-  return String(v);
-}
-
-function validateScriptUrl(){
-  if (!SCRIPT_URL || !/^https:\/\/script\.google\.com\/macros\/s\/[^/]+\/exec$/.test(SCRIPT_URL)) {
-    throw new Error('Configura o SCRIPT_URL com o endereço da Aplicação Web terminado em /exec.');
-  }
-}
-
-function showTab(tab){
-  document.querySelectorAll('.tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
-  ['stock','reservados','clientes','historico'].forEach(x => $('view-'+x).classList.toggle('hidden', x !== tab));
-}
-
-function esc(v){
-  return String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-}
-
-async function readJsonResponse(response){
-  const text = await response.text();
-  try {
-    return JSON.parse(text);
-  } catch (e) {
-    const preview = text.replace(/\s+/g,' ').slice(0,220);
-    if (/^\s*<!doctype html|^\s*<html/i.test(text) || /accounts\.google\.com|ServiceLogin|sign in/i.test(text)) {
-      throw new Error('O Google devolveu uma página HTML em vez de JSON. Confirma a implementação como Aplicação Web (Acesso: Qualquer pessoa) e o URL /exec.');
-    }
-    throw new Error('Resposta inválida do Apps Script: ' + (preview || '(vazia)'));
-  }
-}
-
-async function loadData(){
-  msg('A carregar dados da Google Sheets...');
-  try {
-    validateScriptUrl();
-    const response = await fetch(SCRIPT_URL + '?t=' + Date.now(), {
-      method:'GET',
-      redirect:'follow'
-    });
-    const data = await readJsonResponse(response);
-    if (!data || data.ok !== true) throw new Error(data && data.error ? data.error : 'A API respondeu sem confirmação.');
-    if (!data.data || !Array.isArray(data.data.stock)) {
-      throw new Error('Estrutura de dados inválida recebida do Code.gs.');
-    }
-    db = data.data;
-    renderAll();
-    msg(Sincronizado com Google Sheets (${db.stock.length} artigos).);
-  } catch(e) {
-    console.error('Erro ao carregar I3O:', e);
-    msg('Falha ao carregar: ' + e.message);
-  }
-}
-
-async function post(payload){
-  if (isSaving) return;
-  validateScriptUrl();
-  isSaving = true;
-  $('saveButton').disabled = true;
-  msg('A guardar na Google Sheets...');
-  try {
-    const response = await fetch(SCRIPT_URL, {
-      method:'POST',
-      redirect:'follow',
-      body: JSON.stringify(payload)
-    });
-    const res = await readJsonResponse(response);
-    if (!res || res.ok !== true) {
-      throw new Error(res && res.error ? res.error : 'Erro ao gravar na folha.');
-    }
-    if (res.data) {
-      db = res.data;
-      renderAll();
-      msg('Alteração gravada e sincronizada com Google Sheets.');
-    } else {
-      await loadData();
-    }
-  } catch(e) {
-    console.error('Erro ao guardar:', e);
-    msg('Erro ao guardar: ' + e.message);
-    throw e;
-  } finally {
-    isSaving = false;
-    $('saveButton').disabled = false;
-  }
-}
-
-function renderAll(){
-  fillSelects();
-  renderStock();
-  renderReservations();
-  renderClients();
-  renderHistory();
-}
-
-function fillSelects(){
-  const current = $('stockCategory').value;
-  const cats = [...new Set(db.stock.filter(x => isActive(x.Ativo)).map(x => x.Categoria).filter(Boolean))].sort();
-  $('stockCategory').innerHTML = '<option value="">Todas as categorias</option>' +
-    cats.map(c => <option value="${esc(c)}">${esc(c)}</option>).join('');
-  $('stockCategory').value = cats.includes(current) ? current : '';
-}
-
-function renderStock(){
-  const q = $('stockSearch').value.toLowerCase();
-  const cat = $('stockCategory').value;
-  const items = db.stock.filter(x =>
-    isActive(x.Ativo) &&
-    (!cat || x.Categoria === cat) &&
-    [x.Nome, x.Categoria, formatTipo(x.Tipo)].join(' ').toLowerCase().includes(q)
-  );
-  $('stockList').innerHTML = items.length ? items.map(x => `
-    <article class="card">
-      <h3>${esc(x.Nome)}</h3>
-      <div class="muted">${esc(x.Categoria || 'Outros')} · ${esc(formatTipo(x.Tipo))}</div>
-      <div class="qty"><span class="muted">Stock</span>
-        <input id="qty-stock-${esc(x.ID)}" type="number" min="0" step="1" value="${Number(x.Stock)||0}" aria-label="Quantidade em stock">
-        <button onclick="saveQty('${esc(x.ID)}','stock',${Number(x.Stock)||0})">Guardar</button>
-      </div>
-      <div class="qty"><span class="muted">Demo</span>
-        <input id="qty-demo-${esc(x.ID)}" type="number" min="0" step="1" value="${Number(x.Demo)||0}" aria-label="Quantidade demo">
-        <button onclick="saveQty('${esc(x.ID)}','demo',${Number(x.Demo)||0})">Guardar</button>
-      </div>
-      <div class="actions">
-        <button class="btn" onclick="reserveThis('${esc(x.ID)}')">Reservar</button>
-        <button class="btn danger" onclick="archiveItem('${esc(x.ID)}')">Arquivar</button>
-      </div>
-    </article>`).join('') : '<div class="empty">Não foram encontrados artigos.</div>';
-}
-
-function saveQty(id,field,current){
-  const input = $('qty-' + field + '-' + id);
-  if (!input) return;
-  const value = Number(input.value);
-  if (!Number.isInteger(value) || value < 0){
-    alert('Introduz uma quantidade inteira igual ou superior a zero.');
-    input.focus();
-    return;
-  }
-  const change = value - Number(current || 0);
-  if (change === 0){
-    msg('A quantidade não foi alterada.');
-    return;
-  }
-  post({action:'updateQty',id,change,field}).catch(e => alert(e.message));
-}
-function archiveItem(id){
-  if(confirm('Arquivar este artigo?')) post({action:'deleteItem',id}).catch(e => alert(e.message));
-}
-
-function renderReservations(){
-  const q = $('reservationSearch').value.toLowerCase();
-  const state = $('reservationState').value;
-  const rows = db.reservados.filter(x =>
-    (!state || x.Estado === state) &&
-    [x.ClienteNome,x.ItemNome,x.ID].join(' ').toLowerCase().includes(q)
-  ).slice().reverse();
-
-  $('reservationList').innerHTML = rows.length ? `
-    <div class="table-wrap"><table><thead><tr>
-      <th>Reserva</th><th>Cliente / Artigo</th><th>Qtd.</th><th>Estado</th><th>Datas</th><th>Ações</th>
-    </tr></thead><tbody>${rows.map(x => `<tr>
-      <td>${esc(String(x.ID).slice(0,8))}<br><span class="muted">${dateFmt(x.DataReserva)}</span></td>
-      <td><b>${esc(x.ClienteNome)}</b><br>${esc(x.ItemNome)}<br><span class="muted">${esc(x.Origem)} · ${esc(x.TipoArtigo)}</span></td>
-      <td>${esc(x.Quantidade)}</td>
-      <td><span class="pill ${x.Estado==='Pendente'?'warn':x.Estado==='Entregue'?'ok':'gray'}">${esc(x.Estado)}</span></td>
-      <td>${dateFmt(x.DataPrevista)}</td>
-      <td>${x.Estado==='Pendente' ? <button class="btn" onclick="reservationAction('${esc(x.ID)}','deliverReservation')">Entregue</button> <button class="btn danger" onclick="reservationAction('${esc(x.ID)}','cancelReservation')">Cancelar</button> : '—'}</td>
-    </tr>).join('')}</tbody></table></div> : '<div class="empty">Ainda não existem reservas.</div>';
-}
-
-function dateFmt(v){
-  if(!v) return '—';
-  const d = new Date(v);
-  return isNaN(d) ? esc(v) : d.toLocaleDateString('pt-PT');
-}
-function reservationAction(id,action){
-  const question = action === 'cancelReservation'
-    ? 'Cancelar a reserva e repor a quantidade no stock?'
-    : 'Confirmar que o artigo foi entregue?';
-  if(confirm(question)) post({action,id}).catch(e => alert(e.message));
-}
-
-function renderClients(){
-  const q = $('clientSearch').value.toLowerCase();
-  const rows = db.clientes.filter(x =>
-    isActive(x.Ativo) &&
-    [x.Nome,x.NIF,x.Contacto,x.Email].join(' ').toLowerCase().includes(q)
-  );
-  $('clientList').innerHTML = rows.length ? rows.map(x => `
-    <article class="card">
-      <h3>${esc(x.Nome)}</h3>
-      <div class="muted">NIF: ${esc(x.NIF || '—')}</div>
-      <p style="margin-top:8px">${esc(x.Contacto || '—')}<br>${esc(x.Email || '')}</p>
-      <div class="actions"><button class="btn danger" onclick="archiveClient('${esc(x.ID)}')">Arquivar</button></div>
-    </article>`).join('') : '<div class="empty">Ainda não existem clientes.</div>';
-}
-function archiveClient(id){
-  if(confirm('Arquivar este cliente?')) post({action:'deleteClient',id}).catch(e => alert(e.message));
-}
-
-function renderHistory(){
-  const rows = db.historico || [];
-  $('historyList').innerHTML = rows.length ? `
-    <div class="table-wrap"><table><thead><tr><th>Data</th><th>Ação</th><th>Descrição</th><th>Qtd.</th></tr></thead>
-    <tbody>${rows.map(x => <tr><td>${dateFmt(x.DataHora)}</td><td>${esc(x.Acao)}</td><td>${esc(x.Descricao)}</td><td>${esc(x.Quantidade)}</td></tr>).join('')}</tbody>
-    </table></div>` : '<div class="empty">Sem movimentos registados.</div>';
-}
-
-function reserveThis(id){
-  showTab('reservados');
-  openModal('reservation',id);
-}
-
-function openModal(mode,preselect=''){
-  modalMode = mode;
-  $('modalForm').reset();
-  const activeClients = db.clientes.filter(x => isActive(x.Ativo));
-  const activeItems = db.stock.filter(x => isActive(x.Ativo));
-
-  const fields = {
-    item: `
-      <div class="field"><label>Nome do artigo</label><input name="nome" required></div>
-      <div class="field"><label>Categoria / Marca</label><input name="categoria" placeholder="Huvitz, Nidek, Acessórios..."></div>
-      <div class="field"><label>Tipo de artigo</label><select name="tipo"><option>Equipamento</option><option>Acessório</option><option>Consumível</option><option>Outro</option></select></div>
-      <div class="field"><label>Stock inicial</label><input name="stock" type="number" min="0" step="1" value="0" required></div>
-      <div class="field"><label>Demo inicial</label><input name="demo" type="number" min="0" step="1" value="0" required></div>`,
-    client: `
-      <div class="field"><label>Nome do cliente</label><input name="nome" required></div>
-      <div class="field"><label>NIF</label><input name="nif"></div>
-      <div class="field"><label>Contacto</label><input name="contacto"></div>
-      <div class="field"><label>Email</label><input name="email" type="email"></div>
-      <div class="field"><label>Morada</label><input name="morada"></div>
-      <div class="field"><label>Observações</label><textarea name="observacoes"></textarea></div>`,
-    reservation: `
-      <div class="field"><label>Cliente</label><select name="clienteId" required>
-        ${activeClients.map(x => <option value="${esc(x.ID)}">${esc(x.Nome)}</option>).join('')}
-      </select></div>
-      <div class="field"><label>Artigo</label><select name="itemId" id="reserveItem" required>
-        ${activeItems.map(x => <option value="${esc(x.ID)}">${esc(x.Nome)} (stock ${Number(x.Stock)||0} · demo ${Number(x.Demo)||0})</option>).join('')}
-      </select></div>
-      <div class="field"><label>Retirar de</label><select name="origem"><option>Stock</option><option>Demo</option></select></div>
-      <div class="field"><label>Quantidade</label><input name="quantidade" type="number" min="1" step="1" value="1" required></div>
-      <div class="field"><label>Data prevista de entrega</label><input name="dataPrevista" type="date"></div>
-      <div class="field"><label>Responsável</label><input name="responsavel"></div>
-      <div class="field"><label>Observações</label><textarea name="observacoes"></textarea></div>`
+  let APP_DATA = {
+    stock: [],
+    clientes: [],
+    reservas: [],
+    demos: [],
+    historico: []
   };
 
-  $('modalTitle').textContent = ({item:'Adicionar artigo',client:'Adicionar cliente',reservation:'Criar reserva'})[mode] || 'Novo registo';
-  $('modalFields').innerHTML = fields[mode] || '';
-  if(mode === 'reservation'){
-    if(!activeClients.length) msg('Para criar uma reserva, primeiro adiciona um cliente.');
-    if(!activeItems.length) msg('Não existem artigos ativos para reservar.');
-    if(preselect && $('reserveItem')) $('reserveItem').value = preselect;
+  function showLoader(show) {
+    document.getElementById('loader').style.display = show ? 'flex' : 'none';
   }
-  $('modal').classList.add('show');
-}
 
-function closeModal(){ $('modal').classList.remove('show'); }
-
-async function submitModal(e){
-  e.preventDefault();
-  const form = e.target;
-  const f = Object.fromEntries(new FormData(form).entries());
-
-  try {
-    if(modalMode === 'item'){
-      f.action = 'addItem';
-      f.stock = Number(f.stock);
-      f.demo = Number(f.demo);
-    }
-    if(modalMode === 'client') f.action = 'addClient';
-    if(modalMode === 'reservation'){
-      if(!f.clienteId) throw new Error('Não existem clientes. Cria primeiro um cliente.');
-      if(!f.itemId) throw new Error('Não existem artigos ativos para reservar.');
-      f.action = 'createReservation';
-      f.quantidade = Number(f.quantidade);
-      f.dataReserva = new Date().toISOString();
-    }
-    await post(f);
-    closeModal();
-  } catch(err) {
-    alert(err.message);
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.style.display = 'block';
+    setTimeout(() => { t.style.display = 'none'; }, 3500);
   }
-}
 
-loadData();
+  function switchTab(tabId, btn) {
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('nav button').forEach(el => el.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  async function loadAllData() {
+    if (SCRIPT_URL.includes("COLE_AQUI")) {
+      showToast("⚠️ Configure primeiro o SCRIPT_URL no código HTML.");
+      return;
+    }
+    showLoader(true);
+    try {
+      const res = await fetch(SCRIPT_URL);
+      const json = await res.json();
+      if (json.status === 'ok') {
+        APP_DATA = json.data;
+        renderAll();
+      } else {
+        alert("Erro ao carregar dados: " + json.message);
+      }
+    } catch (err) {
+      alert("Falha de ligação ao Google Sheets: " + err.message);
+    } finally {
+      showLoader(false);
+    }
+  }
+
+  async function sendPost(payload, successMsg) {
+    if (SCRIPT_URL.includes("COLE_AQUI")) {
+      alert("Configure primeiro o SCRIPT_URL no código HTML.");
+      return false;
+    }
+    showLoader(true);
+    try {
+      const res = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      });
+      const json = await res.json();
+      if (json.status === 'ok') {
+        showToast(successMsg);
+        await loadAllData();
+        return true;
+      } else {
+        alert("Erro: " + json.message);
+        return false;
+      }
+    } catch (err) {
+      alert("Erro de comunicação: " + err.message);
+      return false;
+    } finally {
+      showLoader(false);
+    }
+  }
+
+  function renderAll() {
+    renderStockTable();
+    populateSelects();
+    renderReservas();
+    renderDemos();
+    renderClientes();
+    renderHistory();
+    renderStats();
+  }
+
+  function renderStockTable() {
+    const query = (document.getElementById('search-stock').value || '').toLowerCase();
+    const tbody = document.getElementById('tbody-stock');
+    tbody.innerHTML = '';
+
+    const filtered = APP_DATA.stock.filter(item =>
+      String(item.Nome).toLowerCase().includes(query) ||
+      String(item.Codigo).toLowerCase().includes(query) ||
+      String(item.Categoria).toLowerCase().includes(query)
+    );
+
+    if (filtered.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--muted);">Nenhum artigo encontrado.</td></tr>';
+      return;
+    }
+
+    filtered.forEach(item => {
+      const qty = Number(item.Quantidade) || 0;
+      const min = Number(item.StockMinimo) || 0;
+      let badge = `<span class="badge badge-ok">Disponível</span>`;
+      if (qty === 0) badge = `<span class="badge badge-zero">Sem Stock</span>`;
+      else if (qty <= min) badge = `<span class="badge badge-low">Stock Baixo</span>`;
+
+      tbody.innerHTML += `
+        <tr>
+          <td><strong>${item.Codigo || '-'}</strong></td>
+          <td>${item.Nome}</td>
+          <td>${item.Categoria || '-'}</td>
+          <td><strong>${qty}</strong></td>
+          <td>${badge}</td>
+        </tr>
+      `;
+    });
+  }
+
+  function populateSelects() {
+    const itemSelects = ['mov-item', 'res-item', 'demo-item'];
+    itemSelects.forEach(id => {
+      const sel = document.getElementById(id);
+      sel.innerHTML = '<option value="">-- Selecione um artigo --</option>';
+      APP_DATA.stock.forEach(item => {
+        sel.innerHTML += `<option value="${item.ID}">${item.Nome} (Stock: ${item.Quantidade})</option>`;
+      });
+    });
+
+    const clientSelects = ['res-client', 'demo-client'];
+    clientSelects.forEach(id => {
+      const sel = document.getElementById(id);
+      sel.innerHTML = '<option value="">-- Selecione um cliente --</option>';
+      APP_DATA.clientes.forEach(cli => {
+        sel.innerHTML += `<option value="${cli.ID}" data-nome="${cli.Nome}">${cli.Nome} ${cli.Empresa ? '(' + cli.Empresa + ')' : ''}</option>`;
+      });
+    });
+  }
+
+  function renderReservas() {
+    const tbody = document.getElementById('tbody-reservas');
+    tbody.innerHTML = '';
+    const ativas = APP_DATA.reservas.filter(r => r.Estado === 'Ativa');
+
+    if (ativas.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--muted);">Nenhuma reserva ativa.</td></tr>';
+      return;
+    }
+
+    ativas.forEach(r => {
+      tbody.innerHTML += `
+        <tr>
+          <td>${String(r.Data).split('T')[0]}</td>
+          <td><strong>${r.ClienteNome}</strong></td>
+          <td>${r.ItemNome}</td>
+          <td><span class="badge badge-low">${r.Quantidade}</span></td>
+          <td>${r.Notas || '-'}</td>
+          <td style="display:flex; gap:6px;">
+            <button class="btn btn-success btn-sm" onclick="updateReserva('${r.ID}', 'Concluida')">✓ Concluir Venda</button>
+            <button class="btn btn-danger btn-sm" onclick="updateReserva('${r.ID}', 'Cancelada')">✕ Cancelar (+Stock)</button>
+          </td>
+        </tr>
+      `;
+    });
+  }
+
+  function renderDemos() {
+    const tbody = document.getElementById('tbody-demos');
+    tbody.innerHTML = '';
+    const ativas = APP_DATA.demos.filter(d => d.Estado === 'Em Demonstração');
+
+    if (ativas.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--muted);">Nenhum equipamento em demonstração.</td></tr>';
+      return;
+    }
+
+    ativas.forEach(d => {
+      tbody.innerHTML += `
+        <tr>
+          <td>${String(d.DataInicio).split('T')[0]}</td>
+          <td><strong>${d.ClienteNome}</strong></td>
+          <td>${d.ItemNome}</td>
+          <td><span class="badge badge-info">${d.Quantidade}</span></td>
+          <td>${d.Notas || '-'}</td>
+          <td>
+            <button class="btn btn-success btn-sm" onclick="returnDemo('${d.ID}')">↩ Devolver ao Stock</button>
+          </td>
+        </tr>
+      `;
+    });
+  }
+
+  function renderClientes() {
+    const tbody = document.getElementById('tbody-clientes');
+    tbody.innerHTML = '';
+    if (APP_DATA.clientes.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--muted);">Sem clientes registados.</td></tr>';
+      return;
+    }
+    APP_DATA.clientes.forEach(c => {
+      tbody.innerHTML += `
+        <tr>
+          <td><strong>${c.Nome}</strong></td>
+          <td>${c.Empresa || '-'}</td>
+          <td>${c.Telefone || '-'}</td>
+          <td>${c.Email || '-'}</td>
+          <td>${c.Notas || '-'}</td>
+        </tr>
+      `;
+    });
+  }
+
+  function renderHistory() {
+    const tbody = document.getElementById('tbody-history');
+    tbody.innerHTML = '';
+    APP_DATA.historico.forEach(h => {
+      tbody.innerHTML += `
+        <tr>
+          <td>${h.Data}</td>
+          <td><strong>${h.Tipo}</strong></td>
+          <td>${h.ItemNome}</td>
+          <td>${h.Quantidade}</td>
+          <td>${h.ClienteOuMotivo}</td>
+        </tr>
+      `;
+    });
+  }
+
+  function renderStats() {
+    let totalStock = 0;
+    let totalRes = 0;
+    let totalDemo = 0;
+
+    const ativasRes = APP_DATA.reservas.filter(r => r.Estado === 'Ativa');
+    const ativasDemo = APP_DATA.demos.filter(d => d.Estado === 'Em Demonstração');
+
+    APP_DATA.stock.forEach(i => totalStock += (Number(i.Quantidade) || 0));
+    ativasRes.forEach(r => totalRes += (Number(r.Quantidade) || 0));
+    ativasDemo.forEach(d => totalDemo += (Number(d.Quantidade) || 0));
+
+    document.getElementById('stat-total-stock').textContent = totalStock;
+    document.getElementById('stat-total-res').textContent = totalRes;
+    document.getElementById('stat-total-demo').textContent = totalDemo;
+
+    const tbody = document.getElementById('tbody-stats');
+    tbody.innerHTML = '';
+
+    APP_DATA.stock.forEach(item => {
+      const sQty = Number(item.Quantidade) || 0;
+      const rQty = ativasRes.filter(r => r.ItemID === item.ID).reduce((acc, cur) => acc + Number(cur.Quantidade), 0);
+      const dQty = ativasDemo.filter(d => d.ItemID === item.ID).reduce((acc, cur) => acc + Number(cur.Quantidade), 0);
+      const totalItem = sQty + rQty + dQty;
+
+      tbody.innerHTML += `
+        <tr>
+          <td><strong>${item.Nome}</strong></td>
+          <td>${sQty}</td>
+          <td><span class="badge badge-low">${rQty}</span></td>
+          <td><span class="badge badge-info">${dQty}</span></td>
+          <td><strong>${totalItem}</strong></td>
+        </tr>
+      `;
+    });
+  }
+
+  /* FORM HANDLERS */
+  async function handleAddItem(e) {
+    e.preventDefault();
+    const ok = await sendPost({
+      action: 'ADD_ITEM',
+      codigo: document.getElementById('new-item-code').value,
+      nome: document.getElementById('new-item-name').value,
+      categoria: document.getElementById('new-item-cat').value,
+      quantidade: document.getElementById('new-item-qty').value,
+      stockMinimo: document.getElementById('new-item-min').value
+    }, "Artigo criado com sucesso!");
+    if (ok) e.target.reset();
+  }
+
+  async function handleMoveStock(e) {
+    e.preventDefault();
+    const ok = await sendPost({
+      action: 'MOVE_STOCK',
+      itemId: document.getElementById('mov-item').value,
+      tipo: document.getElementById('mov-type').value,
+      quantidade: document.getElementById('mov-qty').value,
+      motivo: document.getElementById('mov-reason').value
+    }, "Stock atualizado!");
+    if (ok) e.target.reset();
+  }
+
+  async function handleAddClient(e) {
+    e.preventDefault();
+    const ok = await sendPost({
+      action: 'ADD_CLIENT',
+      nome: document.getElementById('cli-name').value,
+      empresa: document.getElementById('cli-company').value,
+      telefone: document.getElementById('cli-phone').value,
+      email: document.getElementById('cli-email').value,
+      notas: document.getElementById('cli-notes').value
+    }, "Cliente guardado!");
+    if (ok) e.target.reset();
+  }
+
+  async function handleAddReserva(e) {
+    e.preventDefault();
+    const cliSelect = document.getElementById('res-client');
+    const clienteNome = cliSelect.options[cliSelect.selectedIndex].getAttribute('data-nome');
+    const ok = await sendPost({
+      action: 'ADD_RESERVA',
+      clienteId: cliSelect.value,
+      clienteNome: clienteNome,
+      itemId: document.getElementById('res-item').value,
+      quantidade: document.getElementById('res-qty').value,
+      notas: document.getElementById('res-notes').value
+    }, "Reserva registada e stock descontado!");
+    if (ok) e.target.reset();
+  }
+
+  async function updateReserva(id, novoEstado) {
+    const msg = novoEstado === 'Cancelada'
+      ? "Cancelar esta reserva e devolver o artigo ao stock?"
+      : "Confirmar que a venda foi concluída?";
+    if (!confirm(msg)) return;
+    await sendPost({ action: 'UPDATE_RESERVA', id, novoEstado }, "Reserva atualizada!");
+  }
+
+  async function handleAddDemo(e) {
+    e.preventDefault();
+    const cliSelect = document.getElementById('demo-client');
+    const clienteNome = cliSelect.options[cliSelect.selectedIndex].getAttribute('data-nome');
+    const ok = await sendPost({
+      action: 'ADD_DEMO',
+      clienteId: cliSelect.value,
+      clienteNome: clienteNome,
+      itemId: document.getElementById('demo-item').value,
+      quantidade: document.getElementById('demo-qty').value,
+      notas: document.getElementById('demo-notes').value
+    }, "Enviado para demonstração e stock descontado!");
+    if (ok) e.target.reset();
+  }
+
+  async function returnDemo(id) {
+    if (!confirm("Confirmar devolução deste equipamento ao stock?")) return;
+    await sendPost({ action: 'RETURN_DEMO', id }, "Equipamento devolvido ao stock!");
+  }
+
+  // Carrega dados ao abrir a página
+  window.addEventListener('DOMContentLoaded', loadAllData);
 </script>
 </body>
 </html>
