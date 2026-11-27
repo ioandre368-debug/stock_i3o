@@ -3,844 +3,518 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Gestão de Stock, Reservas & Demonstrações</title>
+  <title>Gestão de Stock</title>
   <style>
     :root {
-      --primary: #1e40af;
-      --primary-light: #3b82f6;
+      --primary: #1d4ed8;
       --bg: #f1f5f9;
       --card: #ffffff;
       --text: #0f172a;
       --muted: #64748b;
       --border: #e2e8f0;
-      --success: #16a34a;
-      --warning: #d97706;
-      --danger: #dc2626;
-      --radius: 12px;
+      --ok: #15803d;
+      --warn: #b45309;
+      --err: #b91c1c;
     }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background: var(--bg); color: var(--text); padding-bottom: 40px; }
-
-    /* Header & Nav */
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+    body { background: var(--bg); color: var(--text); padding-bottom: 48px; }
     header {
-      background: var(--primary);
-      color: #fff;
-      padding: 16px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 10px;
+      background: var(--primary); color: #fff; padding: 14px 20px;
+      display: flex; justify-content: space-between; align-items: center; gap: 12px;
     }
-    header h1 { font-size: 1.25rem; font-weight: 700; }
-    .btn-refresh {
-      background: rgba(255,255,255,0.18);
-      color: #fff;
-      border: 1px solid rgba(255,255,255,0.3);
-      padding: 6px 14px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: 600;
+    header h1 { font-size: 1.15rem; }
+    .btn-top {
+      background: rgba(255,255,255,0.18); color: #fff; border: 1px solid rgba(255,255,255,0.35);
+      padding: 6px 12px; border-radius: 7px; cursor: pointer; font-weight: 600;
     }
-    .btn-refresh:hover { background: rgba(255,255,255,0.28); }
-
     nav {
-      background: var(--card);
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      overflow-x: auto;
-      padding: 0 12px;
-      gap: 4px;
-      position: sticky;
-      top: 0;
-      z-index: 10;
+      background: var(--card); border-bottom: 1px solid var(--border);
+      display: flex; overflow-x: auto; padding: 0 12px; position: sticky; top: 0; z-index: 10;
     }
     nav button {
-      background: none;
-      border: none;
-      padding: 14px 16px;
-      font-size: 0.92rem;
-      font-weight: 600;
-      color: var(--muted);
-      cursor: pointer;
-      border-bottom: 3px solid transparent;
-      white-space: nowrap;
-      transition: 0.2s;
+      background: none; border: none; padding: 13px 15px; font-weight: 600;
+      color: var(--muted); cursor: pointer; border-bottom: 3px solid transparent; white-space: nowrap;
     }
-    nav button.active {
-      color: var(--primary);
-      border-bottom-color: var(--primary);
-    }
-
-    main { max-width: 1100px; margin: 20px auto; padding: 0 16px; }
-
-    .tab-content { display: none; }
-    .tab-content.active { display: block; }
-
-    /* Cards & Forms */
+    nav button.active { color: var(--primary); border-bottom-color: var(--primary); }
+    main { max-width: 1080px; margin: 20px auto; padding: 0 16px; }
+    .tab { display: none; }
+    .tab.active { display: block; }
     .card {
-      background: var(--card);
-      border-radius: var(--radius);
-      padding: 20px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-      margin-bottom: 20px;
-      border: 1px solid var(--border);
+      background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+      padding: 18px; margin-bottom: 18px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);
     }
-    .card h2 { font-size: 1.1rem; margin-bottom: 14px; color: var(--text); }
-
-    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+    .card h2 { font-size: 1.05rem; margin-bottom: 14px; }
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
     .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; }
-
-    label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 5px; color: var(--muted); }
-    input, select, textarea {
-      width: 100%;
-      padding: 10px 12px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      font-size: 0.95rem;
-      background: #fff;
+    label { display: block; font-size: 0.82rem; font-weight: 600; color: var(--muted); margin-bottom: 4px; }
+    input, select {
+      width: 100%; padding: 9px 11px; border: 1px solid var(--border);
+      border-radius: 7px; font-size: 0.92rem; background: #fff;
     }
-    input:focus, select:focus { outline: none; border-color: var(--primary-light); }
-
     .btn {
-      padding: 10px 18px;
-      border: none;
-      border-radius: 8px;
-      font-weight: 600;
-      font-size: 0.92rem;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
+      padding: 9px 16px; border: none; border-radius: 7px; font-weight: 600;
+      cursor: pointer; font-size: 0.9rem;
     }
     .btn-primary { background: var(--primary); color: #fff; }
-    .btn-primary:hover { background: #1e3a8a; }
-    .btn-success { background: var(--success); color: #fff; }
-    .btn-danger { background: var(--danger); color: #fff; }
-    .btn-sm { padding: 6px 10px; font-size: 0.8rem; }
-
-    /* Tables */
+    .btn-ok { background: var(--ok); color: #fff; }
+    .btn-err { background: var(--err); color: #fff; }
+    .btn-sm { padding: 5px 10px; font-size: 0.8rem; }
     .table-wrap { overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-    th {
-      background: #f8fafc;
-      text-align: left;
-      padding: 11px 12px;
-      font-weight: 700;
-      color: var(--muted);
-      border-bottom: 2px solid var(--border);
-    }
-    td { padding: 11px 12px; border-bottom: 1px solid var(--border); }
-
-    /* Badges */
-    .badge {
-      padding: 3px 9px;
-      border-radius: 999px;
-      font-size: 0.78rem;
-      font-weight: 700;
-      display: inline-block;
-    }
-    .badge-ok { background: #dcfce7; color: #166534; }
-    .badge-low { background: #fef3c7; color: #92400e; }
-    .badge-zero { background: #fee2e2; color: #991b1b; }
-    .badge-info { background: #dbeafe; color: #1e40af; }
-
-    /* Stats KPIs */
-    .kpi-box {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 18px;
-      text-align: center;
-    }
-    .kpi-value { font-size: 2rem; font-weight: 800; color: var(--primary); margin: 6px 0; }
-    .kpi-label { font-size: 0.85rem; font-weight: 600; color: var(--muted); text-transform: uppercase; }
-
-    /* Loader & Toast */
-    #loader {
-      position: fixed; inset: 0; background: rgba(255,255,255,0.75);
-      display: none; align-items: center; justify-content: center; z-index: 999;
-      font-weight: 700; color: var(--primary); font-size: 1.1rem;
-    }
-    #toast {
-      position: fixed; bottom: 20px; right: 20px; background: #0f172a; color: #fff;
-      padding: 12px 18px; border-radius: 10px; font-size: 0.9rem; display: none; z-index: 1000;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    }
+    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    th { text-align: left; padding: 10px; background: #f8fafc; color: var(--muted); border-bottom: 2px solid var(--border); }
+    td { padding: 10px; border-bottom: 1px solid var(--border); }
+    .badge { padding: 2px 8px; border-radius: 999px; font-size: 0.76rem; font-weight: 700; }
+    .b-ok { background: #dcfce7; color: var(--ok); }
+    .b-warn { background: #fef3c7; color: var(--warn); }
+    .b-err { background: #fee2e2; color: var(--err); }
+    .b-info { background: #dbeafe; color: var(--primary); }
+    .kpi { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px; text-align: center; }
+    .kpi-num { font-size: 1.8rem; font-weight: 800; color: var(--primary); margin-top: 4px; }
+    .kpi-lbl { font-size: 0.78rem; font-weight: 700; color: var(--muted); text-transform: uppercase; }
+    #status-bar { font-size: 0.82rem; color: var(--muted); margin-bottom: 12px; }
   </style>
 </head>
 <body>
 
-<div id="loader">A sincronizar com Google Sheets...</div>
-<div id="toast"></div>
-
 <header>
-  <h1>📦 Gestão de Stock & Equipamentos</h1>
-  <button class="btn-refresh" onclick="loadAllData()">↻ Atualizar Dados</button>
+  <h1>Gestão de Stock</h1>
+  <button class="btn-top" onclick="loadData()">Atualizar</button>
 </header>
 
 <nav>
-  <button class="active" onclick="switchTab('tab-stock', this)">1. Stock (Início)</button>
-  <button onclick="switchTab('tab-mov', this)">2. Adicionar / Retirar</button>
-  <button onclick="switchTab('tab-reservas', this)">3. Reservados</button>
-  <button onclick="switchTab('tab-demos', this)">4. Demonstração</button>
-  <button onclick="switchTab('tab-clientes', this)">5. Clientes</button>
-  <button onclick="switchTab('tab-stats', this)">6. Estatísticas</button>
+  <button class="active" onclick="openTab('stock', this)">Stock</button>
+  <button onclick="openTab('mov', this)">Adicionar / Retirar</button>
+  <button onclick="openTab('reservas', this)">Reservados</button>
+  <button onclick="openTab('demos', this)">Demonstração</button>
+  <button onclick="openTab('clientes', this)">Criar Cliente</button>
+  <button onclick="openTab('stats', this)">Estatísticas</button>
 </nav>
 
 <main>
+  <div id="status-bar">Pronto.</div>
 
-  <!-- ABA 1: STOCK (PÁGINA INICIAL) -->
-  <section id="tab-stock" class="tab-content active">
+  <!-- STOCK (INÍCIO) -->
+  <section id="stock" class="tab active">
     <div class="card">
-      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
-        <h2 style="margin:0;">Inventário Atual</h2>
-        <input type="text" id="search-stock" placeholder="Pesquisar por nome, código ou categoria..." style="max-width:300px;" onkeyup="renderStockTable()" />
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
+        <h2 style="margin:0;">Stock Atual</h2>
+        <input type="text" id="filter-stock" placeholder="Filtrar artigo ou código..." style="max-width:260px;" oninput="renderStock()" />
       </div>
       <div class="table-wrap">
         <table>
           <thead>
-            <tr>
-              <th>Código</th>
-              <th>Artigo</th>
-              <th>Categoria</th>
-              <th>Qtd. Disponível</th>
-              <th>Estado</th>
-            </tr>
+            <tr><th>Código</th><th>Artigo</th><th>Categoria</th><th>Stock</th><th>Estado</th></tr>
           </thead>
-          <tbody id="tbody-stock"></tbody>
+          <tbody id="tb-stock"></tbody>
         </table>
       </div>
     </div>
 
     <div class="card">
-      <h2>Cadastrar Novo Artigo no Stock</h2>
-      <form onsubmit="handleAddItem(event)">
+      <h2>Novo Artigo</h2>
+      <form onsubmit="createItem(event)">
         <div class="grid-3">
-          <div>
-            <label>Código / Ref.</label>
-            <input type="text" id="new-item-code" placeholder="Ex: REF-001" />
-          </div>
-          <div>
-            <label>Nome do Artigo *</label>
-            <input type="text" id="new-item-name" required placeholder="Ex: Equipamento X" />
-          </div>
-          <div>
-            <label>Categoria</label>
-            <input type="text" id="new-item-cat" placeholder="Ex: Óptica / Oficina" />
-          </div>
-          <div>
-            <label>Quantidade Inicial *</label>
-            <input type="number" id="new-item-qty" min="0" value="1" required />
-          </div>
-          <div>
-            <label>Alerta Stock Mínimo</label>
-            <input type="number" id="new-item-min" min="0" value="2" />
-          </div>
+          <div><label>Código</label><input id="item-code" placeholder="Ex: ART-01" /></div>
+          <div><label>Nome *</label><input id="item-name" required placeholder="Nome do artigo" /></div>
+          <div><label>Categoria</label><input id="item-cat" placeholder="Categoria" /></div>
+          <div><label>Quantidade Inicial *</label><input id="item-qty" type="number" min="0" value="0" required /></div>
+          <div><label>Stock Mínimo</label><input id="item-min" type="number" min="0" value="1" /></div>
         </div>
-        <div style="margin-top:14px;">
-          <button type="submit" class="btn btn-primary">+ Criar Artigo</button>
-        </div>
+        <div style="margin-top:14px;"><button class="btn btn-primary" type="submit">Guardar Artigo</button></div>
       </form>
     </div>
   </section>
 
-  <!-- ABA 2: ADICIONAR E RETIRAR (SELECIONAR E ESCREVER QUANTIDADE) -->
-  <section id="tab-mov" class="tab-content">
+  <!-- ADICIONAR / RETIRAR -->
+  <section id="mov" class="tab">
     <div class="card">
-      <h2>Movimentar Stock (Entrada / Saída Direta)</h2>
-      <form onsubmit="handleMoveStock(event)">
+      <h2>Adicionar ou Retirar Stock</h2>
+      <form onsubmit="moveStock(event)">
         <div class="grid-2">
+          <div><label>Artigo *</label><select id="mov-item" required></select></div>
           <div>
-            <label>Selecionar Artigo *</label>
-            <select id="mov-item" required></select>
-          </div>
-          <div>
-            <label>Tipo de Movimento *</label>
+            <label>Operação *</label>
             <select id="mov-type" required>
-              <option value="ENTRADA">Adicionar ao Stock (+)</option>
-              <option value="SAIDA">Retirar do Stock (-)</option>
+              <option value="ENTRADA">Adicionar ao Stock</option>
+              <option value="SAIDA">Retirar do Stock</option>
             </select>
           </div>
-          <div>
-            <label>Escrever Quantidade *</label>
-            <input type="number" id="mov-qty" min="1" placeholder="Escreva a quantidade..." required />
-          </div>
-          <div>
-            <label>Motivo / Observação</label>
-            <input type="text" id="mov-reason" placeholder="Ex: Compra fornecedor, venda direta, ajuste..." />
-          </div>
+          <div><label>Quantidade *</label><input id="mov-qty" type="number" min="1" required placeholder="Escreva a quantidade" /></div>
+          <div><label>Motivo</label><input id="mov-reason" placeholder="Opcional" /></div>
         </div>
-        <div style="margin-top:16px;">
-          <button type="submit" class="btn btn-primary">Confirmar Movimento</button>
-        </div>
+        <div style="margin-top:14px;"><button class="btn btn-primary" type="submit">Executar Movimento</button></div>
       </form>
     </div>
 
     <div class="card">
-      <h2>Últimos Movimentos Registados</h2>
+      <h2>Histórico Recente</h2>
       <div class="table-wrap">
         <table>
-          <thead>
-            <tr>
-              <th>Data</th>
-              <th>Operação</th>
-              <th>Artigo</th>
-              <th>Qtd.</th>
-              <th>Cliente / Motivo</th>
-            </tr>
-          </thead>
-          <tbody id="tbody-history"></tbody>
+          <thead><tr><th>Data</th><th>Tipo</th><th>Artigo</th><th>Qtd.</th><th>Detalhe</th></tr></thead>
+          <tbody id="tb-hist"></tbody>
         </table>
       </div>
     </div>
   </section>
 
-  <!-- ABA 3: RESERVADOS (RETIRA DO STOCK AO RESERVAR) -->
-  <section id="tab-reservas" class="tab-content">
+  <!-- RESERVADOS -->
+  <section id="reservas" class="tab">
     <div class="card">
-      <h2>Nova Reserva (Retira do Stock Automaticamente)</h2>
-      <form onsubmit="handleAddReserva(event)">
+      <h2>Nova Reserva (Retira do Stock)</h2>
+      <form onsubmit="addReserva(event)">
         <div class="grid-2">
-          <div>
-            <label>Selecionar Cliente *</label>
-            <select id="res-client" required></select>
-          </div>
-          <div>
-            <label>Selecionar Artigo *</label>
-            <select id="res-item" required></select>
-          </div>
-          <div>
-            <label>Quantidade a Reservar *</label>
-            <input type="number" id="res-qty" min="1" value="1" required />
-          </div>
-          <div>
-            <label>Notas da Reserva</label>
-            <input type="text" id="res-notes" placeholder="Ex: Aguarda adjudicação / sinal pago" />
-          </div>
+          <div><label>Cliente *</label><select id="res-cli" required></select></div>
+          <div><label>Artigo *</label><select id="res-item" required></select></div>
+          <div><label>Quantidade *</label><input id="res-qty" type="number" min="1" value="1" required /></div>
+          <div><label>Notas</label><input id="res-notes" placeholder="Opcional" /></div>
         </div>
-        <div style="margin-top:16px;">
-          <button type="submit" class="btn btn-primary">Reservar e Abater Stock</button>
-        </div>
+        <div style="margin-top:14px;"><button class="btn btn-primary" type="submit">Reservar</button></div>
       </form>
     </div>
 
     <div class="card">
-      <h2>Artigos Atualmente Reservados</h2>
+      <h2>Reservas Ativas</h2>
       <div class="table-wrap">
         <table>
-          <thead>
-            <tr>
-              <th>Data</th>
-              <th>Cliente</th>
-              <th>Artigo</th>
-              <th>Qtd.</th>
-              <th>Notas</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-          <tbody id="tbody-reservas"></tbody>
+          <thead><tr><th>Data</th><th>Cliente</th><th>Artigo</th><th>Qtd.</th><th>Notas</th><th>Ações</th></tr></thead>
+          <tbody id="tb-res"></tbody>
         </table>
       </div>
     </div>
   </section>
 
-  <!-- ABA 4: DEMONSTRAÇÃO (RETIRA DO STOCK AO COLOCAR EM DEMO) -->
-  <section id="tab-demos" class="tab-content">
+  <!-- DEMONSTRAÇÃO -->
+  <section id="demos" class="tab">
     <div class="card">
-      <h2>Colocar Equipamento em Demonstração (Retira do Stock)</h2>
-      <form onsubmit="handleAddDemo(event)">
+      <h2>Colocar em Demonstração (Retira do Stock)</h2>
+      <form onsubmit="addDemo(event)">
         <div class="grid-2">
-          <div>
-            <label>Cliente em Demonstração *</label>
-            <select id="demo-client" required></select>
-          </div>
-          <div>
-            <label>Selecionar Artigo *</label>
-            <select id="demo-item" required></select>
-          </div>
-          <div>
-            <label>Quantidade *</label>
-            <input type="number" id="demo-qty" min="1" value="1" required />
-          </div>
-          <div>
-            <label>Observações / Prazo Previsto</label>
-            <input type="text" id="demo-notes" placeholder="Ex: Em teste por 15 dias" />
-          </div>
+          <div><label>Cliente *</label><select id="demo-cli" required></select></div>
+          <div><label>Artigo *</label><select id="demo-item" required></select></div>
+          <div><label>Quantidade *</label><input id="demo-qty" type="number" min="1" value="1" required /></div>
+          <div><label>Notas</label><input id="demo-notes" placeholder="Opcional" /></div>
         </div>
-        <div style="margin-top:16px;">
-          <button type="submit" class="btn btn-primary">Enviar para Demonstração</button>
-        </div>
+        <div style="margin-top:14px;"><button class="btn btn-primary" type="submit">Enviar para Demo</button></div>
       </form>
     </div>
 
     <div class="card">
-      <h2>Equipamentos Atualmente em Demonstração</h2>
+      <h2>Em Demonstração</h2>
       <div class="table-wrap">
         <table>
-          <thead>
-            <tr>
-              <th>Data Saída</th>
-              <th>Cliente</th>
-              <th>Artigo</th>
-              <th>Qtd.</th>
-              <th>Notas</th>
-              <th>Ação</th>
-            </tr>
-          </thead>
-          <tbody id="tbody-demos"></tbody>
+          <thead><tr><th>Data</th><th>Cliente</th><th>Artigo</th><th>Qtd.</th><th>Notas</th><th>Ação</th></tr></thead>
+          <tbody id="tb-demo"></tbody>
         </table>
       </div>
     </div>
   </section>
 
-  <!-- ABA 5: CRIAR CLIENTE -->
-  <section id="tab-clientes" class="tab-content">
+  <!-- CLIENTES -->
+  <section id="clientes" class="tab">
     <div class="card">
-      <h2>Criar Novo Cliente</h2>
-      <form onsubmit="handleAddClient(event)">
+      <h2>Criar Cliente</h2>
+      <form onsubmit="addClient(event)">
         <div class="grid-3">
-          <div>
-            <label>Nome do Contacto / Ótica *</label>
-            <input type="text" id="cli-name" required placeholder="Ex: Ótica Central" />
-          </div>
-          <div>
-            <label>Empresa / Sociedade</label>
-            <input type="text" id="cli-company" placeholder="Ex: Central Óptica Lda." />
-          </div>
-          <div>
-            <label>Telefone</label>
-            <input type="text" id="cli-phone" placeholder="Ex: 912 345 678" />
-          </div>
-          <div>
-            <label>Email</label>
-            <input type="email" id="cli-email" placeholder="cliente@exemplo.pt" />
-          </div>
-          <div>
-            <label>Localidade / Notas</label>
-            <input type="text" id="cli-notes" placeholder="Ex: Aveiro" />
-          </div>
+          <div><label>Nome *</label><input id="cli-name" required placeholder="Nome do cliente" /></div>
+          <div><label>Empresa</label><input id="cli-comp" placeholder="Empresa" /></div>
+          <div><label>Telefone</label><input id="cli-tel" placeholder="Telefone" /></div>
+          <div><label>Email</label><input id="cli-mail" type="email" placeholder="email@exemplo.com" /></div>
+          <div><label>Notas</label><input id="cli-notes" placeholder="Notas" /></div>
         </div>
-        <div style="margin-top:16px;">
-          <button type="submit" class="btn btn-primary">+ Guardar Cliente</button>
-        </div>
+        <div style="margin-top:14px;"><button class="btn btn-primary" type="submit">Guardar Cliente</button></div>
       </form>
     </div>
 
     <div class="card">
-      <h2>Lista de Clientes Registados</h2>
+      <h2>Clientes</h2>
       <div class="table-wrap">
         <table>
-          <thead>
-            <tr>
-              <th>Nome</th>
-              <th>Empresa</th>
-              <th>Telefone</th>
-              <th>Email</th>
-              <th>Notas</th>
-            </tr>
-          </thead>
-          <tbody id="tbody-clientes"></tbody>
+          <thead><tr><th>Nome</th><th>Empresa</th><th>Telefone</th><th>Email</th><th>Notas</th></tr></thead>
+          <tbody id="tb-cli"></tbody>
         </table>
       </div>
     </div>
   </section>
 
-  <!-- ABA 6: ESTATÍSTICAS -->
-  <section id="tab-stats" class="tab-content">
-    <div class="grid-3" style="margin-bottom:20px;">
-      <div class="kpi-box">
-        <div class="kpi-label">Total Unidades em Stock</div>
-        <div class="kpi-value" id="stat-total-stock">0</div>
-      </div>
-      <div class="kpi-box">
-        <div class="kpi-label">Unidades Reservadas</div>
-        <div class="kpi-value" style="color:var(--warning);" id="stat-total-res">0</div>
-      </div>
-      <div class="kpi-box">
-        <div class="kpi-label">Unidades em Demonstração</div>
-        <div class="kpi-value" style="color:var(--success);" id="stat-total-demo">0</div>
-      </div>
+  <!-- ESTATÍSTICAS -->
+  <section id="stats" class="tab">
+    <div class="grid-3" style="margin-bottom:18px;">
+      <div class="kpi"><div class="kpi-lbl">Em Stock</div><div class="kpi-num" id="st-stock">0</div></div>
+      <div class="kpi"><div class="kpi-lbl">Reservados</div><div class="kpi-num" id="st-res">0</div></div>
+      <div class="kpi"><div class="kpi-lbl">Em Demonstração</div><div class="kpi-num" id="st-demo">0</div></div>
     </div>
 
     <div class="card">
-      <h2>Resumo por Artigo (Stock vs. Reservado vs. Demonstração)</h2>
+      <h2>Detalhe por Artigo</h2>
       <div class="table-wrap">
         <table>
-          <thead>
-            <tr>
-              <th>Artigo</th>
-              <th>Disponível em Stock</th>
-              <th>Reservado</th>
-              <th>Em Demonstração</th>
-              <th>Património Total</th>
-            </tr>
-          </thead>
-          <tbody id="tbody-stats"></tbody>
+          <thead><tr><th>Artigo</th><th>Stock</th><th>Reservado</th><th>Demonstração</th><th>Total</th></tr></thead>
+          <tbody id="tb-stats"></tbody>
         </table>
       </div>
     </div>
   </section>
-
 </main>
 
 <script>
-  // ⚠️ COLE AQUI O URL DA SUA APP DA WEB DO GOOGLE APPS SCRIPT:
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby8300vop-vx7LV0QuxDsNBFMGY9Nfn2Vd6m5tuG-i8vMejzYQE4RDFBq4qrCBOQWPvEw/exec";
+  const API_URL = "https://script.google.com/macros/s/AKfycby8300vop-vx7LV0QuxDsNBFMGY9Nfn2Vd6m5tuG-i8vMejzYQE4RDFBq4qrCBOQWPvEw/exec";
 
-  let APP_DATA = {
-    stock: [],
-    clientes: [],
-    reservas: [],
-    demos: [],
-    historico: []
-  };
+  let DB = { stock: [], clientes: [], reservas: [], demos: [], historico: [] };
 
-  function showLoader(show) {
-    document.getElementById('loader').style.display = show ? 'flex' : 'none';
+  function setStatus(msg) {
+    document.getElementById('status-bar').textContent = msg;
   }
 
-  function showToast(msg) {
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.style.display = 'block';
-    setTimeout(() => { t.style.display = 'none'; }, 3500);
-  }
-
-  function switchTab(tabId, btn) {
-    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-    document.querySelectorAll('nav button').forEach(el => el.classList.remove('active'));
-    document.getElementById(tabId).classList.add('active');
+  function openTab(id, btn) {
+    document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+    document.querySelectorAll('nav button').forEach(function(b) { b.classList.remove('active'); });
+    document.getElementById(id).classList.add('active');
     btn.classList.add('active');
   }
 
-  async function loadAllData() {
-    if (SCRIPT_URL.includes("COLE_AQUI")) {
-      showToast("⚠️ Configure primeiro o SCRIPT_URL no código HTML.");
+  async function loadData() {
+    if (!API_URL || API_URL.includes('COLE_AQUI')) {
+      setStatus('Cola primeiro o URL /exec em API_URL.');
       return;
     }
-    showLoader(true);
+    setStatus('A carregar dados...');
     try {
-      const res = await fetch(SCRIPT_URL);
-      const json = await res.json();
-      if (json.status === 'ok') {
-        APP_DATA = json.data;
-        renderAll();
-      } else {
-        alert("Erro ao carregar dados: " + json.message);
-      }
-    } catch (err) {
-      alert("Falha de ligação ao Google Sheets: " + err.message);
-    } finally {
-      showLoader(false);
+      const r = await fetch(API_URL, { redirect: 'follow' });
+      const j = await r.json();
+      if (j.status !== 'ok') throw new Error(j.message || 'Erro no servidor');
+      DB = j.data;
+      renderAll();
+      setStatus('Dados atualizados.');
+    } catch (e) {
+      setStatus('Erro ao ligar: ' + e.message);
     }
   }
 
-  async function sendPost(payload, successMsg) {
-    if (SCRIPT_URL.includes("COLE_AQUI")) {
-      alert("Configure primeiro o SCRIPT_URL no código HTML.");
+  async function postAction(payload) {
+    if (!API_URL || API_URL.includes('COLE_AQUI')) {
+      alert('Cola primeiro o URL /exec em API_URL.');
       return false;
     }
-    showLoader(true);
+    setStatus('A guardar...');
     try {
-      const res = await fetch(SCRIPT_URL, {
+      const r = await fetch(API_URL, {
         method: 'POST',
+        redirect: 'follow',
         body: JSON.stringify(payload)
       });
-      const json = await res.json();
-      if (json.status === 'ok') {
-        showToast(successMsg);
-        await loadAllData();
-        return true;
-      } else {
-        alert("Erro: " + json.message);
-        return false;
-      }
-    } catch (err) {
-      alert("Erro de comunicação: " + err.message);
+      const j = await r.json();
+      if (j.status !== 'ok') throw new Error(j.message || 'Erro ao guardar');
+      await loadData();
+      return true;
+    } catch (e) {
+      alert('Erro: ' + e.message);
+      setStatus('Falha na operação.');
       return false;
-    } finally {
-      showLoader(false);
     }
   }
 
   function renderAll() {
-    renderStockTable();
-    populateSelects();
+    renderStock();
+    renderSelects();
     renderReservas();
     renderDemos();
     renderClientes();
-    renderHistory();
+    renderHistorico();
     renderStats();
   }
 
-  function renderStockTable() {
-    const query = (document.getElementById('search-stock').value || '').toLowerCase();
-    const tbody = document.getElementById('tbody-stock');
-    tbody.innerHTML = '';
-
-    const filtered = APP_DATA.stock.filter(item =>
-      String(item.Nome).toLowerCase().includes(query) ||
-      String(item.Codigo).toLowerCase().includes(query) ||
-      String(item.Categoria).toLowerCase().includes(query)
-    );
-
-    if (filtered.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--muted);">Nenhum artigo encontrado.</td></tr>';
+  function renderStock() {
+    const q = (document.getElementById('filter-stock').value || '').toLowerCase();
+    const tb = document.getElementById('tb-stock');
+    const list = DB.stock.filter(function(i) {
+      return String(i.Nome).toLowerCase().includes(q) ||
+             String(i.Codigo).toLowerCase().includes(q) ||
+             String(i.Categoria).toLowerCase().includes(q);
+    });
+    if (!list.length) {
+      tb.innerHTML = '<tr><td colspan="5">Sem artigos.</td></tr>';
       return;
     }
-
-    filtered.forEach(item => {
-      const qty = Number(item.Quantidade) || 0;
-      const min = Number(item.StockMinimo) || 0;
-      let badge = `<span class="badge badge-ok">Disponível</span>`;
-      if (qty === 0) badge = `<span class="badge badge-zero">Sem Stock</span>`;
-      else if (qty <= min) badge = `<span class="badge badge-low">Stock Baixo</span>`;
-
-      tbody.innerHTML += `
-        <tr>
-          <td><strong>${item.Codigo || '-'}</strong></td>
-          <td>${item.Nome}</td>
-          <td>${item.Categoria || '-'}</td>
-          <td><strong>${qty}</strong></td>
-          <td>${badge}</td>
-        </tr>
-      `;
-    });
+    tb.innerHTML = list.map(function(i) {
+      const qty = Number(i.Quantidade) || 0;
+      const min = Number(i.StockMinimo) || 0;
+      let badge = '<span class="badge b-ok">OK</span>';
+      if (qty === 0) badge = '<span class="badge b-err">Esgotado</span>';
+      else if (qty <= min) badge = '<span class="badge b-warn">Baixo</span>';
+      return '<tr><td>' + (i.Codigo || '-') + '</td><td><strong>' + i.Nome + '</strong></td><td>' + (i.Categoria || '-') + '</td><td><strong>' + qty + '</strong></td><td>' + badge + '</td></tr>';
+    }).join('');
   }
 
-  function populateSelects() {
-    const itemSelects = ['mov-item', 'res-item', 'demo-item'];
-    itemSelects.forEach(id => {
+  function renderSelects() {
+    ['mov-item', 'res-item', 'demo-item'].forEach(function(id) {
       const sel = document.getElementById(id);
-      sel.innerHTML = '<option value="">-- Selecione um artigo --</option>';
-      APP_DATA.stock.forEach(item => {
-        sel.innerHTML += `<option value="${item.ID}">${item.Nome} (Stock: ${item.Quantidade})</option>`;
-      });
+      sel.innerHTML = '<option value="">Selecione...</option>' + DB.stock.map(function(i) {
+        return '<option value="' + i.ID + '">' + i.Nome + ' (Stock: ' + i.Quantidade + ')</option>';
+      }).join('');
     });
 
-    const clientSelects = ['res-client', 'demo-client'];
-    clientSelects.forEach(id => {
+    ['res-cli', 'demo-cli'].forEach(function(id) {
       const sel = document.getElementById(id);
-      sel.innerHTML = '<option value="">-- Selecione um cliente --</option>';
-      APP_DATA.clientes.forEach(cli => {
-        sel.innerHTML += `<option value="${cli.ID}" data-nome="${cli.Nome}">${cli.Nome} ${cli.Empresa ? '(' + cli.Empresa + ')' : ''}</option>`;
-      });
+      sel.innerHTML = '<option value="">Selecione...</option>' + DB.clientes.map(function(c) {
+        const extra = c.Empresa ? ' - ' + c.Empresa : '';
+        return '<option value="' + c.ID + '" data-nome="' + c.Nome + '">' + c.Nome + extra + '</option>';
+      }).join('');
     });
   }
 
   function renderReservas() {
-    const tbody = document.getElementById('tbody-reservas');
-    tbody.innerHTML = '';
-    const ativas = APP_DATA.reservas.filter(r => r.Estado === 'Ativa');
-
-    if (ativas.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--muted);">Nenhuma reserva ativa.</td></tr>';
+    const tb = document.getElementById('tb-res');
+    const list = DB.reservas.filter(function(r) { return r.Estado === 'Ativa'; });
+    if (!list.length) {
+      tb.innerHTML = '<tr><td colspan="6">Sem reservas ativas.</td></tr>';
       return;
     }
-
-    ativas.forEach(r => {
-      tbody.innerHTML += `
-        <tr>
-          <td>${String(r.Data).split('T')[0]}</td>
-          <td><strong>${r.ClienteNome}</strong></td>
-          <td>${r.ItemNome}</td>
-          <td><span class="badge badge-low">${r.Quantidade}</span></td>
-          <td>${r.Notas || '-'}</td>
-          <td style="display:flex; gap:6px;">
-            <button class="btn btn-success btn-sm" onclick="updateReserva('${r.ID}', 'Concluida')">✓ Concluir Venda</button>
-            <button class="btn btn-danger btn-sm" onclick="updateReserva('${r.ID}', 'Cancelada')">✕ Cancelar (+Stock)</button>
-          </td>
-        </tr>
-      `;
-    });
+    tb.innerHTML = list.map(function(r) {
+      return '<tr><td>' + String(r.Data).slice(0, 10) + '</td><td><strong>' + r.ClienteNome + '</strong></td><td>' + r.ItemNome + '</td><td>' + r.Quantidade + '</td><td>' + (r.Notas || '-') + '</td><td>' +
+        '<button class="btn btn-ok btn-sm" onclick="updReserva(\'' + r.ID + '\', \'Concluida\')">Concluir</button> ' +
+        '<button class="btn btn-err btn-sm" onclick="updReserva(\'' + r.ID + '\', \'Cancelada\')">Cancelar</button></td></tr>';
+    }).join('');
   }
 
   function renderDemos() {
-    const tbody = document.getElementById('tbody-demos');
-    tbody.innerHTML = '';
-    const ativas = APP_DATA.demos.filter(d => d.Estado === 'Em Demonstração');
-
-    if (ativas.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--muted);">Nenhum equipamento em demonstração.</td></tr>';
+    const tb = document.getElementById('tb-demo');
+    const list = DB.demos.filter(function(d) { return d.Estado === 'Em Demonstração'; });
+    if (!list.length) {
+      tb.innerHTML = '<tr><td colspan="6">Nenhum artigo em demonstração.</td></tr>';
       return;
     }
-
-    ativas.forEach(d => {
-      tbody.innerHTML += `
-        <tr>
-          <td>${String(d.DataInicio).split('T')[0]}</td>
-          <td><strong>${d.ClienteNome}</strong></td>
-          <td>${d.ItemNome}</td>
-          <td><span class="badge badge-info">${d.Quantidade}</span></td>
-          <td>${d.Notas || '-'}</td>
-          <td>
-            <button class="btn btn-success btn-sm" onclick="returnDemo('${d.ID}')">↩ Devolver ao Stock</button>
-          </td>
-        </tr>
-      `;
-    });
+    tb.innerHTML = list.map(function(d) {
+      return '<tr><td>' + String(d.DataInicio).slice(0, 10) + '</td><td><strong>' + d.ClienteNome + '</strong></td><td>' + d.ItemNome + '</td><td>' + d.Quantidade + '</td><td>' + (d.Notas || '-') + '</td><td>' +
+        '<button class="btn btn-ok btn-sm" onclick="devDemo(\'' + d.ID + '\')">Devolver</button></td></tr>';
+    }).join('');
   }
 
   function renderClientes() {
-    const tbody = document.getElementById('tbody-clientes');
-    tbody.innerHTML = '';
-    if (APP_DATA.clientes.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--muted);">Sem clientes registados.</td></tr>';
+    const tb = document.getElementById('tb-cli');
+    if (!DB.clientes.length) {
+      tb.innerHTML = '<tr><td colspan="5">Sem clientes.</td></tr>';
       return;
     }
-    APP_DATA.clientes.forEach(c => {
-      tbody.innerHTML += `
-        <tr>
-          <td><strong>${c.Nome}</strong></td>
-          <td>${c.Empresa || '-'}</td>
-          <td>${c.Telefone || '-'}</td>
-          <td>${c.Email || '-'}</td>
-          <td>${c.Notas || '-'}</td>
-        </tr>
-      `;
-    });
+    tb.innerHTML = DB.clientes.map(function(c) {
+      return '<tr><td><strong>' + c.Nome + '</strong></td><td>' + (c.Empresa || '-') + '</td><td>' + (c.Telefone || '-') + '</td><td>' + (c.Email || '-') + '</td><td>' + (c.Notas || '-') + '</td></tr>';
+    }).join('');
   }
 
-  function renderHistory() {
-    const tbody = document.getElementById('tbody-history');
-    tbody.innerHTML = '';
-    APP_DATA.historico.forEach(h => {
-      tbody.innerHTML += `
-        <tr>
-          <td>${h.Data}</td>
-          <td><strong>${h.Tipo}</strong></td>
-          <td>${h.ItemNome}</td>
-          <td>${h.Quantidade}</td>
-          <td>${h.ClienteOuMotivo}</td>
-        </tr>
-      `;
-    });
+  function renderHistorico() {
+    const tb = document.getElementById('tb-hist');
+    if (!DB.historico.length) {
+      tb.innerHTML = '<tr><td colspan="5">Sem movimentos.</td></tr>';
+      return;
+    }
+    tb.innerHTML = DB.historico.map(function(h) {
+      return '<tr><td>' + h.Data + '</td><td>' + h.Tipo + '</td><td>' + h.ItemNome + '</td><td>' + h.Quantidade + '</td><td>' + (h.ClienteOuMotivo || '-') + '</td></tr>';
+    }).join('');
   }
 
   function renderStats() {
-    let totalStock = 0;
-    let totalRes = 0;
-    let totalDemo = 0;
+    const activeRes = DB.reservas.filter(function(r) { return r.Estado === 'Ativa'; });
+    const activeDemo = DB.demos.filter(function(d) { return d.Estado === 'Em Demonstração'; });
 
-    const ativasRes = APP_DATA.reservas.filter(r => r.Estado === 'Ativa');
-    const ativasDemo = APP_DATA.demos.filter(d => d.Estado === 'Em Demonstração');
+    const totStock = DB.stock.reduce(function(a, i) { return a + (Number(i.Quantidade) || 0); }, 0);
+    const totRes = activeRes.reduce(function(a, r) { return a + (Number(r.Quantidade) || 0); }, 0);
+    const totDemo = activeDemo.reduce(function(a, d) { return a + (Number(d.Quantidade) || 0); }, 0);
 
-    APP_DATA.stock.forEach(i => totalStock += (Number(i.Quantidade) || 0));
-    ativasRes.forEach(r => totalRes += (Number(r.Quantidade) || 0));
-    ativasDemo.forEach(d => totalDemo += (Number(d.Quantidade) || 0));
+    document.getElementById('st-stock').textContent = totStock;
+    document.getElementById('st-res').textContent = totRes;
+    document.getElementById('st-demo').textContent = totDemo;
 
-    document.getElementById('stat-total-stock').textContent = totalStock;
-    document.getElementById('stat-total-res').textContent = totalRes;
-    document.getElementById('stat-total-demo').textContent = totalDemo;
-
-    const tbody = document.getElementById('tbody-stats');
-    tbody.innerHTML = '';
-
-    APP_DATA.stock.forEach(item => {
-      const sQty = Number(item.Quantidade) || 0;
-      const rQty = ativasRes.filter(r => r.ItemID === item.ID).reduce((acc, cur) => acc + Number(cur.Quantidade), 0);
-      const dQty = ativasDemo.filter(d => d.ItemID === item.ID).reduce((acc, cur) => acc + Number(cur.Quantidade), 0);
-      const totalItem = sQty + rQty + dQty;
-
-      tbody.innerHTML += `
-        <tr>
-          <td><strong>${item.Nome}</strong></td>
-          <td>${sQty}</td>
-          <td><span class="badge badge-low">${rQty}</span></td>
-          <td><span class="badge badge-info">${dQty}</span></td>
-          <td><strong>${totalItem}</strong></td>
-        </tr>
-      `;
-    });
+    const tb = document.getElementById('tb-stats');
+    if (!DB.stock.length) {
+      tb.innerHTML = '<tr><td colspan="5">Sem dados.</td></tr>';
+      return;
+    }
+    tb.innerHTML = DB.stock.map(function(i) {
+      const s = Number(i.Quantidade) || 0;
+      const r = activeRes.filter(function(x) { return x.ItemID === i.ID; }).reduce(function(a, x) { return a + (Number(x.Quantidade) || 0); }, 0);
+      const d = activeDemo.filter(function(x) { return x.ItemID === i.ID; }).reduce(function(a, x) { return a + (Number(x.Quantidade) || 0); }, 0);
+      return '<tr><td><strong>' + i.Nome + '</strong></td><td>' + s + '</td><td>' + r + '</td><td>' + d + '</td><td><strong>' + (s + r + d) + '</strong></td></tr>';
+    }).join('');
   }
 
-  /* FORM HANDLERS */
-  async function handleAddItem(e) {
+  async function createItem(e) {
     e.preventDefault();
-    const ok = await sendPost({
+    const ok = await postAction({
       action: 'ADD_ITEM',
-      codigo: document.getElementById('new-item-code').value,
-      nome: document.getElementById('new-item-name').value,
-      categoria: document.getElementById('new-item-cat').value,
-      quantidade: document.getElementById('new-item-qty').value,
-      stockMinimo: document.getElementById('new-item-min').value
-    }, "Artigo criado com sucesso!");
+      codigo: document.getElementById('item-code').value,
+      nome: document.getElementById('item-name').value,
+      categoria: document.getElementById('item-cat').value,
+      quantidade: document.getElementById('item-qty').value,
+      stockMinimo: document.getElementById('item-min').value
+    });
     if (ok) e.target.reset();
   }
 
-  async function handleMoveStock(e) {
+  async function moveStock(e) {
     e.preventDefault();
-    const ok = await sendPost({
+    const ok = await postAction({
       action: 'MOVE_STOCK',
       itemId: document.getElementById('mov-item').value,
       tipo: document.getElementById('mov-type').value,
       quantidade: document.getElementById('mov-qty').value,
       motivo: document.getElementById('mov-reason').value
-    }, "Stock atualizado!");
+    });
     if (ok) e.target.reset();
   }
 
-  async function handleAddClient(e) {
+  async function addClient(e) {
     e.preventDefault();
-    const ok = await sendPost({
+    const ok = await postAction({
       action: 'ADD_CLIENT',
       nome: document.getElementById('cli-name').value,
-      empresa: document.getElementById('cli-company').value,
-      telefone: document.getElementById('cli-phone').value,
-      email: document.getElementById('cli-email').value,
+      empresa: document.getElementById('cli-comp').value,
+      telefone: document.getElementById('cli-tel').value,
+      email: document.getElementById('cli-mail').value,
       notas: document.getElementById('cli-notes').value
-    }, "Cliente guardado!");
+    });
     if (ok) e.target.reset();
   }
 
-  async function handleAddReserva(e) {
+  async function addReserva(e) {
     e.preventDefault();
-    const cliSelect = document.getElementById('res-client');
-    const clienteNome = cliSelect.options[cliSelect.selectedIndex].getAttribute('data-nome');
-    const ok = await sendPost({
+    const sel = document.getElementById('res-cli');
+    const cliNome = sel.options[sel.selectedIndex].getAttribute('data-nome');
+    const ok = await postAction({
       action: 'ADD_RESERVA',
-      clienteId: cliSelect.value,
-      clienteNome: clienteNome,
+      clienteId: sel.value,
+      clienteNome: cliNome,
       itemId: document.getElementById('res-item').value,
       quantidade: document.getElementById('res-qty').value,
       notas: document.getElementById('res-notes').value
-    }, "Reserva registada e stock descontado!");
+    });
     if (ok) e.target.reset();
   }
 
-  async function updateReserva(id, novoEstado) {
-    const msg = novoEstado === 'Cancelada'
-      ? "Cancelar esta reserva e devolver o artigo ao stock?"
-      : "Confirmar que a venda foi concluída?";
-    if (!confirm(msg)) return;
-    await sendPost({ action: 'UPDATE_RESERVA', id, novoEstado }, "Reserva atualizada!");
+  async function updReserva(id, novoEstado) {
+    if (!confirm(novoEstado === 'Cancelada' ? 'Cancelar reserva e repor stock?' : 'Concluir reserva?')) return;
+    await postAction({ action: 'UPDATE_RESERVA', id: id, novoEstado: novoEstado });
   }
 
-  async function handleAddDemo(e) {
+  async function addDemo(e) {
     e.preventDefault();
-    const cliSelect = document.getElementById('demo-client');
-    const clienteNome = cliSelect.options[cliSelect.selectedIndex].getAttribute('data-nome');
-    const ok = await sendPost({
+    const sel = document.getElementById('demo-cli');
+    const cliNome = sel.options[sel.selectedIndex].getAttribute('data-nome');
+    const ok = await postAction({
       action: 'ADD_DEMO',
-      clienteId: cliSelect.value,
-      clienteNome: clienteNome,
+      clienteId: sel.value,
+      clienteNome: cliNome,
       itemId: document.getElementById('demo-item').value,
       quantidade: document.getElementById('demo-qty').value,
       notas: document.getElementById('demo-notes').value
-    }, "Enviado para demonstração e stock descontado!");
+    });
     if (ok) e.target.reset();
   }
 
-  async function returnDemo(id) {
-    if (!confirm("Confirmar devolução deste equipamento ao stock?")) return;
-    await sendPost({ action: 'RETURN_DEMO', id }, "Equipamento devolvido ao stock!");
+  async function devDemo(id) {
+    if (!confirm('Registar devolução ao stock?')) return;
+    await postAction({ action: 'RETURN_DEMO', id: id });
   }
 
-  // Carrega dados ao abrir a página
-  window.addEventListener('DOMContentLoaded', loadAllData);
+  window.addEventListener('DOMContentLoaded', loadData);
 </script>
 </body>
 </html>
