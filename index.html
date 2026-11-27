@@ -145,6 +145,11 @@
       box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
     }
 
+    .card.highlight {
+      border-color: #93c5fd;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.08);
+    }
+
     .card-head {
       display: flex;
       justify-content: space-between;
@@ -155,6 +160,7 @@
     }
 
     .card h2 { font-size: 1.02rem; font-weight: 700; letter-spacing: -0.01em; }
+    .card h3 { font-size: 0.9rem; font-weight: 700; color: var(--muted); margin: 16px 0 10px; text-transform: uppercase; letter-spacing: 0.03em; }
 
     .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; }
     .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(185px, 1fr)); gap: 14px; }
@@ -304,7 +310,7 @@
     <button onclick="openTab('mov', this)">Definir Quantidade</button>
     <button onclick="openTab('reservas', this)">Reservados</button>
     <button onclick="openTab('demos', this)">Demonstração</button>
-    <button onclick="openTab('clientes', this)">Criar Cliente</button>
+    <button onclick="openTab('clientes', this)">Clientes</button>
     <button onclick="openTab('stats', this)">Estatísticas</button>
   </div>
 </nav>
@@ -326,7 +332,9 @@
               <th>Código</th>
               <th>Artigo</th>
               <th>Categoria</th>
-              <th>Stock</th>
+              <th>Disponível</th>
+              <th>Reservado</th>
+              <th>Em Demo</th>
               <th>Estado</th>
             </tr>
           </thead>
@@ -491,10 +499,78 @@
     </div>
   </section>
 
-  <!-- CLIENTES -->
+  <!-- CLIENTES (INTERATIVO + FICHA DETALHADA) -->
   <section id="clientes" class="tab">
     <div class="card">
-      <h2>Criar Cliente</h2>
+      <div class="card-head">
+        <h2>Clientes & Equipamentos Alocados</h2>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <input type="text" id="filter-cli" class="search-input" placeholder="Pesquisar cliente..." oninput="renderClientes()" />
+          <button class="btn btn-secondary btn-sm" type="button" onclick="syncSheetsTabs()">Sincronizar Abas no Sheets</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Cliente</th>
+              <th>Empresa</th>
+              <th>Contacto</th>
+              <th>Reservados</th>
+              <th>Em Demo</th>
+              <th>Ficha</th>
+            </tr>
+          </thead>
+          <tbody id="tb-cli"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- FICHA INTERATIVA DO CLIENTE SELECIONADO -->
+    <div id="client-detail-card" class="card highlight" style="display:none;">
+      <div class="card-head">
+        <h2 id="client-detail-title">Ficha do Cliente</h2>
+        <button class="btn btn-secondary btn-sm" type="button" onclick="closeClientDetail()">Fechar Ficha</button>
+      </div>
+      <p id="client-detail-meta" style="font-size:0.85rem; color:var(--muted); margin-bottom:12px;"></p>
+
+      <h3>Reservas deste Cliente</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Artigo</th>
+              <th>Qtd.</th>
+              <th>Estado</th>
+              <th>Notas</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="tb-client-res"></tbody>
+        </table>
+      </div>
+
+      <h3>Equipamentos em Demonstração neste Cliente</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Data Saída</th>
+              <th>Artigo</th>
+              <th>Qtd.</th>
+              <th>Estado</th>
+              <th>Notas</th>
+              <th>Ação</th>
+            </tr>
+          </thead>
+          <tbody id="tb-client-demo"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Criar Novo Cliente</h2>
       <form onsubmit="addClient(event)">
         <div class="grid-3">
           <div><label>Nome *</label><input id="cli-name" required placeholder="Nome do cliente" /></div>
@@ -507,24 +583,6 @@
           <button class="btn btn-primary" type="submit">Guardar Cliente</button>
         </div>
       </form>
-    </div>
-
-    <div class="card">
-      <h2>Clientes</h2>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Nome</th>
-              <th>Empresa</th>
-              <th>Telefone</th>
-              <th>Email</th>
-              <th>Notas</th>
-            </tr>
-          </thead>
-          <tbody id="tb-cli"></tbody>
-        </table>
-      </div>
     </div>
   </section>
 
@@ -570,6 +628,7 @@
 
   let DB = { stock: [], clientes: [], reservas: [], demos: [], historico: [] };
   let BULK_DRAFT = {};
+  let SELECTED_CLIENT_ID = null;
 
   function setStatus(msg) {
     document.getElementById('status-bar').textContent = msg;
@@ -668,6 +727,7 @@
     renderReservas();
     renderDemos();
     renderClientes();
+    if (SELECTED_CLIENT_ID) openClientDetail(SELECTED_CLIENT_ID, false);
     renderHistorico();
     renderStats();
   }
@@ -675,22 +735,37 @@
   function renderStock() {
     const q = (document.getElementById('filter-stock').value || '').toLowerCase();
     const tb = document.getElementById('tb-stock');
+    const activeRes = DB.reservas.filter(function(r) { return r.Estado === 'Ativa'; });
+    const activeDemo = DB.demos.filter(function(d) { return d.Estado === 'Em Demonstração'; });
+
     const list = DB.stock.filter(function(i) {
       return String(i.Nome).toLowerCase().includes(q) ||
              String(i.Codigo).toLowerCase().includes(q) ||
              String(i.Categoria).toLowerCase().includes(q);
     });
     if (!list.length) {
-      tb.innerHTML = '<tr><td colspan="5" class="empty-row">Sem artigos registados.</td></tr>';
+      tb.innerHTML = '<tr><td colspan="7" class="empty-row">Sem artigos registados.</td></tr>';
       return;
     }
     tb.innerHTML = list.map(function(i) {
       const qty = Number(i.Quantidade) || 0;
       const min = Number(i.StockMinimo) || 0;
+      const resCount = activeRes.filter(function(r) { return String(r.ItemID) === String(i.ID); }).reduce(function(a, r) { return a + (Number(r.Quantidade) || 0); }, 0);
+      const demoCount = activeDemo.filter(function(d) { return String(d.ItemID) === String(i.ID); }).reduce(function(a, d) { return a + (Number(d.Quantidade) || 0); }, 0);
+
       let badge = '<span class="badge b-ok">Disponível</span>';
       if (qty === 0) badge = '<span class="badge b-err">Esgotado</span>';
       else if (qty <= min) badge = '<span class="badge b-warn">Stock baixo</span>';
-      return '<tr><td>' + (i.Codigo || '-') + '</td><td><strong>' + i.Nome + '</strong></td><td>' + (i.Categoria || '-') + '</td><td><strong>' + qty + '</strong></td><td>' + badge + '</td></tr>';
+
+      return '<tr>' +
+        '<td>' + (i.Codigo || '-') + '</td>' +
+        '<td><strong>' + i.Nome + '</strong></td>' +
+        '<td>' + (i.Categoria || '-') + '</td>' +
+        '<td><strong>' + qty + '</strong></td>' +
+        '<td>' + (resCount > 0 ? '<span class="badge b-warn">' + resCount + '</span>' : '0') + '</td>' +
+        '<td>' + (demoCount > 0 ? '<span class="badge b-info">' + demoCount + '</span>' : '0') + '</td>' +
+        '<td>' + badge + '</td>' +
+      '</tr>';
     }).join('');
   }
 
@@ -832,14 +907,97 @@
   }
 
   function renderClientes() {
+    const q = (document.getElementById('filter-cli').value || '').toLowerCase();
     const tb = document.getElementById('tb-cli');
-    if (!DB.clientes.length) {
-      tb.innerHTML = '<tr><td colspan="5" class="empty-row">Sem clientes registados.</td></tr>';
+    const activeRes = DB.reservas.filter(function(r) { return r.Estado === 'Ativa'; });
+    const activeDemo = DB.demos.filter(function(d) { return d.Estado === 'Em Demonstração'; });
+
+    const list = DB.clientes.filter(function(c) {
+      return String(c.Nome).toLowerCase().includes(q) ||
+             String(c.Empresa).toLowerCase().includes(q) ||
+             String(c.Notas).toLowerCase().includes(q);
+    });
+
+    if (!list.length) {
+      tb.innerHTML = '<tr><td colspan="6" class="empty-row">Sem clientes registados.</td></tr>';
       return;
     }
-    tb.innerHTML = DB.clientes.map(function(c) {
-      return '<tr><td><strong>' + c.Nome + '</strong></td><td>' + (c.Empresa || '-') + '</td><td>' + (c.Telefone || '-') + '</td><td>' + (c.Email || '-') + '</td><td>' + (c.Notas || '-') + '</td></tr>';
+
+    tb.innerHTML = list.map(function(c) {
+      const resTotal = activeRes.filter(function(r) { return String(r.ClienteID) === String(c.ID) || r.ClienteNome === c.Nome; })
+        .reduce(function(a, r) { return a + (Number(r.Quantidade) || 0); }, 0);
+      const demoTotal = activeDemo.filter(function(d) { return String(d.ClienteID) === String(c.ID) || d.ClienteNome === c.Nome; })
+        .reduce(function(a, d) { return a + (Number(d.Quantidade) || 0); }, 0);
+
+      const contact = [c.Telefone, c.Email].filter(Boolean).join(' · ') || '-';
+      return '<tr>' +
+        '<td><strong>' + c.Nome + '</strong></td>' +
+        '<td>' + (c.Empresa || '-') + '</td>' +
+        '<td>' + contact + '</td>' +
+        '<td><span class="badge b-warn">' + resTotal + ' un.</span></td>' +
+        '<td><span class="badge b-info">' + demoTotal + ' un.</span></td>' +
+        '<td><button class="btn btn-primary btn-sm" type="button" onclick="openClientDetail(\'' + c.ID + '\', true)">Ver Equipamentos</button></td>' +
+      '</tr>';
     }).join('');
+  }
+
+  function openClientDetail(clienteId, scrollToCard) {
+    SELECTED_CLIENT_ID = clienteId;
+    const cli = DB.clientes.find(function(c) { return String(c.ID) === String(clienteId); });
+    if (!cli) return;
+
+    const card = document.getElementById('client-detail-card');
+    card.style.display = 'block';
+    document.getElementById('client-detail-title').textContent = 'Ficha do Cliente: ' + cli.Nome + (cli.Empresa ? ' (' + cli.Empresa + ')' : '');
+    document.getElementById('client-detail-meta').textContent = [cli.Telefone, cli.Email, cli.Notas].filter(Boolean).join(' | ') || 'Sem notas adicionais.';
+
+    const cliReservas = DB.reservas.filter(function(r) {
+      return String(r.ClienteID) === String(cli.ID) || r.ClienteNome === cli.Nome;
+    });
+    const tbRes = document.getElementById('tb-client-res');
+    if (!cliReservas.length) {
+      tbRes.innerHTML = '<tr><td colspan="6" class="empty-row">Nenhuma reserva registada para este cliente.</td></tr>';
+    } else {
+      tbRes.innerHTML = cliReservas.map(function(r) {
+        const isAtiva = r.Estado === 'Ativa';
+        const statusBadge = isAtiva
+          ? '<span class="badge b-warn">Ativa</span>'
+          : (r.Estado === 'Concluida' ? '<span class="badge b-ok">Concluída</span>' : '<span class="badge b-err">Cancelada</span>');
+        const actions = isAtiva
+          ? '<button class="btn btn-ok btn-sm" onclick="updReserva(\'' + r.ID + '\', \'Concluida\')">Concluir</button> <button class="btn btn-err btn-sm" onclick="updReserva(\'' + r.ID + '\', \'Cancelada\')">Cancelar</button>'
+          : '-';
+        return '<tr><td>' + String(r.Data).slice(0, 10) + '</td><td><strong>' + r.ItemNome + '</strong></td><td>' + r.Quantidade + '</td><td>' + statusBadge + '</td><td>' + (r.Notas || '-') + '</td><td class="actions-cell">' + actions + '</td></tr>';
+      }).join('');
+    }
+
+    const cliDemos = DB.demos.filter(function(d) {
+      return String(d.ClienteID) === String(cli.ID) || d.ClienteNome === cli.Nome;
+    });
+    const tbDemo = document.getElementById('tb-client-demo');
+    if (!cliDemos.length) {
+      tbDemo.innerHTML = '<tr><td colspan="6" class="empty-row">Nenhum equipamento em demonstração para este cliente.</td></tr>';
+    } else {
+      tbDemo.innerHTML = cliDemos.map(function(d) {
+        const isAtiva = d.Estado === 'Em Demonstração';
+        const statusBadge = isAtiva ? '<span class="badge b-info">Em Demonstração</span>' : '<span class="badge b-ok">Devolvido</span>';
+        const action = isAtiva ? '<button class="btn btn-ok btn-sm" onclick="devDemo(\'' + d.ID + '\')">Devolver</button>' : '-';
+        return '<tr><td>' + String(d.DataInicio).slice(0, 10) + '</td><td><strong>' + d.ItemNome + '</strong></td><td>' + d.Quantidade + '</td><td>' + statusBadge + '</td><td>' + (d.Notas || '-') + '</td><td>' + action + '</td></tr>';
+      }).join('');
+    }
+
+    if (scrollToCard) {
+      card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
+  function closeClientDetail() {
+    SELECTED_CLIENT_ID = null;
+    document.getElementById('client-detail-card').style.display = 'none';
+  }
+
+  async function syncSheetsTabs() {
+    await postAction({ action: 'SYNC_CLIENT_SHEETS' });
+    setStatus('Abas por cliente sincronizadas no Google Sheets.');
   }
 
   function renderHistorico() {
