@@ -290,27 +290,46 @@
     }
   }
 
-  async function postAction(payload) {
-    if (!API_URL || API_URL.includes('COLE_AQUI')) {
-      alert('Cola primeiro o URL /exec em API_URL.');
-      return false;
-    }
-    setStatus('A guardar...');
-    try {
-      const r = await fetch(API_URL, {
-        method: 'POST',
-        redirect: 'follow',
-        body: JSON.stringify(payload)
-      });
-      const j = await r.json();
-      if (j.status !== 'ok') throw new Error(j.message || 'Erro ao guardar');
-      await loadData();
-      return true;
-    } catch (e) {
-      alert('Erro: ' + e.message);
-      setStatus('Falha na operação.');
-      return false;
-    }
+  function postAction(payload) {
+    return new Promise(function(resolve) {
+      if (!API_URL || API_URL.includes('COLE_AQUI')) {
+        alert('Cola primeiro o URL /exec em API_URL.');
+        resolve(false);
+        return;
+      }
+
+      setStatus('A enviar para o Google Sheets...');
+      const frameName = 'hidden_gs_frame';
+      let iframe = document.getElementById(frameName);
+      if (!iframe) {
+        iframe = document.createElement('iframe');
+        iframe.id = frameName;
+        iframe.name = frameName;
+        iframe.style.display = 'none';
+        document.body.appendChild(iframe);
+      }
+
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = API_URL;
+      form.target = frameName;
+      form.style.display = 'none';
+
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = 'payload';
+      input.value = JSON.stringify(payload);
+      form.appendChild(input);
+
+      document.body.appendChild(form);
+      form.submit();
+      document.body.removeChild(form);
+
+      setTimeout(async function() {
+        await loadData();
+        resolve(true);
+      }, 1600);
+    });
   }
 
   function renderAll() {
