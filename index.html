@@ -178,6 +178,13 @@
       transition: border-color 0.15s ease, box-shadow 0.15s ease;
     }
 
+    input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
     input:focus, select:focus {
       outline: none;
       border-color: var(--accent);
@@ -186,7 +193,7 @@
 
     .search-input { max-width: 280px; background: var(--surface-subtle); }
 
-    .form-actions { margin-top: 16px; display: flex; gap: 10px; }
+    .form-actions { margin-top: 16px; display: flex; gap: 10px; flex-wrap: wrap; }
 
     .btn {
       padding: 10px 18px;
@@ -201,6 +208,8 @@
     .btn:active { transform: scale(0.99); }
     .btn-primary { background: var(--accent); color: #ffffff; }
     .btn-primary:hover { background: var(--accent-hover); }
+    .btn-secondary { background: var(--surface-subtle); color: var(--text); border: 1px solid var(--border); }
+    .btn-secondary:hover { background: #eef2f6; }
     .btn-ok { background: var(--ok-bg); color: var(--ok-fg); }
     .btn-ok:hover { background: #bbf7d0; }
     .btn-err { background: var(--err-bg); color: var(--err-fg); }
@@ -274,6 +283,7 @@
 
     .empty-row { text-align: center; color: var(--muted); padding: 24px 14px; }
     .actions-cell { display: flex; gap: 6px; flex-wrap: wrap; }
+    .bulk-qty-input { width: 95px; padding: 7px 9px; }
   </style>
 </head>
 <body>
@@ -379,7 +389,7 @@
   <!-- RESERVADOS -->
   <section id="reservas" class="tab">
     <div class="card">
-      <h2>Nova Reserva</h2>
+      <h2>Nova Reserva Simples</h2>
       <form onsubmit="addReserva(event)">
         <div class="grid-2">
           <div><label>Cliente *</label><select id="res-cli" required></select></div>
@@ -391,6 +401,37 @@
           <button class="btn btn-primary" type="submit">Reservar</button>
         </div>
       </form>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h2>Reserva em Massa (Vários Artigos)</h2>
+        <input type="text" id="filter-bulk-res" class="search-input" placeholder="Filtrar artigos..." oninput="renderBulkReservas()" />
+      </div>
+
+      <div class="grid-2" style="margin-bottom: 16px;">
+        <div><label>Cliente *</label><select id="bulk-res-cli"></select></div>
+        <div><label>Notas da Reserva em Massa</label><input id="bulk-res-notes" placeholder="Opcional (aplicado a todos os marcados)" /></div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 44px;"><input type="checkbox" id="bulk-res-all" onchange="toggleAllBulkRes(this.checked)" /></th>
+              <th>Artigo</th>
+              <th>Disponível</th>
+              <th>Qtd. a Reservar</th>
+            </tr>
+          </thead>
+          <tbody id="tb-bulk-res"></tbody>
+        </table>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn btn-primary" type="button" onclick="submitBulkReservas()">Reservar Selecionados</button>
+        <button class="btn btn-secondary" type="button" onclick="clearBulkSelection()">Limpar Seleção</button>
+      </div>
     </div>
 
     <div class="card">
@@ -525,9 +566,10 @@
 </main>
 
 <script>
-  const API_URL = "https://script.google.com/macros/s/AKfycbyEI56ccNkMw9rQRc6YlmoxuDNyNhftDm5Z0Q0ChXU0h74wRoZVF6w7udSbs_orJSp2kw/exec";
+  const API_URL = "https://script.google.com/macros/s/AKfycby8300vop-vx7LV0QuxDsNBFMGY9Nfn2Vd6m5tuG-i8vMejzYQE4RDFBq4qrCBOQWPvEw/exec";
 
   let DB = { stock: [], clientes: [], reservas: [], demos: [], historico: [] };
+  let BULK_DRAFT = {};
 
   function setStatus(msg) {
     document.getElementById('status-bar').textContent = msg;
@@ -572,9 +614,8 @@
     });
   }
 
-  function postAction(payload) {
+  function sendOnePost(payload, waitMs) {
     return new Promise(function(resolve) {
-      setStatus('A guardar alterações...');
       const frameName = 'hidden_gs_frame';
       let iframe = document.getElementById(frameName);
       if (!iframe) {
@@ -601,11 +642,15 @@
       form.submit();
       document.body.removeChild(form);
 
-      setTimeout(async function() {
-        await loadData();
-        resolve(true);
-      }, 1600);
+      setTimeout(function() { resolve(true); }, waitMs || 1400);
     });
+  }
+
+  async function postAction(payload) {
+    setStatus('A guardar alterações...');
+    await sendOnePost(payload, 1400);
+    await loadData();
+    return true;
   }
 
   function syncCurrentQty() {
@@ -619,6 +664,7 @@
   function renderAll() {
     renderStock();
     renderSelects();
+    renderBulkReservas();
     renderReservas();
     renderDemos();
     renderClientes();
@@ -656,13 +702,106 @@
       }).join('');
     });
 
-    ['res-cli', 'demo-cli'].forEach(function(id) {
+    ['res-cli', 'bulk-res-cli', 'demo-cli'].forEach(function(id) {
       const sel = document.getElementById(id);
+      const prev = sel.value;
       sel.innerHTML = '<option value="">Selecione um cliente...</option>' + DB.clientes.map(function(c) {
         const extra = c.Empresa ? ' · ' + c.Empresa : '';
         return '<option value="' + c.ID + '" data-nome="' + c.Nome + '">' + c.Nome + extra + '</option>';
       }).join('');
+      if (prev) sel.value = prev;
     });
+  }
+
+  function renderBulkReservas() {
+    const q = (document.getElementById('filter-bulk-res').value || '').toLowerCase();
+    const tb = document.getElementById('tb-bulk-res');
+    const list = DB.stock.filter(function(i) {
+      return (Number(i.Quantidade) || 0) > 0 &&
+             (String(i.Nome).toLowerCase().includes(q) || String(i.Codigo).toLowerCase().includes(q));
+    });
+
+    if (!list.length) {
+      tb.innerHTML = '<tr><td colspan="4" class="empty-row">Sem artigos com stock disponível.</td></tr>';
+      return;
+    }
+
+    tb.innerHTML = list.map(function(i) {
+      const avail = Number(i.Quantidade) || 0;
+      const draft = BULK_DRAFT[i.ID] || { checked: false, qty: 1 };
+      const checkedAttr = draft.checked ? ' checked' : '';
+      return '<tr>' +
+        '<td><input type="checkbox" class="bulk-chk" data-id="' + i.ID + '"' + checkedAttr + ' onchange="updateDraft(\'' + i.ID + '\', \'checked\', this.checked)" /></td>' +
+        '<td><strong>' + i.Nome + '</strong></td>' +
+        '<td>' + avail + '</td>' +
+        '<td><input type="number" min="1" max="' + avail + '" value="' + draft.qty + '" class="bulk-qty-input" data-id="' + i.ID + '" onchange="updateDraft(\'' + i.ID + '\', \'qty\', this.value)" /></td>' +
+      '</tr>';
+    }).join('');
+  }
+
+  function updateDraft(id, field, val) {
+    if (!BULK_DRAFT[id]) BULK_DRAFT[id] = { checked: false, qty: 1 };
+    if (field === 'checked') BULK_DRAFT[id].checked = Boolean(val);
+    if (field === 'qty') BULK_DRAFT[id].qty = Math.max(1, Number(val) || 1);
+  }
+
+  function toggleAllBulkRes(checked) {
+    document.querySelectorAll('.bulk-chk').forEach(function(chk) {
+      chk.checked = checked;
+      updateDraft(chk.getAttribute('data-id'), 'checked', checked);
+    });
+  }
+
+  function clearBulkSelection() {
+    BULK_DRAFT = {};
+    const allChk = document.getElementById('bulk-res-all');
+    if (allChk) allChk.checked = false;
+    renderBulkReservas();
+  }
+
+  async function submitBulkReservas() {
+    const cliSel = document.getElementById('bulk-res-cli');
+    if (!cliSel.value) {
+      alert('Selecione um cliente para a reserva em massa.');
+      return;
+    }
+    const cliNome = cliSel.options[cliSel.selectedIndex].getAttribute('data-nome');
+    const notes = document.getElementById('bulk-res-notes').value;
+
+    const selectedItems = [];
+    Object.keys(BULK_DRAFT).forEach(function(itemId) {
+      if (BULK_DRAFT[itemId] && BULK_DRAFT[itemId].checked) {
+        const stockItem = DB.stock.find(function(x) { return String(x.ID) === String(itemId); });
+        const avail = stockItem ? (Number(stockItem.Quantidade) || 0) : 0;
+        const qty = Number(BULK_DRAFT[itemId].qty) || 0;
+        if (qty > 0 && qty <= avail) {
+          selectedItems.push({ itemId: itemId, quantidade: qty });
+        }
+      }
+    });
+
+    if (!selectedItems.length) {
+      alert('Selecione pelo menos um artigo com quantidade válida dentro do stock disponível.');
+      return;
+    }
+
+    for (let idx = 0; idx < selectedItems.length; idx++) {
+      const it = selectedItems[idx];
+      setStatus('A reservar ' + (idx + 1) + ' de ' + selectedItems.length + '...');
+      await sendOnePost({
+        action: 'ADD_RESERVA',
+        clienteId: cliSel.value,
+        clienteNome: cliNome,
+        itemId: it.itemId,
+        quantidade: it.quantidade,
+        notas: notes
+      }, 1300);
+    }
+
+    clearBulkSelection();
+    document.getElementById('bulk-res-notes').value = '';
+    await loadData();
+    setStatus('Reserva em massa concluída.');
   }
 
   function renderReservas() {
