@@ -67,7 +67,6 @@
     .b-ok { background: #dcfce7; color: var(--ok); }
     .b-warn { background: #fef3c7; color: var(--warn); }
     .b-err { background: #fee2e2; color: var(--err); }
-    .b-info { background: #dbeafe; color: var(--primary); }
     .kpi { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px; text-align: center; }
     .kpi-num { font-size: 1.8rem; font-weight: 800; color: var(--primary); margin-top: 4px; }
     .kpi-lbl { font-size: 0.78rem; font-weight: 700; color: var(--muted); text-transform: uppercase; }
@@ -257,7 +256,7 @@
 </main>
 
 <script>
-  const API_URL = "https://script.google.com/macros/s/AKfycby8300vop-vx7LV0QuxDsNBFMGY9Nfn2Vd6m5tuG-i8vMejzYQE4RDFBq4qrCBOQWPvEw/exec";
+  const API_URL = "COLE_AQUI_O_SEU_URL_EXEC";
 
   let DB = { stock: [], clientes: [], reservas: [], demos: [], historico: [] };
 
@@ -272,22 +271,41 @@
     btn.classList.add('active');
   }
 
-  async function loadData() {
+  function loadData() {
     if (!API_URL || API_URL.includes('COLE_AQUI')) {
       setStatus('Cola primeiro o URL /exec em API_URL.');
-      return;
+      return Promise.resolve();
     }
+
     setStatus('A carregar dados...');
-    try {
-      const r = await fetch(API_URL, { redirect: 'follow' });
-      const j = await r.json();
-      if (j.status !== 'ok') throw new Error(j.message || 'Erro no servidor');
-      DB = j.data;
-      renderAll();
-      setStatus('Dados atualizados.');
-    } catch (e) {
-      setStatus('Erro ao ligar: ' + e.message);
-    }
+    return new Promise(function(resolve) {
+      const cbName = 'gsCallback_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+      const script = document.createElement('script');
+
+      window[cbName] = function(j) {
+        delete window[cbName];
+        script.remove();
+        if (!j || j.status !== 'ok') {
+          setStatus('Erro no servidor: ' + (j && j.message ? j.message : 'desconhecido'));
+        } else {
+          DB = j.data;
+          renderAll();
+          setStatus('Dados atualizados.');
+        }
+        resolve();
+      };
+
+      script.onerror = function() {
+        delete window[cbName];
+        script.remove();
+        setStatus('Falha ao contactar o Google Apps Script. Verifica o URL /exec e a permissão "Qualquer pessoa".');
+        resolve();
+      };
+
+      const sep = API_URL.indexOf('?') === -1 ? '?' : '&';
+      script.src = API_URL + sep + 'callback=' + cbName + '&t=' + Date.now();
+      document.body.appendChild(script);
+    });
   }
 
   function postAction(payload) {
